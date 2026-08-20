@@ -1,0 +1,29 @@
+﻿@page
+@model TestDbModel
+
+@{
+    ViewData["Title"] = "Test Database";
+}
+
+<h1>Test Database</h1>
+
+@if (Model.ConnessioneOk)
+{
+    <div class="alert alert-success">
+        Connessione SQL Server riuscita.
+    </div>
+
+    <div class="mt-3">
+        <strong>Server:</strong> @Model.Server
+    </div>
+
+    <div>
+        <strong>Database:</strong> @Model.Database
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        @Model.Errore
+    </div>
+}

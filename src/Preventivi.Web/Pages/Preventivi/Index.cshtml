@@ -96,184 +96,44 @@
 
             <tbody>
 
-                <tr>
-                    <td class="fw-semibold">
-                        2026-00125
-                    </td>
+                @foreach (var preventivo in Model.Preventivi)
+                {
+                    <tr>
+                        <td class="fw-semibold">
+                            @preventivo.NumeroCompleto
+                        </td>
 
-                    <td>
-                        Rossi S.p.A.
-                    </td>
+                        <td>
+                            @preventivo.Cliente
+                        </td>
 
-                    <td>
-                        Espositore promozionale 40x30
-                    </td>
+                        <td>
+                            @preventivo.Oggetto
+                        </td>
 
-                    <td>
-                        19/08/2026
-                    </td>
+                        <td>
+                            @preventivo.DataPreventivo.ToString("dd/MM/yyyy")
+                        </td>
 
-                    <td class="text-end fw-semibold">
-                        € 12.450,00
-                    </td>
+                        <td class="text-end fw-semibold">
+                            @preventivo.TotaleVendita.ToString("C2")
+                        </td>
 
-                    <td>
-                        <span class="pfw-badge pfw-badge-warning">
-                            Da inviare
-                        </span>
-                    </td>
+                        <td>
+                            <span class="pfw-badge @GetStatoBadge(preventivo.Stato)">
+                                @preventivo.Stato
+                            </span>
+                        </td>
 
-                    <td class="text-center">
-                        <a asp-page="/Preventivi/Dettaglio"
-                           class="pfw-action-link">
-                            Apri
-                        </a>
-                    </td>
-                </tr>
-
-
-                <tr>
-                    <td class="fw-semibold">
-                        2026-00124
-                    </td>
-
-                    <td>
-                        Alfa S.r.l.
-                    </td>
-
-                    <td>
-                        Packaging linea retail
-                    </td>
-
-                    <td>
-                        18/08/2026
-                    </td>
-
-                    <td class="text-end fw-semibold">
-                        € 8.900,00
-                    </td>
-
-                    <td>
-                        <span class="pfw-badge pfw-badge-success">
-                            Accettato
-                        </span>
-                    </td>
-
-                    <td class="text-center">
-                        <a asp-page="/Preventivi/Dettaglio"
-                           class="pfw-action-link">
-                            Apri
-                        </a>
-                    </td>
-                </tr>
-
-
-                <tr>
-                    <td class="fw-semibold">
-                        2026-00123
-                    </td>
-
-                    <td>
-                        Gamma S.p.A.
-                    </td>
-
-                    <td>
-                        Imballo tecnico
-                    </td>
-
-                    <td>
-                        18/08/2026
-                    </td>
-
-                    <td class="text-end fw-semibold">
-                        € 4.320,00
-                    </td>
-
-                    <td>
-                        <span class="pfw-badge pfw-badge-primary">
-                            In lavorazione
-                        </span>
-                    </td>
-
-                    <td class="text-center">
-                        <a asp-page="/Preventivi/Dettaglio"
-                           class="pfw-action-link">
-                            Apri
-                        </a>
-                    </td>
-                </tr>
-
-
-                <tr>
-                    <td class="fw-semibold">
-                        2026-00122
-                    </td>
-
-                    <td>
-                        Beta S.r.l.
-                    </td>
-
-                    <td>
-                        Allestimento promozionale
-                    </td>
-
-                    <td>
-                        17/08/2026
-                    </td>
-
-                    <td class="text-end fw-semibold">
-                        € 18.750,00
-                    </td>
-
-                    <td>
-                        <span class="pfw-badge pfw-badge-secondary">
-                            Bozza
-                        </span>
-                    </td>
-
-                    <td class="text-center">
-                        <a asp-page="/Preventivi/Dettaglio"
-                           class="pfw-action-link">
-                            Apri
-                        </a>
-                    </td>
-                </tr>
-
-
-                <tr>
-                    <td class="fw-semibold">
-                        2026-00121
-                    </td>
-
-                    <td>
-                        Delta S.r.l.
-                    </td>
-
-                    <td>
-                        Revisione struttura espositore
-                    </td>
-
-                    <td>
-                        16/08/2026
-                    </td>
-
-                    <td class="text-end fw-semibold">
-                        € 6.280,00
-                    </td>
-
-                    <td>
-                        <span class="pfw-badge pfw-badge-primary">
-                            In lavorazione
-                        </span>
-                    </td>
-
-                    <td class="text-center">
-                        <a asp-page="/Preventivi/Dettaglio"
-                            class="pfw-panel pfw-panel-auto mb-3">
-                            Apri
-                        </a>
-                    </td>
-                </tr>
+                        <td class="text-center">
+                            <a asp-page="/Preventivi/Dettaglio"
+                               asp-route-id="@preventivo.IdPreventivo"
+                               class="pfw-action-link">
+                                Apri
+                            </a>
+                        </td>
+                    </tr>
+                }
 
             </tbody>
 
@@ -314,3 +174,29 @@
     </div>
 
 </section>
+
+@functions {
+
+    private static string GetStatoBadge(string stato)
+    {
+        return stato switch
+        {
+            "Accettato" => "pfw-badge-success",
+
+            "Pronto da Inviare"
+                or "Da Verificare"
+                => "pfw-badge-warning",
+
+            "Respinto"
+                or "Annullato"
+                => "pfw-badge-danger",
+
+            "Inviato"
+                or "In Produzione"
+                => "pfw-badge-primary",
+
+            _ => "pfw-badge-secondary"
+        };
+    }
+
+}
