@@ -2,249 +2,340 @@
 @model Preventivi.DettaglioModel
 
 @{
-    ViewData["Title"] = "Preventivo 2026-00125";
+    ViewData["Title"] = $"Preventivo {Model.Preventivo!.NumeroCompleto}";
 }
 
-<div class="workspace-header">
+<div class="workspace-page">
 
-    <div class="workspace-breadcrumb">
-        <a asp-page="/Index">Dashboard</a>
-        <span>/</span>
-        <a asp-page="/Preventivi/Index">Preventivi</a>
-        <span>/</span>
-        <span>2026-00125</span>
+    <div class="workspace-header">
+
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Index">Dashboard</a>
+            <span>/</span>
+            <a asp-page="/Preventivi/Index">Preventivi</a>
+            <span>/</span>
+            <span>@Model.Preventivo.NumeroCompleto</span>
+        </div>
+
+        <div class="workspace-top">
+
+            <div>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+
+                    <h1 class="workspace-title mb-0">
+                        Preventivo @Model.Preventivo.NumeroCompleto
+                    </h1>
+
+                    <span class="pfw-badge @GetStatoBadge(Model.Preventivo.Stato)">
+                        @Model.Preventivo.Stato
+                    </span>
+
+                </div>
+
+                <div class="workspace-subtitle">
+                    @Model.Preventivo.Cliente
+                    <span class="mx-1">•</span>
+                    @Model.Preventivo.Oggetto
+                </div>
+            </div>
+
+            <div class="workspace-actions">
+                <button type="button" class="pfw-btn pfw-btn-secondary">
+                    Duplica
+                </button>
+
+                <button type="button" class="pfw-btn pfw-btn-secondary">
+                    PDF
+                </button>
+
+                <button type="button" class="pfw-btn pfw-btn-primary">
+                    Salva
+                </button>
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="workspace-top">
-        <div>
-            <h1 class="workspace-title">Preventivo 2026-00125</h1>
-            <div class="workspace-subtitle">
-                Rossi S.p.A. • Espositore promozionale banco cassa
+    <div class="row g-3">
+
+        <!-- AREA PRINCIPALE -->
+        <div class="col-12 col-xl-9">
+
+            <!-- DATI TESTATA -->
+            <section class="pfw-panel mb-3">
+
+                <div class="pfw-panel-header">
+                    <div>
+                        <h2 class="pfw-panel-title">Dati preventivo</h2>
+                        <div class="pfw-panel-subtitle">
+                            Informazioni principali del documento
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Cliente</label>
+                            <input class="form-control"
+                                   value="@Model.Preventivo.Cliente"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Data preventivo</label>
+                            <input class="form-control"
+                                   value="@Model.Preventivo.DataPreventivo.ToString("dd/MM/yyyy")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Stato</label>
+                            <input class="form-control"
+                                   value="@Model.Preventivo.Stato"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label">Oggetto</label>
+                            <input class="form-control"
+                                   value="@Model.Preventivo.Oggetto"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Markup predefinito</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Preventivo.MarkupPercDefault.ToString("N2") %"
+                                   readonly />
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- KPI -->
+            <div class="row g-3 mb-3">
+
+                <div class="col-12 col-md-4">
+                    <div class="pfw-kpi-card workspace-kpi">
+                        <div class="pfw-kpi-label">Totale costi</div>
+                        <div class="pfw-kpi-value">
+                            @Model.Preventivo.TotaleCosti.ToString("C2")
+                        </div>
+                        <div class="pfw-kpi-footer">
+                            Costi complessivi preventivati
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <div class="pfw-kpi-card workspace-kpi">
+                        <div class="pfw-kpi-label">Totale vendita</div>
+                        <div class="pfw-kpi-value">
+                            @Model.Preventivo.TotaleVendita.ToString("C2")
+                        </div>
+                        <div class="pfw-kpi-footer">
+                            Valore complessivo offerta
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <div class="pfw-kpi-card workspace-kpi">
+                        <div class="pfw-kpi-label">Margine</div>
+                        <div class="pfw-kpi-value">
+                            @Model.Preventivo.MarginePerc.ToString("N2")%
+                        </div>
+                        <div class="pfw-kpi-footer">
+                            @Model.Preventivo.MargineValore.ToString("C2")
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- AREA OPERATIVA -->
+            <section class="pfw-panel">
+
+                <div class="workspace-tabs">
+
+                    <button type="button" class="workspace-tab active">
+                        Righe
+                    </button>
+
+                    <button type="button" class="workspace-tab">
+                        Varianti
+                    </button>
+
+                    <button type="button" class="workspace-tab">
+                        Allegati
+                    </button>
+
+                    <button type="button" class="workspace-tab">
+                        Campionature
+                    </button>
+
+                    <button type="button" class="workspace-tab">
+                        Ordini fornitori
+                    </button>
+
+                    <button type="button" class="workspace-tab">
+                        Storico
+                    </button>
+
+                </div>
+
+                <div class="workspace-tab-content">
+
+                    <div class="workspace-placeholder">
+
+                        <div class="workspace-placeholder-title">
+                            Righe preventivo
+                        </div>
+
+                        <div class="workspace-placeholder-text">
+                            Il contenuto operativo delle righe verrà collegato
+                            nel prossimo sprint.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
         </div>
 
-        <div class="workspace-actions">
-            <button class="pfw-btn pfw-btn-secondary">PDF</button>
-            <button class="pfw-btn pfw-btn-secondary">Duplica</button>
-            <button class="pfw-btn pfw-btn-primary">Salva</button>
+        <!-- SIDEBAR -->
+        <div class="col-12 col-xl-3">
+
+            <aside class="workspace-sidebar">
+
+                <section class="pfw-panel mb-3">
+
+                    <div class="pfw-panel-header">
+                        <div>
+                            <h2 class="pfw-panel-title">Stato attività</h2>
+                        </div>
+                    </div>
+
+                    <div class="workspace-sidebar-content">
+
+                        <div class="workspace-status-row">
+                            <span>Richiesta cliente</span>
+
+                            @if (Model.Preventivo.IdRichiestaCliente.HasValue)
+                            {
+                                <span class="pfw-badge pfw-badge-success">
+                                    Collegata
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="pfw-badge pfw-badge-secondary">
+                                    Assente
+                                </span>
+                            }
+                        </div>
+
+                        <div class="workspace-status-row">
+                            <span>Campionature</span>
+                            <span class="pfw-badge pfw-badge-warning">
+                                Demo
+                            </span>
+                        </div>
+
+                        <div class="workspace-status-row">
+                            <span>Ordini fornitori</span>
+                            <span class="pfw-badge pfw-badge-primary">
+                                Demo
+                            </span>
+                        </div>
+
+                        <div class="workspace-status-row">
+                            <span>Allegati</span>
+                            <span class="pfw-badge pfw-badge-secondary">
+                                Demo
+                            </span>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="pfw-panel">
+
+                    <div class="pfw-panel-header">
+                        <div>
+                            <h2 class="pfw-panel-title">Riepilogo</h2>
+                        </div>
+                    </div>
+
+                    <div class="workspace-sidebar-content">
+
+                        <div class="workspace-summary-row">
+                            <span>Numero</span>
+                            <strong>@Model.Preventivo.NumeroCompleto</strong>
+                        </div>
+
+                        <div class="workspace-summary-row">
+                            <span>Stato</span>
+                            <strong>@Model.Preventivo.Stato</strong>
+                        </div>
+
+                        <div class="workspace-summary-row">
+                            <span>Markup</span>
+                            <strong>
+                                @Model.Preventivo.MarkupPercDefault.ToString("N2")%
+                            </strong>
+                        </div>
+
+                        <div class="workspace-summary-row">
+                            <span>Margine</span>
+                            <strong>
+                                @Model.Preventivo.MarginePerc.ToString("N2")%
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </aside>
+
         </div>
+
     </div>
 
 </div>
 
-<div class="row g-3 mb-3">
+@functions
+{
+    private static string GetStatoBadge(string stato)
+    {
+        return stato switch
+        {
+            "Accettato" => "pfw-badge-success",
 
-    <div class="col-12 col-xl-8">
-        <section class="pfw-panel pfw-panel-auto">
+            "Pronto da Inviare"
+                or "Da Verificare"
+                => "pfw-badge-warning",
 
-            <div class="pfw-panel-header">
-                <div>
-                    <h2 class="pfw-panel-title">Dati preventivo</h2>
-                    <div class="pfw-panel-subtitle">Informazioni generali</div>
-                </div>
-            </div>
+            "Respinto"
+                or "Annullato"
+                => "pfw-badge-danger",
 
-            <div class="p-3">
+            "Inviato"
+                or "In Produzione"
+                => "pfw-badge-primary",
 
-                <div class="row g-3">
-
-                    <div class="col-md-6">
-                        <label class="form-label">Cliente</label>
-                        <input class="form-control" value="Rossi S.p.A." />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">Data</label>
-                        <input class="form-control" value="20/08/2026" />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">Stato</label>
-                        <select class="form-select">
-                            <option>Bozza</option>
-                            <option selected>In lavorazione</option>
-                            <option>Da inviare</option>
-                            <option>Inviato</option>
-                            <option>Accettato</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Oggetto</label>
-                        <input class="form-control"
-                               value="Espositore promozionale banco cassa" />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">Validità</label>
-                        <input class="form-control" value="30 giorni" />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">Markup default</label>
-                        <input class="form-control text-end" value="35,00 %" />
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-    </div>
-
-    <div class="col-12 col-xl-4">
-
-        <section class="pfw-panel pfw-panel-auto">
-
-            <div class="pfw-panel-header">
-                <div>
-                    <h2 class="pfw-panel-title">Stato attività</h2>
-                </div>
-            </div>
-
-            <div class="p-3">
-
-                <div class="workspace-status-row">
-                    <span>Richiesta cliente</span>
-                    <span class="pfw-badge pfw-badge-success">Collegata</span>
-                </div>
-
-                <div class="workspace-status-row">
-                    <span>Campionatura</span>
-                    <span class="pfw-badge pfw-badge-warning">Aperta</span>
-                </div>
-
-                <div class="workspace-status-row">
-                    <span>Ordini fornitori</span>
-                    <span class="pfw-badge pfw-badge-primary">2 ordini</span>
-                </div>
-
-                <div class="workspace-status-row">
-                    <span>Allegati</span>
-                    <span class="pfw-badge pfw-badge-secondary">4 file</span>
-                </div>
-
-            </div>
-
-        </section>
-
-    </div>
-
-</div>
-
-<div class="row g-3 mb-3">
-
-    <div class="col-6 col-xl-3">
-        <div class="pfw-kpi-card">
-            <div class="pfw-kpi-label">Totale costi</div>
-            <div class="pfw-kpi-value">€ 5.320</div>
-        </div>
-    </div>
-
-    <div class="col-6 col-xl-3">
-        <div class="pfw-kpi-card">
-            <div class="pfw-kpi-label">Totale vendita</div>
-            <div class="pfw-kpi-value">€ 8.450</div>
-        </div>
-    </div>
-
-    <div class="col-6 col-xl-3">
-        <div class="pfw-kpi-card">
-            <div class="pfw-kpi-label">Margine</div>
-            <div class="pfw-kpi-value">37,04%</div>
-        </div>
-    </div>
-
-    <div class="col-6 col-xl-3">
-        <div class="pfw-kpi-card">
-            <div class="pfw-kpi-label">Varianti</div>
-            <div class="pfw-kpi-value">2</div>
-        </div>
-    </div>
-
-</div>
-
-<section class="pfw-panel">
-
-    <div class="workspace-tabs">
-
-        <button class="workspace-tab active">Righe</button>
-        <button class="workspace-tab">Materiali</button>
-        <button class="workspace-tab">Lavorazioni</button>
-        <button class="workspace-tab">Componenti</button>
-        <button class="workspace-tab">Varianti</button>
-        <button class="workspace-tab">Allegati</button>
-
-    </div>
-
-    <div class="table-responsive">
-
-        <table class="table pfw-table align-middle mb-0">
-
-            <thead>
-                <tr>
-                    <th>Riga</th>
-                    <th>Tipo</th>
-                    <th>Descrizione</th>
-                    <th class="text-end">Q.tà</th>
-                    <th class="text-end">Costo</th>
-                    <th class="text-end">Vendita</th>
-                    <th class="text-end">Margine</th>
-                    <th></th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                <tr>
-                    <td>10</td>
-                    <td>
-                        <span class="pfw-badge pfw-badge-primary">Articolo</span>
-                    </td>
-                    <td>Espositore banco cassa modello A</td>
-                    <td class="text-end">100</td>
-                    <td class="text-end">€ 3.850,00</td>
-                    <td class="text-end">€ 6.100,00</td>
-                    <td class="text-end">36,89%</td>
-                    <td class="text-end">
-                        <a href="#" class="pfw-action-link">Apri</a>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>20</td>
-                    <td>
-                        <span class="pfw-badge pfw-badge-secondary">Trasporto</span>
-                    </td>
-                    <td>Trasporto dedicato</td>
-                    <td class="text-end">1</td>
-                    <td class="text-end">€ 450,00</td>
-                    <td class="text-end">€ 650,00</td>
-                    <td class="text-end">30,77%</td>
-                    <td class="text-end">
-                        <a href="#" class="pfw-action-link">Apri</a>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>30</td>
-                    <td>
-                        <span class="pfw-badge pfw-badge-warning">Attrezzaggio</span>
-                    </td>
-                    <td>Attrezzaggio iniziale</td>
-                    <td class="text-end">1</td>
-                    <td class="text-end">€ 1.020,00</td>
-                    <td class="text-end">€ 1.700,00</td>
-                    <td class="text-end">40,00%</td>
-                    <td class="text-end">
-                        <a href="#" class="pfw-action-link">Apri</a>
-                    </td>
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</section>
+            _ => "pfw-badge-secondary"
+        };
+    }
+}
