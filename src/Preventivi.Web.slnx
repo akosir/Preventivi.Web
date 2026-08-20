@@ -1,1 +1,6 @@
-<Solution />
+<Solution>
+  <Project Path="Preventivi.Core/Preventivi.Core.csproj" Id="1e7fde18-3ff4-4062-94f7-61f156459690" />
+  <Project Path="Preventivi.Data/Preventivi.Data.csproj" Id="fb051e82-d72b-464d-aaaa-be5d8dcc8deb" />
+  <Project Path="Preventivi.Shared/Preventivi.Shared.csproj" Id="8e0931fb-a46d-47b9-879f-89da4d59fec5" />
+  <Project Path="Preventivi.Web/Preventivi.Web.csproj" Id="15882d38-3641-455e-ae41-54e68cd9c83a" />
+</Solution>
