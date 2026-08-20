@@ -1,0 +1,58 @@
+﻿@model global::Preventivi.Web.Components.PFWPageHeader.PFWPageHeaderModel
+
+<div class="page-header">
+
+    <div>
+        <h1 class="page-title">
+            @Model.Title
+        </h1>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+        {
+            <p class="page-subtitle">
+                @Model.Subtitle
+            </p>
+        }
+    </div>
+
+    <div class="page-header-actions">
+
+        @if (!string.IsNullOrWhiteSpace(Model.SecondaryActionText))
+        {
+            @if (!string.IsNullOrWhiteSpace(Model.SecondaryActionPage))
+            {
+                <a asp-page="@Model.SecondaryActionPage"
+                   class="pfw-btn pfw-btn-secondary">
+                    @Model.SecondaryActionText
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="pfw-btn pfw-btn-secondary">
+                    @Model.SecondaryActionText
+                </button>
+            }
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.PrimaryActionText))
+        {
+            @if (!string.IsNullOrWhiteSpace(Model.PrimaryActionPage))
+            {
+                <a asp-page="@Model.PrimaryActionPage"
+                   class="pfw-btn pfw-btn-primary">
+                    @Model.PrimaryActionText
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="pfw-btn pfw-btn-primary">
+                    @Model.PrimaryActionText
+                </button>
+            }
+        }
+
+    </div>
+
+</div>

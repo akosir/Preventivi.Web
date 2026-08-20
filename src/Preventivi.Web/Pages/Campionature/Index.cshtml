@@ -1,0 +1,108 @@
+﻿@page
+@model Campionature.IndexModel
+
+@{
+    ViewData["Title"] = "Campionature";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Campionature</h1>
+        <p class="page-subtitle">Monitoraggio campioni, rilievi ed esiti tecnici</p>
+    </div>
+
+    <div>
+        <button class="pfw-btn pfw-btn-primary">Nuova campionatura</button>
+    </div>
+</div>
+
+<section class="pfw-panel pfw-panel-auto mb-3">
+
+    <div class="pfw-filter-bar">
+
+        <input type="text"
+               class="form-control"
+               placeholder="Cerca cliente, richiesta o oggetto..." />
+
+        <select class="form-select">
+            <option>Tutti gli stati</option>
+            <option>Aperta</option>
+            <option>In verifica</option>
+            <option>Approvata</option>
+            <option>Respinta</option>
+        </select>
+
+        <select class="form-select">
+            <option>Tutte le priorità</option>
+            <option>Urgente</option>
+            <option>Alta</option>
+            <option>Media</option>
+            <option>Bassa</option>
+        </select>
+
+        <button class="pfw-btn pfw-btn-secondary">Aggiorna</button>
+
+    </div>
+
+</section>
+
+<section class="pfw-panel">
+
+    <div class="pfw-panel-header">
+        <div>
+            <h2 class="pfw-panel-title">Campionature aperte</h2>
+            <div class="pfw-panel-subtitle">3 attività in corso</div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table pfw-table align-middle mb-0">
+
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Oggetto</th>
+                    <th>Priorità</th>
+                    <th>Consegna prevista</th>
+                    <th>Esito</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Rossi S.p.A.</td>
+                    <td>Espositore promozionale</td>
+                    <td><span class="pfw-badge pfw-badge-danger">Urgente</span></td>
+                    <td>22/08/2026</td>
+                    <td><span class="pfw-badge pfw-badge-warning">In verifica</span></td>
+                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
+                </tr>
+
+                <tr>
+                    <td>Beta S.r.l.</td>
+                    <td>Prototipo packaging</td>
+                    <td><span class="pfw-badge pfw-badge-warning">Alta</span></td>
+                    <td>30/08/2026</td>
+                    <td><span class="pfw-badge pfw-badge-secondary">Aperta</span></td>
+                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
+                </tr>
+
+                <tr>
+                    <td>Gamma S.p.A.</td>
+                    <td>Revisione struttura</td>
+                    <td><span class="pfw-badge pfw-badge-primary">Media</span></td>
+                    <td>04/09/2026</td>
+                    <td><span class="pfw-badge pfw-badge-success">Approvata</span></td>
+                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>

@@ -1,52 +1,165 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - Preventivi.Web</title>
+
     <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Preventivi.Web.styles.css" asp-append-version="true" />
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Preventivi.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+    <div class="app-shell">
+
+        <!-- SIDEBAR -->
+        <aside class="app-sidebar">
+
+            <div class="app-brand">
+                <div class="app-brand-logo">
+                    P
+                </div>
+
+                <div class="app-brand-text">
+                    <div class="app-brand-title">Preventivi</div>
+                    <div class="app-brand-subtitle">Web</div>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Preventivi.Web - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            <nav class="app-menu">
+
+                <a class="app-menu-item active"
+                   asp-page="/Index">
+                    Dashboard
+                </a>
+
+                <div class="app-menu-section">
+                    CRM
+                </div>
+
+                <a class="app-menu-item"
+                    asp-page="/RichiesteClienti/Index">
+                    Richieste Clienti
+                </a>
+
+                <a class="app-menu-item"
+                    asp-page="/Campionature/Index">
+                    Campionature
+                </a>
+
+                <div class="app-menu-section">
+                    Preventivi
+                </div>
+
+                <a class="app-menu-item"
+                   asp-page="/Preventivi/Index">
+                    Preventivi
+                </a>
+
+                <a class="app-menu-item" href="#">
+                    Varianti
+                </a>
+
+                <div class="app-menu-section">
+                    Anagrafiche
+                </div>
+
+                <a class="app-menu-item" href="#">
+                    Clienti
+                </a>
+
+                <a class="app-menu-item" href="#">
+                    Articoli
+                </a>
+
+                <a class="app-menu-item" href="#">
+                    Materiali
+                </a>
+
+                <a class="app-menu-item" href="#">
+                    Lavorazioni
+                </a>
+
+                <a class="app-menu-item" href="#">
+                    Fornitori
+                </a>
+
+                <div class="app-menu-section">
+                    Acquisti
+                </div>
+
+                <a class="app-menu-item" href="#">
+                    Ordini Fornitori
+                </a>
+
+                <div class="app-menu-section">
+                    Analisi
+                </div>
+
+                <a class="app-menu-item" href="#">
+                    Report
+                </a>
+
+                <a class="app-menu-item" href="#">
+                    Amministrazione
+                </a>
+
+            </nav>
+
+        </aside>
+
+        <!-- MAIN AREA -->
+        <div class="app-main">
+
+            <!-- HEADER -->
+            <header class="app-header">
+
+                <div>
+                    <div class="app-page-title">
+                        @ViewData["Title"]
+                    </div>
+                </div>
+
+                <div class="app-user">
+
+                    <span class="app-user-name">
+                        Utente
+                    </span>
+
+                    <div class="app-user-avatar">
+                        U
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- CONTENT -->
+            <main class="app-content">
+
+                @RenderBody()
+
+            </main>
+
+            <!-- FOOTER -->
+            <footer class="app-footer">
+                Preventivi.Web &copy; 2026
+            </footer>
+
         </div>
-    </footer>
+
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

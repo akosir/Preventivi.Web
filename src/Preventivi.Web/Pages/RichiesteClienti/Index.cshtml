@@ -1,0 +1,104 @@
+﻿@page
+@model RichiesteClienti.IndexModel
+
+@{
+    ViewData["Title"] = "Richieste Clienti";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Richieste Clienti</h1>
+        <p class="page-subtitle">Gestione della pipeline commerciale e delle richieste ricevute</p>
+    </div>
+
+    <div>
+        <button class="pfw-btn pfw-btn-primary">Nuova richiesta</button>
+    </div>
+</div>
+
+<section class="pfw-panel pfw-panel-auto mb-3">
+
+    <div class="pfw-filter-bar">
+        <input type="text"
+               class="form-control"
+               placeholder="Cerca cliente, oggetto o riferimento..." />
+
+        <select class="form-select">
+            <option>Tutte le priorità</option>
+            <option>Urgente</option>
+            <option>Alta</option>
+            <option>Media</option>
+            <option>Bassa</option>
+        </select>
+
+        <select class="form-select">
+            <option>Tutti gli stati</option>
+            <option>Nuova</option>
+            <option>In valutazione</option>
+            <option>Preventivo</option>
+            <option>Chiusa</option>
+        </select>
+
+        <button class="pfw-btn pfw-btn-secondary">Aggiorna</button>
+    </div>
+
+</section>
+
+<section class="pfw-panel">
+
+    <div class="pfw-panel-header">
+        <div>
+            <h2 class="pfw-panel-title">Elenco richieste</h2>
+            <div class="pfw-panel-subtitle">6 richieste aperte</div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table pfw-table align-middle mb-0">
+
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Oggetto</th>
+                    <th>Priorità</th>
+                    <th>Scadenza</th>
+                    <th>Stato</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Rossi S.p.A.</td>
+                    <td>Espositore promozionale</td>
+                    <td><span class="pfw-badge pfw-badge-danger">Urgente</span></td>
+                    <td>21/08/2026</td>
+                    <td><span class="pfw-badge pfw-badge-primary">In valutazione</span></td>
+                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
+                </tr>
+
+                <tr>
+                    <td>Alfa S.r.l.</td>
+                    <td>Nuovo packaging retail</td>
+                    <td><span class="pfw-badge pfw-badge-warning">Alta</span></td>
+                    <td>28/08/2026</td>
+                    <td><span class="pfw-badge pfw-badge-secondary">Nuova</span></td>
+                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
+                </tr>
+
+                <tr>
+                    <td>Gamma S.p.A.</td>
+                    <td>Revisione imballo tecnico</td>
+                    <td><span class="pfw-badge pfw-badge-primary">Media</span></td>
+                    <td>02/09/2026</td>
+                    <td><span class="pfw-badge pfw-badge-success">Preventivo</span></td>
+                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
+                </tr>
+
+            </tbody>
+
+        </table>
+    </div>
+
+</section>

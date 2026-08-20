@@ -1,0 +1,316 @@
+﻿@page
+@model Preventivi.IndexModel
+
+@{
+    ViewData["Title"] = "Preventivi";
+}
+
+@await Component.InvokeAsync(
+    "PFWPageHeader",
+    new
+    {
+        title = "Preventivi",
+        subtitle = "Gestione e monitoraggio dei preventivi clienti",
+        primaryActionText = "Nuovo preventivo"
+    })
+
+<!-- TOOLBAR FILTRI -->
+
+<section class="pfw-panel mb-3">
+
+    <div class="pfw-filter-bar">
+
+        <div class="pfw-filter-search">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Cerca numero, cliente o descrizione..." />
+        </div>
+
+        <div>
+            <select class="form-select">
+                <option value="">Tutti gli stati</option>
+                <option>Bozza</option>
+                <option>In lavorazione</option>
+                <option>Da inviare</option>
+                <option>Inviato</option>
+                <option>Accettato</option>
+                <option>Respinto</option>
+            </select>
+        </div>
+
+        <div>
+            <select class="form-select">
+                <option value="">Tutti i clienti</option>
+                <option>Rossi S.p.A.</option>
+                <option>Alfa S.r.l.</option>
+                <option>Gamma S.p.A.</option>
+                <option>Beta S.r.l.</option>
+            </select>
+        </div>
+
+        <div>
+            <button type="button"
+                    class="pfw-btn pfw-btn-secondary">
+                Aggiorna
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ELENCO PREVENTIVI -->
+
+<section class="pfw-panel">
+
+    <div class="pfw-panel-header">
+
+        <div>
+            <h2 class="pfw-panel-title">
+                Elenco preventivi
+            </h2>
+
+            <div class="pfw-panel-subtitle">
+                8 preventivi trovati
+            </div>
+        </div>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table pfw-table pfw-table-clickable align-middle mb-0">
+
+            <thead>
+                <tr>
+                    <th>Numero</th>
+                    <th>Cliente</th>
+                    <th>Oggetto</th>
+                    <th>Data</th>
+                    <th class="text-end">Totale</th>
+                    <th>Stato</th>
+                    <th class="text-center">Azioni</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td class="fw-semibold">
+                        2026-00125
+                    </td>
+
+                    <td>
+                        Rossi S.p.A.
+                    </td>
+
+                    <td>
+                        Espositore promozionale 40x30
+                    </td>
+
+                    <td>
+                        19/08/2026
+                    </td>
+
+                    <td class="text-end fw-semibold">
+                        € 12.450,00
+                    </td>
+
+                    <td>
+                        <span class="pfw-badge pfw-badge-warning">
+                            Da inviare
+                        </span>
+                    </td>
+
+                    <td class="text-center">
+                        <a asp-page="/Preventivi/Dettaglio"
+                           class="pfw-action-link">
+                            Apri
+                        </a>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td class="fw-semibold">
+                        2026-00124
+                    </td>
+
+                    <td>
+                        Alfa S.r.l.
+                    </td>
+
+                    <td>
+                        Packaging linea retail
+                    </td>
+
+                    <td>
+                        18/08/2026
+                    </td>
+
+                    <td class="text-end fw-semibold">
+                        € 8.900,00
+                    </td>
+
+                    <td>
+                        <span class="pfw-badge pfw-badge-success">
+                            Accettato
+                        </span>
+                    </td>
+
+                    <td class="text-center">
+                        <a asp-page="/Preventivi/Dettaglio"
+                           class="pfw-action-link">
+                            Apri
+                        </a>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td class="fw-semibold">
+                        2026-00123
+                    </td>
+
+                    <td>
+                        Gamma S.p.A.
+                    </td>
+
+                    <td>
+                        Imballo tecnico
+                    </td>
+
+                    <td>
+                        18/08/2026
+                    </td>
+
+                    <td class="text-end fw-semibold">
+                        € 4.320,00
+                    </td>
+
+                    <td>
+                        <span class="pfw-badge pfw-badge-primary">
+                            In lavorazione
+                        </span>
+                    </td>
+
+                    <td class="text-center">
+                        <a asp-page="/Preventivi/Dettaglio"
+                           class="pfw-action-link">
+                            Apri
+                        </a>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td class="fw-semibold">
+                        2026-00122
+                    </td>
+
+                    <td>
+                        Beta S.r.l.
+                    </td>
+
+                    <td>
+                        Allestimento promozionale
+                    </td>
+
+                    <td>
+                        17/08/2026
+                    </td>
+
+                    <td class="text-end fw-semibold">
+                        € 18.750,00
+                    </td>
+
+                    <td>
+                        <span class="pfw-badge pfw-badge-secondary">
+                            Bozza
+                        </span>
+                    </td>
+
+                    <td class="text-center">
+                        <a asp-page="/Preventivi/Dettaglio"
+                           class="pfw-action-link">
+                            Apri
+                        </a>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td class="fw-semibold">
+                        2026-00121
+                    </td>
+
+                    <td>
+                        Delta S.r.l.
+                    </td>
+
+                    <td>
+                        Revisione struttura espositore
+                    </td>
+
+                    <td>
+                        16/08/2026
+                    </td>
+
+                    <td class="text-end fw-semibold">
+                        € 6.280,00
+                    </td>
+
+                    <td>
+                        <span class="pfw-badge pfw-badge-primary">
+                            In lavorazione
+                        </span>
+                    </td>
+
+                    <td class="text-center">
+                        <a asp-page="/Preventivi/Dettaglio"
+                            class="pfw-panel pfw-panel-auto mb-3">
+                            Apri
+                        </a>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- PAGINAZIONE DEMO -->
+
+    <div class="pfw-table-footer">
+
+        <div class="pfw-secondary-text">
+            Visualizzati 1-5 di 8
+        </div>
+
+        <div class="pfw-pagination">
+
+            <button class="pfw-page-button"
+                    disabled>
+                &lsaquo;
+            </button>
+
+            <button class="pfw-page-button active">
+                1
+            </button>
+
+            <button class="pfw-page-button">
+                2
+            </button>
+
+            <button class="pfw-page-button">
+                &rsaquo;
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
