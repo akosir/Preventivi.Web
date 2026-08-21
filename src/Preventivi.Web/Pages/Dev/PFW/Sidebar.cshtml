@@ -1,0 +1,55 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFW.SidebarModel
+
+@{
+    ViewData["Title"] = "PFW Sidebar";
+}
+
+<h1 class="mb-4">PFW Sidebar</h1>
+
+@await Html.PartialAsync(
+    "Shared/PFW/Sidebar/_PFWSidebar",
+    new global::Preventivi.Web.UI.Sidebar.PFWSidebarModel
+    {
+        Titolo = "Preventivi",
+
+        Sottotitolo = "PFW v0.1",
+
+        Footer = "Utente: Admin",
+
+        Gruppi =
+        [
+            new()
+            {
+                Titolo = "Commerciale",
+                Espanso = true,
+                Voci =
+                [
+                    new(){ Testo="Preventivi", Url="#", Attiva=true },
+                    new(){ Testo="Richieste Clienti", Url="#" },
+                    new(){ Testo="Campionature", Url="#" }
+                ]
+            },
+
+            new()
+            {
+                Titolo = "Anagrafiche",
+                Voci =
+                [
+                    new(){ Testo="Clienti", Url="#" },
+                    new(){ Testo="Articoli", Url="#" },
+                    new(){ Testo="Materiali", Url="#" }
+                ]
+            },
+
+            new()
+            {
+                Titolo = "Produzione",
+                Voci =
+                [
+                    new(){ Testo="Distinte Base", Url="#" },
+                    new(){ Testo="Modelli Ciclo", Url="#" }
+                ]
+            }
+        ]
+    })

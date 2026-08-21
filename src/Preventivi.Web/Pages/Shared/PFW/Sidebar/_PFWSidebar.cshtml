@@ -1,0 +1,95 @@
+﻿@model global::Preventivi.Web.UI.Sidebar.PFWSidebarModel
+
+<aside class="pfw-sidebar">
+
+    <div class="pfw-sidebar-header">
+
+        @if (!string.IsNullOrWhiteSpace(Model.Logo))
+        {
+            <img src="@Model.Logo" class="pfw-sidebar-logo" />
+        }
+
+        <div class="pfw-sidebar-title">
+            @Model.Titolo
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+        {
+            <div class="pfw-sidebar-subtitle">
+                @Model.Sottotitolo
+            </div>
+        }
+
+    </div>
+
+    <div class="pfw-sidebar-body">
+
+        @foreach (var gruppo in Model.Gruppi)
+        {
+            <details class="pfw-sidebar-group" open="@gruppo.Espanso">
+
+                <summary>
+
+                    @if (!string.IsNullOrWhiteSpace(gruppo.Icona))
+                    {
+                        <i class="@gruppo.Icona"></i>
+                    }
+
+                    @gruppo.Titolo
+
+                </summary>
+
+                @foreach (var voce in gruppo.Voci.Where(v => v.Visibile))
+                {
+                    var css = "pfw-sidebar-item";
+
+                    if (voce.Attiva)
+                        css += " active";
+
+                    if (voce.Disabilitata)
+                        css += " disabled";
+
+                    if (!voce.Disabilitata &&
+                        !string.IsNullOrWhiteSpace(voce.Url))
+                    {
+                        <a href="@voce.Url" class="@css">
+
+                            @if (!string.IsNullOrWhiteSpace(voce.Icona))
+                            {
+                                <i class="@voce.Icona"></i>
+                            }
+
+                            @voce.Testo
+
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="@css">
+
+                            @if (!string.IsNullOrWhiteSpace(voce.Icona))
+                            {
+                                <i class="@voce.Icona"></i>
+                            }
+
+                            @voce.Testo
+
+                        </span>
+                    }
+                }
+
+            </details>
+        }
+
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Footer))
+    {
+        <div class="pfw-sidebar-footer">
+
+            @Model.Footer
+
+        </div>
+    }
+
+</aside>

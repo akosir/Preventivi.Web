@@ -17,10 +17,8 @@
     <Folder Include="Pages\Shared\KPI\" />
     <Folder Include="Pages\Shared\EmptyState\" />
     <Folder Include="Pages\Shared\Sections\" />
-    <Folder Include="Pages\Shared\Sidebar\" />
     <Folder Include="Pages\Shared\Workspace\" />
     <Folder Include="Services\" />
-    <Folder Include="UI\Nuova cartella\" />
     <Folder Include="wwwroot\css\pages\" />
   </ItemGroup>
 
