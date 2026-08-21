@@ -11,7 +11,11 @@ public sealed class PFWTabModel
 
     public string Titolo { get; init; } = "";
 
+    public string? Url { get; init; }
+
     public bool Attiva { get; init; }
 
     public bool Disabilitata { get; init; }
+
+    public bool Visibile { get; init; } = true;
 }

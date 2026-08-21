@@ -1,0 +1,42 @@
+﻿@model global::Preventivi.Web.UI.Tabs.PFWTabsModel
+
+<nav class="pfw-tabs" aria-label="Schede">
+
+    @foreach (var scheda in Model.Schede)
+    {
+        if (!scheda.Visibile)
+        {
+            continue;
+        }
+
+        var classi = "pfw-tab";
+
+        if (scheda.Attiva)
+        {
+            classi += " pfw-tab-active";
+        }
+
+        if (scheda.Disabilitata)
+        {
+            classi += " pfw-tab-disabled";
+        }
+
+        if (!scheda.Disabilitata &&
+            !string.IsNullOrWhiteSpace(scheda.Url))
+        {
+            <a id="@scheda.Id"
+               href="@scheda.Url"
+               class="@classi">
+                @scheda.Titolo
+            </a>
+        }
+        else
+        {
+            <span id="@scheda.Id"
+                  class="@classi">
+                @scheda.Titolo
+            </span>
+        }
+    }
+
+</nav>

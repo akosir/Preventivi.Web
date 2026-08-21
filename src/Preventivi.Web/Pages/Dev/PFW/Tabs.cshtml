@@ -1,0 +1,101 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFW.TabsModel
+
+@{
+    ViewData["Title"] = "PFW Tabs";
+}
+
+<h1 class="mb-4">PFW Tabs</h1>
+
+<h2 class="h5 mb-3">Tabs standard</h2>
+
+@await Html.PartialAsync(
+    "Shared/PFW/Tabs/_PFWTabs",
+    new global::Preventivi.Web.UI.Tabs.PFWTabsModel
+    {
+        Schede =
+        [
+            new()
+            {
+                Id = "generale",
+                Titolo = "Generale",
+                Url = "#",
+                Attiva = true
+            },
+
+            new()
+            {
+                Id = "materiali",
+                Titolo = "Materiali",
+                Url = "#"
+            },
+
+            new()
+            {
+                Id = "lavorazioni",
+                Titolo = "Lavorazioni",
+                Url = "#"
+            },
+
+            new()
+            {
+                Id = "componenti",
+                Titolo = "Componenti",
+                Url = "#"
+            }
+        ]
+    })
+
+<div style="height:32px"></div>
+
+<h2 class="h5 mb-3">Tab disabilitata</h2>
+
+@await Html.PartialAsync(
+    "Shared/PFW/Tabs/_PFWTabs",
+    new global::Preventivi.Web.UI.Tabs.PFWTabsModel
+    {
+        Schede =
+        [
+            new()
+            {
+                Id = "righe",
+                Titolo = "Righe",
+                Url = "#",
+                Attiva = true
+            },
+
+            new()
+            {
+                Id = "varianti",
+                Titolo = "Varianti",
+                Url = "#"
+            },
+
+            new()
+            {
+                Id = "storico",
+                Titolo = "Storico",
+                Disabilitata = true
+            }
+        ]
+    })
+
+<div style="height:32px"></div>
+
+<h2 class="h5 mb-3">Molte schede</h2>
+
+@await Html.PartialAsync(
+    "Shared/PFW/Tabs/_PFWTabs",
+    new global::Preventivi.Web.UI.Tabs.PFWTabsModel
+    {
+        Schede =
+        [
+            new() { Id = "tab1", Titolo = "Generale", Url = "#", Attiva = true },
+            new() { Id = "tab2", Titolo = "Materiali", Url = "#" },
+            new() { Id = "tab3", Titolo = "Lavorazioni", Url = "#" },
+            new() { Id = "tab4", Titolo = "Componenti", Url = "#" },
+            new() { Id = "tab5", Titolo = "Distinta", Url = "#" },
+            new() { Id = "tab6", Titolo = "Allegati", Url = "#" },
+            new() { Id = "tab7", Titolo = "Storico", Url = "#" }
+        ]
+    })
