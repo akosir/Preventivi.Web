@@ -1,1 +1,92 @@
-﻿
+﻿/* ==========================================================================
+   PFW TOOLBAR
+   ========================================================================== */
+
+/* Layout */
+
+.pfw-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 68px;
+    padding: 14px 24px;
+    background-color: #ffffff;
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+}
+
+
+/* Left */
+
+.pfw-toolbar-left {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+
+/* Right */
+
+.pfw-toolbar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+/* Typography */
+
+.pfw-toolbar-title {
+    margin: 0;
+    color: var(--app-text);
+    font-size: 20px;
+    font-weight: 650;
+    line-height: 1.2;
+}
+
+.pfw-toolbar-subtitle {
+    margin-top: 4px;
+    color: var(--app-text-muted);
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+
+/* Icons */
+
+.pfw-toolbar .pfw-btn i {
+    margin-right: 6px;
+}
+
+
+/* Disabled */
+
+.pfw-toolbar .pfw-btn.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+
+/* Responsive */
+
+@media (max-width: 850px) {
+
+    .pfw-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px 16px;
+    }
+
+    .pfw-toolbar-left,
+    .pfw-toolbar-right {
+        width: 100%;
+    }
+
+    .pfw-toolbar-right {
+        justify-content: flex-start;
+    }
+}

@@ -23,14 +23,38 @@
 
     <div class="pfw-toolbar-right">
 
-        @foreach (var pulsante in Model.Pulsanti)
+        @foreach (var pulsante in Model.Pulsanti.Where(p => p.Visibile))
         {
-            <a href="@pulsante.Url"
-               class="pfw-btn @pulsante.CssClass">
+            if (!string.IsNullOrWhiteSpace(pulsante.Url))
+            {
+                <a href="@pulsante.Url"
+                   class="pfw-btn @pulsante.CssClass @(pulsante.Abilitato ? "" : "disabled")">
 
-                @pulsante.Testo
+                    @if (!string.IsNullOrWhiteSpace(pulsante.Icona))
+                    {
+                        <i class="@pulsante.Icona"></i>
+                    }
 
-            </a>
+                    @pulsante.Testo
+
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="pfw-btn @pulsante.CssClass"
+                        onclick="@pulsante.OnClick"
+                        disabled="@(!pulsante.Abilitato)">
+
+                    @if (!string.IsNullOrWhiteSpace(pulsante.Icona))
+                    {
+                        <i class="@pulsante.Icona"></i>
+                    }
+
+                    @pulsante.Testo
+
+                </button>
+            }
         }
 
     </div>

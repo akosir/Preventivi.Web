@@ -5,6 +5,72 @@
     ViewData["Title"] = "Preventivi Framework";
 }
 
+@await Html.PartialAsync(
+    "Shared/Toolbar/_PFWToolbar",
+    new global::Preventivi.Web.UI.Toolbar.PFWToolbarModel
+    {
+        Titolo = "Toolbar semplice"
+    })
+<div style="height:32px"></div>
+@await Html.PartialAsync(
+"Shared/Toolbar/_PFWToolbar",
+new global::Preventivi.Web.UI.Toolbar.PFWToolbarModel
+{
+    Titolo = "Preventivo 2026/001",
+
+    Sottotitolo = "Cliente: Alfa S.r.l."
+})
+<div style="height:32px"></div>
+@await Html.PartialAsync(
+    "Shared/Toolbar/_PFWToolbar",
+    new global::Preventivi.Web.UI.Toolbar.PFWToolbarModel
+    {
+        Titolo = "Toolbar con pulsanti",
+
+        Pulsanti =
+        [
+            new()
+            {
+                Testo = "Nuovo",
+                Url = "#",
+                CssClass = "pfw-btn-primary"
+            },
+
+            new()
+            {
+                Testo = "Annulla",
+                Url = "#",
+                CssClass = "pfw-btn-secondary"
+            }
+        ]
+    })
+<div style="height:32px"></div>
+@await Html.PartialAsync(
+"Shared/Toolbar/_PFWToolbar",
+new global::Preventivi.Web.UI.Toolbar.PFWToolbarModel
+{
+    Titolo = "Preventivo 2026/001",
+
+    Sottotitolo = "Cliente: Alfa S.r.l.",
+
+    Pulsanti =
+    [
+        new()
+            {
+                Testo = "Duplica",
+                Url = "#",
+                CssClass = "pfw-btn-secondary"
+            },
+
+            new()
+            {
+                Testo = "Salva",
+                Url = "#",
+                CssClass = "pfw-btn-primary"
+            }
+    ]
+})
+<div style="height:32px"></div>
 <div class="container-fluid py-4">
 
     <h1>Preventivi Framework</h1>
