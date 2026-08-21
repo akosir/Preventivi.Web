@@ -1,0 +1,19 @@
+﻿@model global::Preventivi.Web.UI.Badge.PFWBadgeModel
+
+@if (Model.Visibile)
+{
+    var css = Model.Variante switch
+    {
+        "primario" => "primary",
+        "neutro" => "secondary",
+        "successo" => "success",
+        "attenzione" => "warning",
+        "errore" => "danger",
+        "informazione" => "info",
+        _ => "secondary"
+    };
+
+    <span class="pfw-badge pfw-badge-@css">
+        @Model.Testo
+    </span>
+}

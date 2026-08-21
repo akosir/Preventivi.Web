@@ -1,0 +1,60 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFW.BadgeModel
+
+@{
+    ViewData["Title"] = "PFW Badge";
+}
+
+<h1 class="mb-4">PFW Badge</h1>
+
+<div style="display:flex; gap:12px; flex-wrap:wrap;">
+
+    @await Html.PartialAsync(
+        "Shared/PFW/Badge/_PFWBadge",
+        new global::Preventivi.Web.UI.Badge.PFWBadgeModel
+        {
+            Testo = "Primario",
+            Variante = "primario"
+        })
+
+    @await Html.PartialAsync(
+        "Shared/PFW/Badge/_PFWBadge",
+        new global::Preventivi.Web.UI.Badge.PFWBadgeModel
+        {
+            Testo = "Neutro",
+            Variante = "neutro"
+        })
+
+    @await Html.PartialAsync(
+        "Shared/PFW/Badge/_PFWBadge",
+        new global::Preventivi.Web.UI.Badge.PFWBadgeModel
+        {
+            Testo = "Accettato",
+            Variante = "successo"
+        })
+
+    @await Html.PartialAsync(
+        "Shared/PFW/Badge/_PFWBadge",
+        new global::Preventivi.Web.UI.Badge.PFWBadgeModel
+        {
+            Testo = "Da verificare",
+            Variante = "attenzione"
+        })
+
+    @await Html.PartialAsync(
+        "Shared/PFW/Badge/_PFWBadge",
+        new global::Preventivi.Web.UI.Badge.PFWBadgeModel
+        {
+            Testo = "Errore",
+            Variante = "errore"
+        })
+
+    @await Html.PartialAsync(
+        "Shared/PFW/Badge/_PFWBadge",
+        new global::Preventivi.Web.UI.Badge.PFWBadgeModel
+        {
+            Testo = "Informazione",
+            Variante = "informazione"
+        })
+
+</div>
