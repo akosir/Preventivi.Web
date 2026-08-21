@@ -1,2 +1,104 @@
-﻿body {
+﻿/* ==========================================================================
+   PFW KPI
+   ========================================================================== */
+
+.pfw-kpi {
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: var(--app-text);
+}
+
+/* Header */
+
+.pfw-kpi-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--app-text-muted);
+}
+
+.pfw-kpi-title {
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+}
+
+/* Value */
+
+.pfw-kpi-value {
+    margin-top: 12px;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+/* Subtitle */
+
+.pfw-kpi-subtitle {
+    margin-top: 10px;
+    color: var(--app-text-muted);
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+/* Highlight */
+
+.pfw-kpi-highlighted {
+    border-width: 2px;
+}
+
+/* Neutral */
+
+.pfw-kpi-neutral {
+    border-left: 4px solid #8b949e;
+}
+
+/* Primary */
+
+.pfw-kpi-primary {
+    border-left: 4px solid var(--app-primary);
+}
+
+/* Success */
+
+.pfw-kpi-success {
+    border-left: 4px solid #3f8f63;
+}
+
+/* Warning */
+
+.pfw-kpi-warning {
+    border-left: 4px solid #c58b16;
+}
+
+/* Danger */
+
+.pfw-kpi-danger {
+    border-left: 4px solid #b64b45;
+}
+
+/* Info */
+
+.pfw-kpi-info {
+    border-left: 4px solid #347aa8;
+}
+
+/* Responsive */
+
+@media (max-width: 767px) {
+
+    .pfw-kpi {
+        min-height: 115px;
+    }
+
+    .pfw-kpi-value {
+        font-size: 24px;
+    }
 }

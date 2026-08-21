@@ -1,0 +1,85 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFW.KPIModel
+
+@{
+    ViewData["Title"] = "PFW KPI";
+}
+
+<h1 class="mb-4">PFW KPI</h1>
+
+<div class="row g-3">
+
+    <div class="col-12 col-md-6 col-xl-4">
+        @await Html.PartialAsync(
+            "Shared/PFW/KPI/_PFWKPI",
+            new global::Preventivi.Web.UI.KPI.PFWKPIModel
+            {
+                Titolo = "Documenti",
+                Valore = "128",
+                Sottotitolo = "+12% rispetto al mese precedente",
+                Variante = "primario"
+            })
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+        @await Html.PartialAsync(
+            "Shared/PFW/KPI/_PFWKPI",
+            new global::Preventivi.Web.UI.KPI.PFWKPIModel
+            {
+                Titolo = "Soggetti",
+                Valore = "342",
+                Sottotitolo = "Totale attivi",
+                Variante = "informazione"
+            })
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+        @await Html.PartialAsync(
+            "Shared/PFW/KPI/_PFWKPI",
+            new global::Preventivi.Web.UI.KPI.PFWKPIModel
+            {
+                Titolo = "Ordini",
+                Valore = "27",
+                Sottotitolo = "5 richiedono attenzione",
+                Variante = "attenzione"
+            })
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+        @await Html.PartialAsync(
+            "Shared/PFW/KPI/_PFWKPI",
+            new global::Preventivi.Web.UI.KPI.PFWKPIModel
+            {
+                Titolo = "Valore",
+                Valore = "€ 1.245.320",
+                Sottotitolo = "Periodo corrente",
+                Variante = "successo",
+                Evidenziato = true
+            })
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+        @await Html.PartialAsync(
+            "Shared/PFW/KPI/_PFWKPI",
+            new global::Preventivi.Web.UI.KPI.PFWKPIModel
+            {
+                Titolo = "Segnalazioni",
+                Valore = "4",
+                Sottotitolo = "Da verificare",
+                Variante = "errore"
+            })
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+        @await Html.PartialAsync(
+            "Shared/PFW/KPI/_PFWKPI",
+            new global::Preventivi.Web.UI.KPI.PFWKPIModel
+            {
+                Titolo = "Attività",
+                Valore = "56",
+                Sottotitolo = "In corso",
+                Variante = "neutro"
+            })
+    </div>
+
+</div>

@@ -15,17 +15,23 @@ public sealed class PFWSidebarModel
 
 public sealed class PFWSidebarGroupModel
 {
+    public string Id { get; init; } = "";
+
     public string Titolo { get; init; } = "";
 
     public string? Icona { get; init; }
 
     public bool Espanso { get; init; } = true;
 
+    public bool Visibile { get; init; } = true;
+
     public IReadOnlyList<PFWSidebarItemModel> Voci { get; init; } = [];
 }
 
 public sealed class PFWSidebarItemModel
 {
+    public string Id { get; init; } = "";
+
     public string Testo { get; init; } = "";
 
     public string? Icona { get; init; }

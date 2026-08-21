@@ -1,0 +1,17 @@
+﻿@model global::Preventivi.Web.UI.Workspace.PFWWorkspaceModel
+
+<main class="pfw-workspace">
+
+    <section class="pfw-workspace-content">
+        @Html.Raw(Model.ContenutoHtml)
+    </section>
+
+    @if (Model.MostraStatusBar &&
+         !string.IsNullOrWhiteSpace(Model.StatusBarHtml))
+    {
+        <footer class="pfw-workspace-statusbar">
+            @Html.Raw(Model.StatusBarHtml)
+        </footer>
+    }
+
+</main>

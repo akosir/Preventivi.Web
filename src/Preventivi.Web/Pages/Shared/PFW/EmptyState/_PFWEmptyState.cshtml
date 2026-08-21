@@ -1,0 +1,49 @@
+﻿@model global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+
+@if (Model.Visibile)
+{
+    <div class="pfw-empty-state">
+
+        @if (!string.IsNullOrWhiteSpace(Model.Icona))
+        {
+            <div class="pfw-empty-state-icon">
+                <i class="@Model.Icona"
+                   aria-hidden="true"></i>
+            </div>
+        }
+
+        <div class="pfw-empty-state-title">
+            @Model.Titolo
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Messaggio))
+        {
+            <div class="pfw-empty-state-message">
+                @Model.Messaggio
+            </div>
+        }
+
+        @if (Model.MostraAzione)
+        {
+            <div class="pfw-empty-state-actions">
+
+                @if (!string.IsNullOrWhiteSpace(Model.UrlAzione))
+                {
+                    <a href="@Model.UrlAzione"
+                       class="pfw-btn pfw-btn-@Model.VarianteAzione">
+                        @Model.TestoAzione
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="pfw-btn pfw-btn-@Model.VarianteAzione">
+                        @Model.TestoAzione
+                    </button>
+                }
+
+            </div>
+        }
+
+    </div>
+}

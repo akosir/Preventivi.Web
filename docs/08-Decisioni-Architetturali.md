@@ -26,3 +26,21 @@ Il Preventivi Framework utilizza un'Application Shell composta da:
 Tutti i moduli applicativi devono essere ospitati all'interno del Workspace.
 
 L'Application Shell costituisce il layout standard del framework.
+
+DA-011
+
+Il Preventivi Framework è suddiviso in due macro aree:
+
+1. Layout Engine
+2. UI Components
+
+Il Layout Engine è responsabile
+esclusivamente dell'organizzazione
+dell'applicazione.
+
+I Componenti UI sono responsabili
+esclusivamente della rappresentazione
+grafica.
+
+Nessun componente UI può decidere
+il layout dell'applicazione.

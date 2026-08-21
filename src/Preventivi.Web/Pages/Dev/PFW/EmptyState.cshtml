@@ -1,0 +1,56 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFW.EmptyStateModel
+
+@{
+    ViewData["Title"] = "PFW EmptyState";
+}
+
+<h1 class="mb-4">PFW EmptyState</h1>
+
+<div class="pfw-panel mb-4">
+
+    @await Html.PartialAsync(
+        "Shared/PFW/EmptyState/_PFWEmptyState",
+        new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+        {
+            Titolo = "Nessun dato presente",
+
+            Messaggio =
+                "Non sono presenti elementi da visualizzare."
+        })
+
+</div>
+
+<div class="pfw-panel mb-4">
+
+    @await Html.PartialAsync(
+        "Shared/PFW/EmptyState/_PFWEmptyState",
+        new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+        {
+            Titolo = "Nessun risultato",
+
+            Messaggio =
+                "Prova a modificare i criteri di ricerca."
+        })
+
+</div>
+
+<div class="pfw-panel">
+
+    @await Html.PartialAsync(
+        "Shared/PFW/EmptyState/_PFWEmptyState",
+        new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+        {
+            Titolo = "Nessun elemento creato",
+
+            Messaggio =
+                "Crea il primo elemento per iniziare a lavorare.",
+
+            TestoAzione = "Nuovo",
+
+            UrlAzione = "#",
+
+            VarianteAzione = "primary"
+        })
+
+</div>

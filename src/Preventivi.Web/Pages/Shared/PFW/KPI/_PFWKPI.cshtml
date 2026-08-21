@@ -1,0 +1,50 @@
+﻿@model global::Preventivi.Web.UI.KPI.PFWKPIModel
+
+@if (Model.Visibile)
+{
+    var varianteCss = Model.Variante switch
+    {
+        "primario" => "primary",
+        "successo" => "success",
+        "attenzione" => "warning",
+        "errore" => "danger",
+        "informazione" => "info",
+        _ => "neutral"
+    };
+
+    var classi = $"pfw-kpi pfw-kpi-{varianteCss}";
+
+    if (Model.Evidenziato)
+    {
+        classi += " pfw-kpi-highlighted";
+    }
+
+    <div class="@classi">
+
+        <div class="pfw-kpi-header">
+
+            @if (!string.IsNullOrWhiteSpace(Model.Icona))
+            {
+                <i class="@Model.Icona"
+                   aria-hidden="true"></i>
+            }
+
+            <span class="pfw-kpi-title">
+                @Model.Titolo
+            </span>
+
+        </div>
+
+        <div class="pfw-kpi-value">
+            @Model.Valore
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+        {
+            <div class="pfw-kpi-subtitle">
+                @Model.Sottotitolo
+            </div>
+        }
+
+    </div>
+}

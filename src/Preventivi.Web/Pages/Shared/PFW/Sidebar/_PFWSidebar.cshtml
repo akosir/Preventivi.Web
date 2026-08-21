@@ -6,89 +6,135 @@
 
         @if (!string.IsNullOrWhiteSpace(Model.Logo))
         {
-            <img src="@Model.Logo" class="pfw-sidebar-logo" />
+            <img src="@Model.Logo"
+                 alt=""
+                 class="pfw-sidebar-logo" />
         }
 
-        <div class="pfw-sidebar-title">
-            @Model.Titolo
-        </div>
+        <div class="pfw-sidebar-brand">
 
-        @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
-        {
-            <div class="pfw-sidebar-subtitle">
-                @Model.Sottotitolo
+            <div class="pfw-sidebar-title">
+                @Model.Titolo
             </div>
-        }
+
+            @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+            {
+                <div class="pfw-sidebar-subtitle">
+                    @Model.Sottotitolo
+                </div>
+            }
+
+        </div>
 
     </div>
 
-    <div class="pfw-sidebar-body">
+    <nav class="pfw-sidebar-body"
+         aria-label="Navigazione principale">
 
         @foreach (var gruppo in Model.Gruppi)
         {
-            <details class="pfw-sidebar-group" open="@gruppo.Espanso">
+            if (!gruppo.Visibile)
+            {
+                continue;
+            }
 
-                <summary>
+            <details id="@gruppo.Id"
+                     class="pfw-sidebar-group"
+                     open="@gruppo.Espanso">
 
-                    @if (!string.IsNullOrWhiteSpace(gruppo.Icona))
-                    {
-                        <i class="@gruppo.Icona"></i>
-                    }
+                <summary class="pfw-sidebar-group-header">
 
-                    @gruppo.Titolo
+                    <span class="pfw-sidebar-group-label">
+
+                        @if (!string.IsNullOrWhiteSpace(gruppo.Icona))
+                        {
+                            <i class="@gruppo.Icona"
+                               aria-hidden="true"></i>
+                        }
+
+                        <span>
+                            @gruppo.Titolo
+                        </span>
+
+                    </span>
+
+                    <span class="pfw-sidebar-chevron"
+                          aria-hidden="true">
+                        ›
+                    </span>
 
                 </summary>
 
-                @foreach (var voce in gruppo.Voci.Where(v => v.Visibile))
-                {
-                    var css = "pfw-sidebar-item";
+                <div class="pfw-sidebar-group-items">
 
-                    if (voce.Attiva)
-                        css += " active";
-
-                    if (voce.Disabilitata)
-                        css += " disabled";
-
-                    if (!voce.Disabilitata &&
-                        !string.IsNullOrWhiteSpace(voce.Url))
+                    @foreach (var voce in gruppo.Voci)
                     {
-                        <a href="@voce.Url" class="@css">
+                        if (!voce.Visibile)
+                        {
+                            continue;
+                        }
 
-                            @if (!string.IsNullOrWhiteSpace(voce.Icona))
-                            {
-                                <i class="@voce.Icona"></i>
-                            }
+                        var cssClass = "pfw-sidebar-item";
 
-                            @voce.Testo
+                        if (voce.Attiva)
+                        {
+                            cssClass += " pfw-sidebar-item-active";
+                        }
 
-                        </a>
+                        if (voce.Disabilitata)
+                        {
+                            cssClass += " pfw-sidebar-item-disabled";
+                        }
+
+                        if (!voce.Disabilitata &&
+                            !string.IsNullOrWhiteSpace(voce.Url))
+                        {
+                            <a id="@voce.Id"
+                               href="@voce.Url"
+                               class="@cssClass">
+
+                                @if (!string.IsNullOrWhiteSpace(voce.Icona))
+                                {
+                                    <i class="@voce.Icona"
+                                       aria-hidden="true"></i>
+                                }
+
+                                <span>
+                                    @voce.Testo
+                                </span>
+
+                            </a>
+                        }
+                        else
+                        {
+                            <span id="@voce.Id"
+                                  class="@cssClass">
+
+                                @if (!string.IsNullOrWhiteSpace(voce.Icona))
+                                {
+                                    <i class="@voce.Icona"
+                                       aria-hidden="true"></i>
+                                }
+
+                                <span>
+                                    @voce.Testo
+                                </span>
+
+                            </span>
+                        }
                     }
-                    else
-                    {
-                        <span class="@css">
 
-                            @if (!string.IsNullOrWhiteSpace(voce.Icona))
-                            {
-                                <i class="@voce.Icona"></i>
-                            }
-
-                            @voce.Testo
-
-                        </span>
-                    }
-                }
+                </div>
 
             </details>
         }
 
-    </div>
+    </nav>
 
     @if (!string.IsNullOrWhiteSpace(Model.Footer))
     {
         <div class="pfw-sidebar-footer">
-
             @Model.Footer
-
         </div>
     }
 

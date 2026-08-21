@@ -1,0 +1,45 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFW.WorkspaceModel
+
+@{
+    ViewData["Title"] = "PFW Workspace";
+}
+
+<h1 class="mb-4">PFW Workspace</h1>
+
+<div style="
+    height:600px;
+    display:flex;
+    border:1px solid #ddd;
+    ">
+
+    @await Html.PartialAsync(
+        "Shared/PFW/Workspace/_PFWWorkspace",
+        new global::Preventivi.Web.UI.Workspace.PFWWorkspaceModel
+        {
+            ContenutoHtml = """
+                <div class="pfw-panel">
+                    <div class="pfw-panel-header">
+                        <div>
+                            <h3 class="pfw-panel-title">
+                                Area di lavoro
+                            </h3>
+                            <div class="pfw-panel-subtitle">
+                                Contenuto dimostrativo del Workspace
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pfw-panel-body">
+                        Il Workspace ospita il contenuto applicativo.
+                    </div>
+                </div>
+                """,
+
+            MostraStatusBar = true,
+
+            StatusBarHtml =
+                "PFW Workspace • Ambiente di sviluppo"
+        })
+
+</div>

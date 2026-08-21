@@ -1,2 +1,53 @@
-﻿body {
+﻿/* ==========================================================================
+   PFW WORKSPACE
+   ========================================================================== */
+
+.pfw-workspace {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    background-color: #f7f8fa;
+}
+
+
+/* Content */
+
+.pfw-workspace-content {
+    flex: 1;
+    min-width: 0;
+    padding: 20px 24px;
+    overflow: auto;
+}
+
+
+/* Status bar */
+
+.pfw-workspace-statusbar {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    padding: 7px 16px;
+    border-top: 1px solid var(--app-border);
+    background-color: #ffffff;
+    color: var(--app-text-muted);
+    font-size: 11px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 991px) {
+
+    .pfw-workspace-content {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .pfw-workspace-content {
+        padding: 14px;
+    }
 }
