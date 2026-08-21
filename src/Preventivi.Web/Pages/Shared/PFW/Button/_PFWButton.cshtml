@@ -1,0 +1,35 @@
+﻿@model global::Preventivi.Web.UI.Button.PFWButtonModel
+
+@if (Model.Visibile)
+{
+    var cssClass = $"pfw-btn pfw-btn-{Model.Variante}";
+
+    if (!string.IsNullOrWhiteSpace(Model.Url))
+    {
+        <a href="@Model.Url"
+           class="@cssClass @(Model.Abilitato ? "" : "disabled")">
+
+            @if (!string.IsNullOrWhiteSpace(Model.Icona))
+            {
+                <i class="@Model.Icona"></i>
+            }
+
+            @Model.Testo
+        </a>
+    }
+    else
+    {
+        <button type="button"
+                class="@cssClass"
+                onclick="@Model.OnClick"
+                disabled="@(!Model.Abilitato)">
+
+            @if (!string.IsNullOrWhiteSpace(Model.Icona))
+            {
+                <i class="@Model.Icona"></i>
+            }
+
+            @Model.Testo
+        </button>
+    }
+}

@@ -1,0 +1,50 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFW.ButtonModel
+
+@{
+    ViewData["Title"] = "PFW Button";
+}
+
+<h1>PFW Button</h1>
+
+<div class="mb-4">
+    @await Html.PartialAsync(
+        "Shared/PFW/Button/_PFWButton",
+        new global::Preventivi.Web.UI.Button.PFWButtonModel
+        {
+            Testo = "Primary",
+            Variante = "primary"
+        })
+</div>
+
+<div class="mb-4">
+    @await Html.PartialAsync(
+        "Shared/PFW/Button/_PFWButton",
+        new global::Preventivi.Web.UI.Button.PFWButtonModel
+        {
+            Testo = "Secondary",
+            Variante = "secondary"
+        })
+</div>
+
+<div class="mb-4">
+    @await Html.PartialAsync(
+        "Shared/PFW/Button/_PFWButton",
+        new global::Preventivi.Web.UI.Button.PFWButtonModel
+        {
+            Testo = "Disabled",
+            Variante = "primary",
+            Abilitato = false
+        })
+</div>
+
+<div class="mb-4">
+    @await Html.PartialAsync(
+        "Shared/PFW/Button/_PFWButton",
+        new global::Preventivi.Web.UI.Button.PFWButtonModel
+        {
+            Testo = "Vai ai Preventivi",
+            Url = "/Preventivi",
+            Variante = "secondary"
+        })
+</div>
