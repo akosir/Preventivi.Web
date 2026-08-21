@@ -1,51 +1,38 @@
+
+
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
 }
-:root {
-    --app-sidebar: #2f3a4a;
-    --app-sidebar-hover: #3b485b;
-    --app-sidebar-active: #1f6fb2;
-    --app-header: #ffffff;
-    --app-background: #f5f7fa;
-    --app-surface: #ffffff;
-    --app-border: #d9dee5;
-    --app-text: #2b2b2b;
-    --app-text-muted: #7a8491;
-    --app-primary: #1f6fb2;
-    --app-success: #2e8b57;
-    --app-warning: #f4a300;
-    --app-danger: #d9534f;
-    --app-sidebar-width: 240px;
-    --app-header-height: 64px;
-}
+
+
 
 html,
 body {
@@ -63,7 +50,6 @@ body {
     min-height: 100vh;
     display: flex;
 }
-
 /* SIDEBAR */
 
 .app-sidebar {
@@ -140,7 +126,6 @@ body {
         background-color: var(--app-sidebar-active);
         color: #ffffff;
     }
-
 /* AREA PRINCIPALE */
 
 .app-main {
@@ -151,7 +136,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
-
 /* HEADER */
 
 .app-header {
@@ -192,14 +176,12 @@ body {
     font-size: 13px;
     font-weight: 600;
 }
-
 /* CONTENT */
 
 .app-content {
     flex: 1;
     padding: 24px;
 }
-
 /* FOOTER */
 
 .app-footer {
@@ -209,7 +191,6 @@ body {
     color: var(--app-text-muted);
     font-size: 12px;
 }
-
 /* RESPONSIVE */
 
 @media (max-width: 768px) {
@@ -259,8 +240,6 @@ body {
     color: var(--app-text-muted);
     font-size: 13px;
 }
-
-
 /* KPI */
 
 .pfw-kpi-card {
@@ -308,8 +287,6 @@ body {
     color: var(--app-text-muted);
     font-size: 12px;
 }
-
-
 /* STATUS */
 
 .pfw-status-success {
@@ -326,57 +303,6 @@ body {
     color: var(--app-danger);
     font-weight: 600;
 }
-
-
-/* PANEL */
-
-.pfw-panel {
-    background: var(--app-surface);
-    border: 1px solid var(--app-border);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.pfw-panel-fill {
-    height: 100%;
-}
-
-.pfw-panel-auto {
-    height: auto;
-}
-
-.pfw-panel-header {
-    min-height: 64px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--app-border);
-}
-
-.pfw-panel-title {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 650;
-}
-
-.pfw-panel-subtitle {
-    margin-top: 2px;
-    font-size: 11px;
-    color: var(--app-text-muted);
-}
-
-.pfw-panel-link {
-    color: var(--app-primary);
-    text-decoration: none;
-    font-size: 12px;
-}
-
-    .pfw-panel-link:hover {
-        text-decoration: underline;
-    }
-
-
 /* TABLE */
 
 .pfw-table {
@@ -401,45 +327,6 @@ body {
     .pfw-table tbody tr:hover {
         background-color: #fafcff;
     }
-
-
-/* BADGES */
-
-.pfw-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 650;
-    white-space: nowrap;
-}
-
-.pfw-badge-primary {
-    background: #e7f1fb;
-    color: #1764a2;
-}
-
-.pfw-badge-success {
-    background: #e6f5ed;
-    color: #237044;
-}
-
-.pfw-badge-warning {
-    background: #fff2d8;
-    color: #9a6500;
-}
-
-.pfw-badge-danger {
-    background: #fde9e7;
-    color: #a53b35;
-}
-
-.pfw-badge-secondary {
-    background: #eceff2;
-    color: #5e6874;
-}
-
-
 /* ALERT */
 
 .pfw-alert-count {
@@ -504,8 +391,6 @@ body {
     color: var(--app-text-muted);
     font-size: 11px;
 }
-
-
 /* CHART DEMO */
 
 .pfw-chart-placeholder {
@@ -544,8 +429,6 @@ body {
     color: var(--app-text-muted);
     font-size: 11px;
 }
-
-
 /* REQUESTS */
 
 .pfw-request-list {
@@ -571,8 +454,6 @@ body {
     color: var(--app-text-muted);
     font-size: 11px;
 }
-
-
 /* RESPONSIVE DASHBOARD */
 
 @media (max-width: 768px) {
@@ -615,47 +496,6 @@ body {
     color: var(--app-text-muted);
     font-size: 13px;
 }
-
-
-/* BUTTONS */
-
-.pfw-btn {
-    min-height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 7px 14px;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.pfw-btn-primary {
-    background-color: var(--app-primary);
-    border-color: var(--app-primary);
-    color: #ffffff;
-}
-
-    .pfw-btn-primary:hover {
-        background-color: #195f99;
-        border-color: #195f99;
-        color: #ffffff;
-    }
-
-.pfw-btn-secondary {
-    background-color: #ffffff;
-    border-color: var(--app-border);
-    color: var(--app-text);
-}
-
-    .pfw-btn-secondary:hover {
-        background-color: #f6f8fa;
-    }
-
-
 /* FILTER BAR */
 
 .pfw-filter-bar {
@@ -678,8 +518,6 @@ body {
             border-color: var(--app-primary);
             box-shadow: 0 0 0 0.15rem rgba(31, 111, 178, 0.12);
         }
-
-
 /* TABLE ACTION */
 
 .pfw-table-clickable tbody tr {
@@ -696,8 +534,6 @@ body {
     .pfw-action-link:hover {
         text-decoration: underline;
     }
-
-
 /* TABLE FOOTER */
 
 .pfw-table-footer {
@@ -738,8 +574,6 @@ body {
     .pfw-page-button:disabled {
         opacity: .45;
     }
-
-
 /* RESPONSIVE */
 
 @media (max-width: 1000px) {
@@ -855,7 +689,6 @@ body {
         color: var(--app-primary);
         border-bottom-color: var(--app-primary);
     }
-
 /* =========================================================
    WORKSPACE PREVENTIVO - SPRINT 2.1
    ========================================================= */
@@ -1015,4 +848,22 @@ body {
     .workspace-actions {
         width: 100%;
     }
+}
+
+.workspace-righe-toolbar {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--app-border);
+    font-size: 13px;
+}
+
+.workspace-righe-count {
+    margin-left: 8px;
+    color: var(--app-text-muted);
+    font-size: 11px;
+    font-weight: 400;
 }

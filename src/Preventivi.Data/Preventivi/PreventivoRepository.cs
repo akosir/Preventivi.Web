@@ -35,4 +35,19 @@ public sealed class PreventivoRepository : IPreventivoRepository
             parameters,
             cancellationToken);
     }
+
+    public async Task<IReadOnlyList<PreventivoRigaListItem>> GetRigheAsync(
+    int idPreventivo,
+    CancellationToken cancellationToken = default)
+    {
+        var parameters = new[]
+        {
+        new SqlParameter("@IdPreventivo", idPreventivo)
+    };
+
+        return await _db.QueryAsync<PreventivoRigaListItem>(
+            "dbo.Preventivi_Righe_Elenco",
+            parameters,
+            cancellationToken);
+    }
 }

@@ -10,6 +10,9 @@ public class DettaglioModel : PageModel
 
     public PreventivoDettaglio? Preventivo { get; private set; }
 
+    public IReadOnlyList<PreventivoRigaListItem> Righe { get; private set; }
+        = Array.Empty<PreventivoRigaListItem>();
+
     public DettaglioModel(IPreventivoRepository repository)
     {
         _repository = repository;
@@ -20,10 +23,19 @@ public class DettaglioModel : PageModel
         CancellationToken cancellationToken)
     {
         Preventivo =
-            await _repository.GetDettaglioAsync(id, cancellationToken);
+            await _repository.GetDettaglioAsync(
+                id,
+                cancellationToken);
 
         if (Preventivo is null)
+        {
             return NotFound();
+        }
+
+        Righe =
+            await _repository.GetRigheAsync(
+                id,
+                cancellationToken);
 
         return Page();
     }

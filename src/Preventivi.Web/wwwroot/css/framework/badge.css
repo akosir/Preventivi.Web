@@ -1,0 +1,38 @@
+﻿/* ==========================================================
+   PFW BADGE
+   Preventivi Framework
+   ========================================================== */
+
+.pfw-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.pfw-badge-primary {
+    background: #e7f1fb;
+    color: #1764a2;
+}
+
+.pfw-badge-success {
+    background: #e6f5ed;
+    color: #237044;
+}
+
+.pfw-badge-warning {
+    background: #fff2d8;
+    color: #9a6500;
+}
+
+.pfw-badge-danger {
+    background: #fde9e7;
+    color: #a53b35;
+}
+
+.pfw-badge-secondary {
+    background: #eceff2;
+    color: #5e6874;
+}

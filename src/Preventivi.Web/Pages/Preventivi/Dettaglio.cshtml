@@ -193,18 +193,112 @@
 
                 <div class="workspace-tab-content">
 
-                    <div class="workspace-placeholder">
+                    <div class="workspace-righe-toolbar">
 
-                        <div class="workspace-placeholder-title">
-                            Righe preventivo
+                        <div>
+                            <strong>Righe preventivo</strong>
+                            <span class="workspace-righe-count">
+                                @Model.Righe.Count righe
+                            </span>
                         </div>
 
-                        <div class="workspace-placeholder-text">
-                            Il contenuto operativo delle righe verrà collegato
-                            nel prossimo sprint.
-                        </div>
+                        <button type="button"
+                                class="pfw-btn pfw-btn-primary">
+                            Nuova riga
+                        </button>
 
                     </div>
+
+                    @if (Model.Righe.Count == 0)
+                    {
+                        <div class="workspace-placeholder">
+
+                            <div class="workspace-placeholder-title">
+                                Nessuna riga presente
+                            </div>
+
+                            <div class="workspace-placeholder-text">
+                                Il preventivo non contiene ancora righe.
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+
+                            <table class="table pfw-table align-middle mb-0">
+
+                                <thead>
+                                    <tr>
+                                        <th>Riga</th>
+                                        <th>Tipo</th>
+                                        <th>Descrizione</th>
+                                        <th class="text-end">Q.tà</th>
+                                        <th class="text-end">Costo</th>
+                                        <th class="text-end">Prezzo unit.</th>
+                                        <th class="text-end">Vendita</th>
+                                        <th class="text-end">Margine</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var riga in Model.Righe)
+                                    {
+                                        <tr>
+
+                                            <td class="fw-semibold">
+                                                @riga.RigaNr
+                                            </td>
+
+                                            <td>
+                                                <span class="pfw-badge pfw-badge-secondary">
+                                                    @riga.TipoRiga
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                @riga.DescrizioneVoce
+                                            </td>
+
+                                            <td class="text-end">
+                                                @riga.Quantita.ToString("N2")
+                                            </td>
+
+                                            <td class="text-end">
+                                                @riga.TotaleCosti.ToString("C2")
+                                            </td>
+
+                                            <td class="text-end">
+                                                @riga.PrezzoUnitarioVendita.ToString("C2")
+                                            </td>
+
+                                            <td class="text-end fw-semibold">
+                                                @riga.TotaleVendita.ToString("C2")
+                                            </td>
+
+                                            <td class="text-end">
+                                                @riga.MarginePerc.ToString("N2")%
+                                            </td>
+
+                                            <td class="text-end">
+                                                <a href="#"
+                                                   class="pfw-action-link">
+                                                    Apri
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    }
 
                 </div>
 

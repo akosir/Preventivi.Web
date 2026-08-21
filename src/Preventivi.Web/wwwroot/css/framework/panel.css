@@ -1,0 +1,50 @@
+﻿/* ==========================================================
+   PFW PANEL
+   Preventivi Framework
+   ========================================================== */
+
+.pfw-panel {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.pfw-panel-fill {
+    height: 100%;
+}
+
+.pfw-panel-auto {
+    height: auto;
+}
+
+.pfw-panel-header {
+    min-height: 64px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.pfw-panel-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 650;
+}
+
+.pfw-panel-subtitle {
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--app-text-muted);
+}
+
+.pfw-panel-link {
+    color: var(--app-primary);
+    text-decoration: none;
+    font-size: 12px;
+}
+
+    .pfw-panel-link:hover {
+        text-decoration: underline;
+    }

@@ -1,0 +1,17 @@
+﻿:root {
+    --app-sidebar: #2f3a4a;
+    --app-sidebar-hover: #3b485b;
+    --app-sidebar-active: #1f6fb2;
+    --app-header: #ffffff;
+    --app-background: #f5f7fa;
+    --app-surface: #ffffff;
+    --app-border: #d9dee5;
+    --app-text: #2b2b2b;
+    --app-text-muted: #7a8491;
+    --app-primary: #1f6fb2;
+    --app-success: #2e8b57;
+    --app-warning: #f4a300;
+    --app-danger: #d9534f;
+    --app-sidebar-width: 240px;
+    --app-header-height: 64px;
+}

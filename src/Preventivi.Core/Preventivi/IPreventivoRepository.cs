@@ -8,4 +8,8 @@ public interface IPreventivoRepository
     Task<PreventivoDettaglio?> GetDettaglioAsync(
     int idPreventivo,
     CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<PreventivoRigaListItem>> GetRigheAsync(
+    int idPreventivo,
+    CancellationToken cancellationToken = default);
 }
