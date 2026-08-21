@@ -1,0 +1,38 @@
+﻿@model global::Preventivi.Web.UI.Toolbar.PFWToolbarModel
+
+<div class="pfw-toolbar">
+
+    <div class="pfw-toolbar-left">
+
+        <div>
+
+            <h2 class="pfw-toolbar-title">
+                @Model.Titolo
+            </h2>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+            {
+                <div class="pfw-toolbar-subtitle">
+                    @Model.Sottotitolo
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="pfw-toolbar-right">
+
+        @foreach (var pulsante in Model.Pulsanti)
+        {
+            <a href="@pulsante.Url"
+               class="pfw-btn @pulsante.CssClass">
+
+                @pulsante.Testo
+
+            </a>
+        }
+
+    </div>
+
+</div>

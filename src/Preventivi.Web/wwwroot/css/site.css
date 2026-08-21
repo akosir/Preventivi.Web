@@ -496,28 +496,7 @@ body {
     color: var(--app-text-muted);
     font-size: 13px;
 }
-/* FILTER BAR */
 
-.pfw-filter-bar {
-    display: grid;
-    grid-template-columns: minmax(240px, 1fr) 190px 220px auto;
-    gap: 10px;
-    align-items: center;
-    padding: 14px;
-}
-
-    .pfw-filter-bar .form-control,
-    .pfw-filter-bar .form-select {
-        min-height: 38px;
-        border-color: var(--app-border);
-        font-size: 13px;
-    }
-
-        .pfw-filter-bar .form-control:focus,
-        .pfw-filter-bar .form-select:focus {
-            border-color: var(--app-primary);
-            box-shadow: 0 0 0 0.15rem rgba(31, 111, 178, 0.12);
-        }
 /* TABLE ACTION */
 
 .pfw-table-clickable tbody tr {
@@ -867,3 +846,26 @@ body {
     font-size: 11px;
     font-weight: 400;
 }
+
+/* FILTER BAR */
+
+.pfw-filter-bar {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) 190px 220px auto;
+    gap: 10px;
+    align-items: center;
+    padding: 14px;
+}
+
+    .pfw-filter-bar .form-control,
+    .pfw-filter-bar .form-select {
+        min-height: 38px;
+        border-color: var(--app-border);
+        font-size: 13px;
+    }
+
+        .pfw-filter-bar .form-control:focus,
+        .pfw-filter-bar .form-select:focus {
+            border-color: var(--app-primary);
+            box-shadow: 0 0 0 0.15rem rgba(31, 111, 178, 0.12);
+        }

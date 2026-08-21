@@ -18,7 +18,6 @@
     <Folder Include="Pages\Shared\EmptyState\" />
     <Folder Include="Pages\Shared\Sections\" />
     <Folder Include="Pages\Shared\Sidebar\" />
-    <Folder Include="Pages\Shared\Toolbar\" />
     <Folder Include="Pages\Shared\Tabs\" />
     <Folder Include="Pages\Shared\Workspace\" />
     <Folder Include="Services\" />

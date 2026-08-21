@@ -1,0 +1,93 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFWModel
+
+@{
+    ViewData["Title"] = "Preventivi Framework";
+}
+
+<div class="container-fluid py-4">
+
+    <h1>Preventivi Framework</h1>
+
+    <p class="text-muted">
+        Playground dei componenti del Preventivi Framework (PFW).
+    </p>
+
+    <hr />
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-header">
+                    Layout
+                </div>
+
+                <div class="card-body">
+
+                    <ul>
+                        <li>Toolbar</li>
+                        <li>Workspace</li>
+                        <li>Sidebar</li>
+                        <li>Tabs</li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+            @await Html.PartialAsync(
+    "Shared/Toolbar/_PFWToolbar",
+    new global::Preventivi.Web.UI.Toolbar.PFWToolbarModel
+    {
+        Titolo = "Toolbar di test",
+
+        Sottotitolo = "Primo componente del Preventivi Framework",
+
+        Pulsanti =
+        [
+            new()
+            {
+                Testo = "Nuovo",
+                Url = "#",
+                CssClass = "pfw-btn-primary"
+            },
+
+            new()
+            {
+                Testo = "Annulla",
+                Url = "#",
+                CssClass = "pfw-btn-secondary"
+            }
+        ]
+    })
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-header">
+                    Data
+                </div>
+
+                <div class="card-body">
+
+                    <ul>
+                        <li>Panel</li>
+                        <li>KPI</li>
+                        <li>Badge</li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
