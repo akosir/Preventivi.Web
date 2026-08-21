@@ -1,0 +1,41 @@
+﻿@model global::Preventivi.Web.UI.Panel.PFWPanelModel
+
+<div class="pfw-panel">
+
+    @if (Model.MostraHeader)
+    {
+        <div class="pfw-panel-header">
+
+            <div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Titolo))
+                {
+                    <h3 class="pfw-panel-title">
+                        @Model.Titolo
+                    </h3>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+                {
+                    <div class="pfw-panel-subtitle">
+                        @Model.Sottotitolo
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+    <div class="pfw-panel-body">
+        @Html.Raw(Model.BodyHtml)
+    </div>
+
+    @if (Model.MostraFooter)
+    {
+        <div class="pfw-panel-footer">
+            @Model.Footer
+        </div>
+    }
+
+</div>

@@ -1,0 +1,56 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.PFW.PanelModel
+
+@{
+    ViewData["Title"] = "PFW Panel";
+}
+
+<h1>PFW Panel</h1>
+
+<div class="mb-4">
+    @await Html.PartialAsync(
+        "Shared/PFW/Panel/_PFWPanel",
+        new global::Preventivi.Web.UI.Panel.PFWPanelModel
+        {
+            Titolo = "Panel semplice",
+            BodyHtml = "Questo è il contenuto del panel."
+        })
+</div>
+
+<div class="mb-4">
+    @await Html.PartialAsync(
+        "Shared/PFW/Panel/_PFWPanel",
+        new global::Preventivi.Web.UI.Panel.PFWPanelModel
+        {
+            Titolo = "Panel con sottotitolo",
+            Sottotitolo = "Informazioni generali",
+            BodyHtml = "Lorem ipsum..."
+        })
+</div>
+
+<div class="mb-4">
+    @await Html.PartialAsync(
+        "Shared/PFW/Panel/_PFWPanel",
+        new global::Preventivi.Web.UI.Panel.PFWPanelModel
+        {
+            Titolo = "Panel con footer",
+            BodyHtml = "Lorem ipsum...",
+            Footer = "Ultimo aggiornamento: oggi",
+            MostraFooter = true
+            
+        })
+</div>
+
+<div class="mb-4">
+    @await Html.PartialAsync(
+        "Shared/PFW/Panel/_PFWPanel",
+        new global::Preventivi.Web.UI.Panel.PFWPanelModel
+        {
+            Titolo = "Panel completo",
+            Sottotitolo = "Sotto titolo",
+            BodyHtml = "Questo è il contenuto del panel.",
+            Footer = "Footer del panel",
+            MostraFooter = true
+
+        })
+</div>
