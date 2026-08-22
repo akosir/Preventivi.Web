@@ -110,4 +110,92 @@ public sealed class ClienteRepository : IClienteRepository
 
         return risultati;
     }
+    public async Task<int> CreaAsync(
+    ClienteCreateModel cliente,
+    CancellationToken cancellationToken = default)
+    {
+        await using var connection =
+            _connectionFactory.CreateConnection();
+
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command =
+            new SqlCommand(
+                "dbo.Clienti_Crea",
+                connection);
+
+        command.CommandType =
+            CommandType.StoredProcedure;
+
+        command.Parameters.Add(
+            new SqlParameter("@CodiceCliente", SqlDbType.NVarChar, 50)
+            {
+                Value = cliente.CodiceCliente
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@RagioneSociale", SqlDbType.NVarChar, 200)
+            {
+                Value = cliente.RagioneSociale
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@PartitaIVA", SqlDbType.NVarChar, 30)
+            {
+                Value = (object?)cliente.PartitaIVA ?? DBNull.Value
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@CodiceFiscale", SqlDbType.NVarChar, 30)
+            {
+                Value = (object?)cliente.CodiceFiscale ?? DBNull.Value
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@Indirizzo", SqlDbType.NVarChar, 200)
+            {
+                Value = (object?)cliente.Indirizzo ?? DBNull.Value
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@CAP", SqlDbType.NVarChar, 10)
+            {
+                Value = (object?)cliente.CAP ?? DBNull.Value
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@Citta", SqlDbType.NVarChar, 100)
+            {
+                Value = (object?)cliente.Citta ?? DBNull.Value
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@Provincia", SqlDbType.NVarChar, 10)
+            {
+                Value = (object?)cliente.Provincia ?? DBNull.Value
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@Telefono", SqlDbType.NVarChar, 50)
+            {
+                Value = (object?)cliente.Telefono ?? DBNull.Value
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@Email", SqlDbType.NVarChar, 200)
+            {
+                Value = (object?)cliente.Email ?? DBNull.Value
+            });
+
+        command.Parameters.Add(
+            new SqlParameter("@Attivo", SqlDbType.Bit)
+            {
+                Value = cliente.Attivo
+            });
+
+        var risultato =
+            await command.ExecuteScalarAsync(cancellationToken);
+
+        return Convert.ToInt32(risultato);
+    }
 }

@@ -1,0 +1,32 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Clienti.NuovoModel
+
+@{
+    ViewData["Title"] = "Nuovo Cliente";
+}
+
+@await Html.PartialAsync(
+    "Shared/Clienti/_ClientiHeader",
+    Model.Header)
+
+<form method="post">
+
+    @await Html.PartialAsync(
+        "Shared/Clienti/_ClienteForm",
+        Model.Cliente)
+
+    <div class="d-flex justify-content-end gap-2 mt-3">
+
+        <a asp-page="./Index"
+           class="pfw-btn pfw-btn-secondary">
+            Annulla
+        </a>
+
+        <button type="submit"
+                class="pfw-btn pfw-btn-primary">
+            Salva
+        </button>
+
+    </div>
+
+</form>

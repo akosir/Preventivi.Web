@@ -6,4 +6,8 @@ public interface IClienteRepository
         string? ricerca = null,
         bool? soloAttivi = null,
         CancellationToken cancellationToken = default);
+
+    Task<int> CreaAsync(
+    ClienteCreateModel cliente,
+    CancellationToken cancellationToken = default);
 }
