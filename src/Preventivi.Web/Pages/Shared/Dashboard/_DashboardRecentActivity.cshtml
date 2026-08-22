@@ -1,0 +1,75 @@
+﻿@model global::Preventivi.Web.UI.Modules.Dashboard.DashboardRecentActivityModel
+
+<div class="pfw-panel h-100">
+
+    <div class="pfw-panel-header">
+
+        <div>
+            <h3 class="pfw-panel-title">
+                @Model.Titolo
+            </h3>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+            {
+                <div class="pfw-panel-subtitle">
+                    @Model.Sottotitolo
+                </div>
+            }
+        </div>
+
+    </div>
+
+    <div class="pfw-panel-body">
+
+        @if (Model.Elementi.Count == 0)
+        {
+            @await Html.PartialAsync(
+                "Shared/PFW/EmptyState/_PFWEmptyState",
+                new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+                {
+                    Titolo = "Nessuna attività recente",
+                    Messaggio = "Non sono presenti operazioni recenti da visualizzare."
+                })
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+
+                @foreach (var elemento in Model.Elementi)
+                {
+                    <div class="d-flex justify-content-between gap-3">
+
+                        <div>
+                            <div class="fw-semibold">
+                                @elemento.Titolo
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(elemento.Dettaglio))
+                            {
+                                <div class="small text-muted">
+                                    @elemento.Dettaglio
+                                </div>
+                            }
+                        </div>
+
+                        <div class="text-end">
+
+                            @await Html.PartialAsync(
+                                "Shared/PFW/Badge/_PFWBadge",
+                                new global::Preventivi.Web.UI.Badge.PFWBadgeModel
+                                {
+                                    Testo = elemento.DataOra,
+                                    Variante = elemento.Variante
+                                })
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</div>

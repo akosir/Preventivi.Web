@@ -1,0 +1,16 @@
+﻿@model global::Preventivi.Web.UI.Modules.Dashboard.DashboardKpiRowModel
+
+<div class="row g-3 mb-3">
+
+    @foreach (var kpi in Model.Elementi)
+    {
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            @await Html.PartialAsync(
+                "Shared/PFW/KPI/_PFWKPI",
+                kpi)
+
+        </div>
+    }
+
+</div>

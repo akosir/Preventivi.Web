@@ -15,10 +15,6 @@
 
   <ItemGroup>
     <Folder Include="Filters\" />
-    <Folder Include="Pages\Shared\KPI\" />
-    <Folder Include="Pages\Shared\EmptyState\" />
-    <Folder Include="Pages\Shared\Sections\" />
-    <Folder Include="Pages\Shared\Workspace\" />
     <Folder Include="Services\" />
     <Folder Include="wwwroot\css\pages\" />
   </ItemGroup>

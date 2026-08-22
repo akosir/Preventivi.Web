@@ -1,0 +1,70 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dashboard.IndexModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@await Html.PartialAsync(
+    "Shared/Dashboard/_DashboardHeader",
+    Model.Header)
+
+@await Html.PartialAsync(
+    "Shared/Dashboard/_DashboardKpiRow",
+    Model.Kpi)
+
+    <div class="row g-3">
+
+        <div class="col-12 col-xl-6">
+
+            @await Html.PartialAsync(
+                "Shared/Dashboard/_DashboardRecentActivity",
+                Model.AttivitaRecenti)
+
+        </div>
+
+        <div class="col-12 col-xl-6">
+
+            @await Html.PartialAsync(
+                "Shared/Dashboard/_DashboardDeadlines",
+                Model.Scadenze)
+
+        </div>
+
+    </div>
+
+    <div class="row g-3 mt-0">
+
+        <div class="col-12 col-xl-6">
+
+            @await Html.PartialAsync(
+                "Shared/Dashboard/_DashboardTodo",
+                Model.DaFare)
+
+        </div>
+
+        <div class="col-12 col-xl-6">
+
+            <div class="pfw-panel h-100">
+
+                <div class="pfw-panel-header">
+
+                <div class="col-12 col-xl-6">
+
+                    @await Html.PartialAsync(
+                        "Shared/Dashboard/_DashboardQuickLinks",
+                        Model.CollegamentiRapidi)
+
+                </div>
+
+                </div>
+
+                <div class="pfw-panel-body">
+                    Contenuto in costruzione
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>

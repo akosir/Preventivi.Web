@@ -1,0 +1,47 @@
+﻿@model global::Preventivi.Web.UI.Modules.Dashboard.DashboardHeaderModel
+
+<div class="pfw-panel mb-3">
+
+    <div class="pfw-panel-body">
+
+        <div class="d-flex flex-wrap
+            align-items-center
+            justify-content-between
+            gap-3">
+
+            <div>
+
+                <h1 class="h4 mb-1">
+                    @Model.Titolo
+                </h1>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+                {
+                    <div class="text-muted">
+                        @Model.Sottotitolo
+                    </div>
+                }
+
+            </div>
+
+            <div class="text-end">
+
+                <div class="fw-semibold">
+                    @Model.DataTesto
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.UltimoAggiornamento))
+                {
+                    <div class="small text-muted">
+                        Ultimo aggiornamento:
+                        @Model.UltimoAggiornamento
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

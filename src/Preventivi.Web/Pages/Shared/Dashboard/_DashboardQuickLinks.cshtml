@@ -1,0 +1,60 @@
+﻿@model global::Preventivi.Web.UI.Modules.Dashboard.DashboardQuickLinksModel
+
+<div class="pfw-panel h-100">
+
+    <div class="pfw-panel-header">
+
+        <div>
+
+            <h3 class="pfw-panel-title">
+                @Model.Titolo
+            </h3>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+            {
+                <div class="pfw-panel-subtitle">
+                    @Model.Sottotitolo
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="pfw-panel-body">
+
+        @if (!Model.Elementi.Any())
+        {
+            @await Html.PartialAsync(
+                "Shared/PFW/EmptyState/_PFWEmptyState",
+                new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+                {
+                    Titolo = "Nessun collegamento disponibile",
+                    Messaggio = "Non sono presenti collegamenti rapidi."
+                })
+        }
+        else
+        {
+            <div class="d-grid gap-2">
+
+                @foreach (var item in Model.Elementi)
+                {
+                    <a href="@item.Url"
+                       class="btn btn-outline-primary text-start @(item.Abilitato ? "" : "disabled")">
+
+                        @if (!string.IsNullOrWhiteSpace(item.Icona))
+                        {
+                            <i class="@item.Icona me-2"></i>
+                        }
+
+                        @item.Titolo
+
+                    </a>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</div>
