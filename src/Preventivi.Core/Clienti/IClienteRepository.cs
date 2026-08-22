@@ -10,4 +10,12 @@ public interface IClienteRepository
     Task<int> CreaAsync(
     ClienteCreateModel cliente,
     CancellationToken cancellationToken = default);
+
+    Task<ClienteDettaglio?> GetByIdAsync(
+    int idCliente,
+    CancellationToken cancellationToken = default);
+
+    Task AggiornaAsync(
+        ClienteUpdateModel cliente,
+        CancellationToken cancellationToken = default);
 }

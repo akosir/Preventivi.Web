@@ -120,7 +120,7 @@ public static class ClienteGridMapper
                                 Testo = "Apri",
 
                                 Url =
-                                    $"/Clienti/Dettaglio?id={cliente.IdCliente}",
+                                $"/Clienti/Dettaglio?IdCliente={cliente.IdCliente}",
 
                                 Variante = "secondary"
                             }
