@@ -1,0 +1,31 @@
+﻿@model global::Preventivi.Web.UI.Modules.Clienti.ClientiHeaderModel
+
+<div class="pfw-panel mb-3">
+
+    <div class="pfw-panel-header">
+
+        <div>
+
+            <h1 class="pfw-panel-title">
+                @Model.Titolo
+            </h1>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Sottotitolo))
+            {
+                <div class="pfw-panel-subtitle">
+                    @Model.Sottotitolo
+                </div>
+            }
+
+        </div>
+
+        <a href="@Model.UrlNuovo"
+           class="pfw-btn pfw-btn-primary">
+
+            @Model.TestoPulsanteNuovo
+
+        </a>
+
+    </div>
+
+</div>

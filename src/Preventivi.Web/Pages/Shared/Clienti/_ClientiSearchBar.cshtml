@@ -1,0 +1,65 @@
+﻿@model global::Preventivi.Web.UI.Modules.Clienti.ClientiSearchBarModel
+
+<div class="pfw-panel mb-3">
+
+    <div class="pfw-panel-body">
+
+        <form method="get"
+              class="row g-2 align-items-end">
+
+            <div class="col-12 col-lg">
+
+                <label class="form-label">
+                    Ricerca
+                </label>
+
+                <input type="text"
+                       name="Ricerca"
+                       value="@Model.Ricerca"
+                       class="form-control"
+                       placeholder="Codice, ragione sociale o partita IVA" />
+
+            </div>
+
+            <div class="col-12 col-md-4 col-lg-3">
+
+                <label class="form-label">
+                    Stato
+                </label>
+
+                <select name="Stato"
+                        class="form-select">
+
+                    <option value="attivi"
+                            selected="@(Model.Stato == "attivi")">
+                        Attivi
+                    </option>
+
+                    <option value="nonattivi"
+                            selected="@(Model.Stato == "nonattivi")">
+                        Non attivi
+                    </option>
+
+                    <option value="tutti"
+                            selected="@(Model.Stato == "tutti")">
+                        Tutti
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="col-12 col-md-auto">
+
+                <button type="submit"
+                        class="pfw-btn pfw-btn-primary">
+                    Cerca
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

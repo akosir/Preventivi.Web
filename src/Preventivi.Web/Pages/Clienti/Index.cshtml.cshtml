@@ -1,0 +1,34 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Clienti.IndexModel
+
+@{
+    ViewData["Title"] = "Clienti";
+}
+
+<div class="pfw-panel mb-3">
+
+    @await Html.PartialAsync(
+    "Shared/Clienti/_ClientiHeader",
+    Model.Header)
+
+</div>
+
+<div class="pfw-panel mb-3">
+
+    @await Html.PartialAsync(
+     "Shared/Clienti/_ClientiSearchBar",
+     Model.BarraRicerca)
+
+</div>
+
+<div class="pfw-panel">
+
+    <div class="pfw-panel-body p-0">
+
+        @await Html.PartialAsync(
+            "Shared/Common/_DataGrid",
+            Model.Griglia)
+
+    </div>
+
+</div>

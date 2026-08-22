@@ -22,6 +22,10 @@ builder.Services.AddScoped<
     IPreventivoRepository,
     PreventivoRepository>();
 
+builder.Services.AddScoped<
+    global::Preventivi.Core.Clienti.IClienteRepository,
+    global::Preventivi.Data.Clienti.ClienteRepository>();
+
 
 var app = builder.Build();
 

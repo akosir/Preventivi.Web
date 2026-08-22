@@ -1,0 +1,147 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.Common.DataGridModel
+
+@{
+    ViewData["Title"] = "Common DataGrid";
+}
+
+<h1 class="mb-4">Common DataGrid</h1>
+
+<div class="pfw-panel">
+
+    <div class="pfw-panel-header">
+
+        <div>
+            <h3 class="pfw-panel-title">
+                Esempio DataGrid
+            </h3>
+
+            <div class="pfw-panel-subtitle">
+                Componente condiviso del gestionale
+            </div>
+        </div>
+
+    </div>
+
+    <div class="pfw-panel-body p-0">
+
+        @await Html.PartialAsync(
+            "Shared/Common/_DataGrid",
+            new global::Preventivi.Web.UI.Common.DataGrid.DataGridModel
+            {
+                Colonne =
+                [
+                    new()
+                    {
+                        Chiave = "codice",
+                        Titolo = "Codice"
+                    },
+
+                    new()
+                    {
+                        Chiave = "descrizione",
+                        Titolo = "Descrizione"
+                    },
+
+                    new()
+                    {
+                        Chiave = "citta",
+                        Titolo = "Città"
+                    },
+
+                    new()
+                    {
+                        Chiave = "stato",
+                        Titolo = "Stato"
+                    }
+                ],
+
+                Righe =
+                [
+                    new()
+                    {
+                        Id = "riga-1",
+
+                        Celle =
+                            new Dictionary<string,
+                                global::Preventivi.Web.UI.Common.DataGrid.DataGridCellModel>
+                            {
+                                ["codice"] = new()
+                                {
+                                    Testo = "CLI001"
+                                },
+
+                                ["descrizione"] = new()
+                                {
+                                    Testo = "Alfa S.r.l."
+                                },
+
+                                ["citta"] = new()
+                                {
+                                    Testo = "Bologna"
+                                },
+
+                                ["stato"] = new()
+                                {
+                                    Testo = "Attivo",
+                                    BadgeVariante = "successo"
+                                }
+                            },
+
+                        Azioni =
+                        [
+                            new()
+                            {
+                                Testo = "Apri",
+                                Url = "#",
+                                Variante = "secondary"
+                            }
+                        ]
+                    },
+
+                    new()
+                    {
+                        Id = "riga-2",
+
+                        Celle =
+                            new Dictionary<string,
+                                global::Preventivi.Web.UI.Common.DataGrid.DataGridCellModel>
+                            {
+                                ["codice"] = new()
+                                {
+                                    Testo = "CLI002"
+                                },
+
+                                ["descrizione"] = new()
+                                {
+                                    Testo = "Beta S.p.A."
+                                },
+
+                                ["citta"] = new()
+                                {
+                                    Testo = "Modena"
+                                },
+
+                                ["stato"] = new()
+                                {
+                                    Testo = "Non attivo",
+                                    BadgeVariante = "neutro"
+                                }
+                            },
+
+                        Azioni =
+                        [
+                            new()
+                            {
+                                Testo = "Apri",
+                                Url = "#",
+                                Variante = "secondary"
+                            }
+                        ]
+                    }
+                ]
+            })
+
+    </div>
+
+</div>

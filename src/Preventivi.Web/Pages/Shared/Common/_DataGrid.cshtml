@@ -1,0 +1,97 @@
+﻿@model global::Preventivi.Web.UI.Common.DataGrid.DataGridModel
+
+@if (Model.Righe.Count == 0)
+{
+    @await Html.PartialAsync(
+        "Shared/PFW/EmptyState/_PFWEmptyState",
+        new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+        {
+            Titolo = Model.TitoloVuoto,
+            Messaggio = Model.MessaggioVuoto
+        })
+}
+else
+{
+    <div class="common-datagrid-wrapper">
+
+        <table class="common-datagrid">
+
+            <thead>
+                <tr>
+
+                    @foreach (var colonna in Model.Colonne)
+                    {
+                        <th class="@colonna.CssClass">
+                            @colonna.Titolo
+                        </th>
+                    }
+
+                    <th class="common-datagrid-actions-header">
+                        Azioni
+                    </th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var riga in Model.Righe)
+                {
+                    <tr id="@riga.Id">
+
+                        @foreach (var colonna in Model.Colonne)
+                        {
+                            riga.Celle.TryGetValue(
+                                colonna.Chiave,
+                                out var cella);
+
+                            <td class="@cella?.CssClass">
+
+                                @if (cella is not null &&
+                                     !string.IsNullOrWhiteSpace(
+                                         cella.BadgeVariante))
+                                {
+                                    @await Html.PartialAsync(
+                                        "Shared/PFW/Badge/_PFWBadge",
+                                        new global::Preventivi.Web.UI.Badge.PFWBadgeModel
+                                        {
+                                            Testo = cella.Testo,
+                                            Variante = cella.BadgeVariante
+                                        })
+                                }
+                                else
+                                {
+                                    @cella?.Testo
+                                }
+
+                            </td>
+                        }
+
+                        <td class="common-datagrid-actions">
+
+                            @foreach (var azione in riga.Azioni)
+                            {
+                                if (!azione.Visibile)
+                                {
+                                    continue;
+                                }
+
+                                <a href="@azione.Url"
+                                   class="pfw-btn pfw-btn-@azione.Variante @(azione.Abilitata ? "" : "disabled")">
+
+                                    @azione.Testo
+
+                                </a>
+                            }
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}
