@@ -380,4 +380,30 @@ public sealed class ClienteRepository : IClienteRepository
 
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
+
+    public async Task DisattivaAsync(
+    int idCliente,
+    CancellationToken cancellationToken = default)
+    {
+        await using var connection =
+            _connectionFactory.CreateConnection();
+
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command =
+            new SqlCommand(
+                "dbo.Clienti_Disattiva",
+                connection);
+
+        command.CommandType =
+            CommandType.StoredProcedure;
+
+        command.Parameters.Add(
+            new SqlParameter("@IdCliente", SqlDbType.Int)
+            {
+                Value = idCliente
+            });
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
 }

@@ -18,4 +18,8 @@ public interface IClienteRepository
     Task AggiornaAsync(
         ClienteUpdateModel cliente,
         CancellationToken cancellationToken = default);
+
+    Task DisattivaAsync(
+    int idCliente,
+    CancellationToken cancellationToken = default);
 }

@@ -114,17 +114,21 @@ public static class ClienteGridMapper
                             },
 
                         Azioni =
-                        [
-                            new()
-                            {
-                                Testo = "Apri",
+                                [
+                                    new()
+                                    {
+                                        Testo = "Apri",
+                                        Url = $"/Clienti/Dettaglio?IdCliente={cliente.IdCliente}",
+                                        Variante = "secondary"
+                                    },
 
-                                Url =
-                                $"/Clienti/Dettaglio?IdCliente={cliente.IdCliente}",
-
-                                Variante = "secondary"
-                            }
-                        ]
+                                    new()
+                                    {
+                                        Testo = "Disattiva",
+                                        Url = $"/Clienti/Disattiva?IdCliente={cliente.IdCliente}",
+                                        Variante = "danger"
+                                    }
+                                ]
                     })
                 .ToList()
         };

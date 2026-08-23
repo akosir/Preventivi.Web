@@ -1,0 +1,50 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Clienti.DisattivaModel
+
+@{
+    ViewData["Title"] = "Disattiva Cliente";
+}
+
+@await Html.PartialAsync(
+    "Shared/Clienti/_ClientiHeader",
+    Model.Header)
+
+<div class="pfw-panel">
+
+    <div class="pfw-panel-body">
+
+        <p class="mb-4">
+
+            Confermi la disattivazione del cliente:
+
+            <strong>@Model.RagioneSociale</strong>?
+
+        </p>
+
+        <form method="post">
+
+            <input asp-for="IdCliente" type="hidden" />
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a asp-page="./Index"
+                   class="pfw-btn pfw-btn-secondary">
+
+                    Annulla
+
+                </a>
+
+                <button type="submit"
+                        class="pfw-btn pfw-btn-danger">
+
+                    Disattiva
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

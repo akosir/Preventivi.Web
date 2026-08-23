@@ -1,0 +1,184 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Dev.Allegati.RepositoryModel
+
+@{
+    ViewData["Title"] = "Playground Repository Allegati";
+}
+
+<h1 class="mb-4">
+    Playground Repository Allegati
+</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.Esito))
+{
+    <div class="alert alert-info mb-4">
+        @Model.Esito
+    </div>
+}
+
+
+<!-- =========================================================
+     TEST DISATTIVA
+     ========================================================= -->
+
+<div class="pfw-panel mb-4">
+
+    <div class="pfw-panel-header">
+
+        <div>
+            <h3 class="pfw-panel-title">
+                Test DisattivaAsync
+            </h3>
+
+            <div class="pfw-panel-subtitle">
+                Disattivazione logica di un allegato
+            </div>
+        </div>
+
+    </div>
+
+    <div class="pfw-panel-body">
+
+        <form method="post"
+              asp-page-handler="Disattiva">
+
+            <div class="row g-3 align-items-end">
+
+                <div class="col-12 col-md-4">
+
+                    <label asp-for="IdAllegatoDisattiva"
+                           class="form-label">
+                        Id Allegato
+                    </label>
+
+                    <input asp-for="IdAllegatoDisattiva"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-12 col-md-auto">
+
+                    <button type="submit"
+                            class="pfw-btn pfw-btn-danger">
+
+                        Test Disattiva
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TEST CREA
+     ========================================================= -->
+
+<div class="pfw-panel">
+
+    <div class="pfw-panel-header">
+
+        <div>
+            <h3 class="pfw-panel-title">
+                Test CreaAsync
+            </h3>
+
+            <div class="pfw-panel-subtitle">
+                Test Storage + Repository + SQL Server
+            </div>
+        </div>
+
+    </div>
+
+    <div class="pfw-panel-body">
+
+        <form method="post"
+              asp-page-handler="Crea">
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label asp-for="Entita"
+                           class="form-label">
+                        Entità
+                    </label>
+
+                    <input asp-for="Entita"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <label asp-for="IdEntita"
+                           class="form-label">
+                        Id Entità
+                    </label>
+
+                    <input asp-for="IdEntita"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label asp-for="TipoAllegato"
+                           class="form-label">
+                        Tipo Allegato
+                    </label>
+
+                    <input asp-for="TipoAllegato"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-12">
+
+                    <label asp-for="Descrizione"
+                           class="form-label">
+                        Descrizione
+                    </label>
+
+                    <input asp-for="Descrizione"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-12">
+
+                    <label asp-for="FileOrigine"
+                           class="form-label">
+                        Percorso file sorgente
+                    </label>
+
+                    <input asp-for="FileOrigine"
+                           class="form-control"
+                           placeholder="C:\Temp\prova.pdf" />
+
+                </div>
+
+                <div class="col-12">
+
+                    <button type="submit"
+                            class="pfw-btn pfw-btn-primary">
+
+                        Test Crea
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
