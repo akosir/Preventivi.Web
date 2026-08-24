@@ -1,8 +1,10 @@
 
 using Preventivi.Core.Allegati.Storage;
+using Preventivi.Core.ParametriSistema;
 using Preventivi.Core.Preventivi;
 using Preventivi.Data.Allegati;
 using Preventivi.Data.Comune;
+using Preventivi.Data.ParametriSistema;
 using Preventivi.Data.Preventivi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +40,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     global::Preventivi.Core.Allegati.IAllegatoRepository,
     global::Preventivi.Data.Allegati.AllegatoRepository>();
+
+builder.Services.AddScoped<
+    IParametriSistemaRepository,
+    ParametriSistemaRepository>();
+
+builder.Services.AddScoped<
+    global::Preventivi.Core.Allegati.Application.IAllegatoApplicationService,
+    global::Preventivi.Data.Allegati.AllegatoApplicationService>();
 
 
 

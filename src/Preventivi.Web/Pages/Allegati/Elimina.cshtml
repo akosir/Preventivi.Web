@@ -1,0 +1,46 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Allegati.EliminaModel
+
+@{
+    ViewData["Title"] = "Elimina Allegato";
+}
+
+<h1 class="mb-4">Elimina Allegato</h1>
+
+<div class="pfw-panel">
+
+    <div class="pfw-panel-body">
+
+        <div class="alert alert-warning">
+            Confermi l'eliminazione definitiva dell'allegato
+            <strong>@Model.NomeFileOriginale</strong>?
+        </div>
+
+        <p>
+            Verranno eliminati sia il file fisico sia il record dal database.
+        </p>
+
+        <form method="post">
+
+            <input type="hidden"
+                   asp-for="IdAllegato" />
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a href="javascript:history.back()"
+                   class="pfw-btn pfw-btn-secondary">
+                    Annulla
+                </a>
+
+                <button type="submit"
+                        class="pfw-btn pfw-btn-danger">
+                    Elimina
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

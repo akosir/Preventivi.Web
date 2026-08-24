@@ -97,7 +97,18 @@ internal static class AllegatoMapper
 
             Note = reader.IsDBNull(reader.GetOrdinal("Note"))
                 ? null
-                : reader.GetString(reader.GetOrdinal("Note"))
+                : reader.GetString(reader.GetOrdinal("Note")),
+
+            DataCreazione =
+    reader.GetDateTime(
+        reader.GetOrdinal("DataCreazione")),
+
+            DimensioneFile =
+    reader.IsDBNull(
+        reader.GetOrdinal("DimensioneFile"))
+            ? null
+            : reader.GetInt64(
+                reader.GetOrdinal("DimensioneFile"))
         };
     }
 }

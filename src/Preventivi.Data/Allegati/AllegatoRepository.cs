@@ -141,9 +141,9 @@ public sealed class AllegatoRepository : IAllegatoRepository
         return Convert.ToInt32(risultato);
     }
 
-    public async Task DisattivaAsync(
-     int idAllegato,
-     CancellationToken cancellationToken = default)
+    public async Task EliminaAsync(
+    int idAllegato,
+    CancellationToken cancellationToken = default)
     {
         await using var connection =
             _connectionFactory.CreateConnection();
@@ -152,7 +152,7 @@ public sealed class AllegatoRepository : IAllegatoRepository
 
         await using var command =
             new SqlCommand(
-                "dbo.Allegati_Disattiva",
+                "dbo.Allegati_Elimina",
                 connection);
 
         command.CommandType =

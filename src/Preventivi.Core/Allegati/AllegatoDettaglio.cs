@@ -25,4 +25,8 @@ public sealed class AllegatoDettaglio
     public string? UtenteInserimento { get; init; }
 
     public string? Note { get; init; }
+
+    public DateTime DataCreazione { get; init; }
+
+    public long? DimensioneFile { get; init; }
 }

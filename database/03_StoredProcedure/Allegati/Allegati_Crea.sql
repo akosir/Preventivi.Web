@@ -17,39 +17,37 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO dbo.Allegati
-    (
-        Entita,
-        IdEntita,
-        TipoAllegato,
-        Descrizione,
-        NomeFileOriginale,
-        PercorsoFile,
-        Estensione,
-        DataAllegato,
-        UtenteInserimento,
-        Note,
-        Attivo,
-        NomeFileArchiviato,
-        DimensioneFile
-    )
-    VALUES
-    (
-        @Entita,
-        @IdEntita,
-        @TipoAllegato,
-        @Descrizione,
-        @NomeFileOriginale,
-        @PercorsoFile,
-        @Estensione,
-        @DataAllegato,
-        @UtenteInserimento,
-        @Note,
-        1,
-        @NomeFileArchiviato,
-        @DimensioneFile
-    );
+   INSERT INTO dbo.Allegati
+(
+    Entita,
+    IdEntita,
+    TipoAllegato,
+    Descrizione,
+    NomeFileOriginale,
+    PercorsoFile,
+    Estensione,
+    DataAllegato,
+    UtenteInserimento,
+    Note,
+    NomeFileArchiviato,
+    DimensioneFile
+)
+VALUES
+(
+    @Entita,
+    @IdEntita,
+    @TipoAllegato,
+    @Descrizione,
+    @NomeFileOriginale,
+    @PercorsoFile,
+    @Estensione,
+    @DataAllegato,
+    @UtenteInserimento,
+    @Note,
+    @NomeFileArchiviato,
+    @DimensioneFile
+);
 
-    SELECT CONVERT(INT, SCOPE_IDENTITY()) AS IdAllegato;
+SELECT CONVERT(INT, SCOPE_IDENTITY()) AS IdAllegato;
 END
 GO

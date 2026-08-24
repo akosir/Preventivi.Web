@@ -53,7 +53,7 @@ public class RepositoryModel : PageModel
             return Page();
         }
 
-        await _allegatoRepository.DisattivaAsync(
+        await _allegatoRepository.EliminaAsync(
             IdAllegatoDisattiva,
             cancellationToken);
 

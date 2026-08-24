@@ -8,10 +8,9 @@ public interface IAllegatoStorageService
         StorageSaveRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Stream> ApriAsync(
-        string percorsoRelativo,
-        string nomeFileArchiviato,
-        CancellationToken cancellationToken = default);
+    Task<StorageFileResult> ApriAsync(
+    StorageOpenRequest request,
+    CancellationToken cancellationToken = default);
 
     Task EliminaAsync(
         string percorsoRelativo,

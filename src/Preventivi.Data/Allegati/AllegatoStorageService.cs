@@ -1,23 +1,29 @@
 ﻿using Microsoft.Extensions.Options;
 using Preventivi.Core.Allegati.Storage;
+using Preventivi.Core.ParametriSistema;
 
 namespace Preventivi.Data.Allegati;
 
 public sealed class AllegatoStorageService : IAllegatoStorageService
 {
-    private readonly StorageOptions _options;
+
+    private readonly IParametriSistemaRepository _parametriRepository;
 
     public AllegatoStorageService(
-        IOptions<StorageOptions> options)
+    IParametriSistemaRepository parametriRepository)
     {
-        _options = options.Value;
+        _parametriRepository = parametriRepository;
     }
 
     public async Task<StorageSaveResult> SalvaAsync(
     StorageSaveRequest request,
     CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(_options.ArchivioAllegati))
+        var percorsoRoot =
+await GetPercorsoRootAsync(
+    cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(percorsoRoot))
         {
             throw new InvalidOperationException(
                 "La cartella ArchivioAllegati non è configurata.");
@@ -59,7 +65,7 @@ public sealed class AllegatoStorageService : IAllegatoStorageService
             request.IdEntita.ToString());
 
         var cartellaCompleta = Path.Combine(
-            _options.ArchivioAllegati,
+            percorsoRoot,
             percorsoRelativo);
 
         Directory.CreateDirectory(cartellaCompleta);
@@ -115,19 +121,111 @@ public sealed class AllegatoStorageService : IAllegatoStorageService
         };
     }
 
-    public Task<Stream> ApriAsync(
-        string percorsoRelativo,
-        string nomeFileArchiviato,
-        CancellationToken cancellationToken = default)
+    public async Task<StorageFileResult> ApriAsync(
+    StorageOpenRequest request,
+    CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var percorsoRoot =
+            await GetPercorsoRootAsync(
+                cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(request.PercorsoRelativo))
+        {
+            throw new ArgumentException(
+                "Percorso relativo non valido.",
+                nameof(request));
+        }
+
+        if (string.IsNullOrWhiteSpace(request.NomeFileArchiviato))
+        {
+            throw new ArgumentException(
+                "Nome file archiviato non valido.",
+                nameof(request));
+        }
+
+        var percorsoCompleto = Path.Combine(
+            percorsoRoot,
+            request.PercorsoRelativo,
+            request.NomeFileArchiviato);
+
+        if (!File.Exists(percorsoCompleto))
+        {
+            throw new FileNotFoundException(
+                "Il file allegato non è stato trovato nello storage.",
+                percorsoCompleto);
+        }
+
+        Stream stream = new FileStream(
+            percorsoCompleto,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            81920,
+            useAsync: true);
+
+        var infoFile =
+            new FileInfo(percorsoCompleto);
+
+        return new StorageFileResult
+        {
+            Stream = stream,
+            NomeFileOriginale = request.NomeFileOriginale,
+            Estensione = Path.GetExtension(request.NomeFileOriginale),
+            DimensioneFile = infoFile.Length
+        };
     }
 
-    public Task EliminaAsync(
-        string percorsoRelativo,
-        string nomeFileArchiviato,
-        CancellationToken cancellationToken = default)
+    public async Task EliminaAsync(
+    string percorsoRelativo,
+    string nomeFileArchiviato,
+    CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var percorsoRoot =
+            await GetPercorsoRootAsync(
+                cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(percorsoRelativo))
+        {
+            throw new ArgumentException(
+                "Percorso relativo non valido.",
+                nameof(percorsoRelativo));
+        }
+
+        if (string.IsNullOrWhiteSpace(nomeFileArchiviato))
+        {
+            throw new ArgumentException(
+                "Nome file archiviato non valido.",
+                nameof(nomeFileArchiviato));
+        }
+
+        var percorsoCompleto =
+            Path.Combine(
+                percorsoRoot,
+                percorsoRelativo,
+                nomeFileArchiviato);
+
+        if (!File.Exists(percorsoCompleto))
+        {
+            return;
+        }
+
+        File.Delete(percorsoCompleto);
+    }
+
+    private async Task<string> GetPercorsoRootAsync(
+    CancellationToken cancellationToken)
+    {
+        var percorso =
+            await _parametriRepository.GetValoreAsync(
+                "PercorsoRootAllegati",
+                cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(percorso))
+        {
+            throw new InvalidOperationException(
+                "Il parametro 'PercorsoRootAllegati' non è configurato.");
+        }
+
+        return percorso.Trim();
     }
 }

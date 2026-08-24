@@ -1,0 +1,48 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Allegati.NuovoModel
+
+@{
+    ViewData["Title"] = "Nuovo Allegato";
+}
+
+@await Html.PartialAsync(
+    "~/Pages/Shared/Allegati/_AllegatiHeader.cshtml",
+    new global::Preventivi.Web.UI.Modules.Allegati.AllegatiHeaderModel
+    {
+        Titolo = "Nuovo Allegato",
+        Sottotitolo = $"{Model.Entita} - {Model.IdEntita}"
+    })
+
+<form method="post"
+      enctype="multipart/form-data">
+
+    <input type="hidden"
+           asp-for="Entita" />
+
+    <input type="hidden"
+           asp-for="IdEntita" />
+
+
+    @await Html.PartialAsync(
+        "~/Pages/Shared/Allegati/_AllegatoForm.cshtml",
+        Model.Form)
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+
+        <a class="pfw-btn pfw-btn-secondary"
+           href="javascript:history.back()">
+
+            Annulla
+
+        </a>
+
+        <button type="submit"
+                class="pfw-btn pfw-btn-primary">
+
+            Salva
+
+        </button>
+
+    </div>
+
+</form>

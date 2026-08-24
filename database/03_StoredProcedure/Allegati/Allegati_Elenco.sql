@@ -19,8 +19,8 @@ BEGIN
     FROM dbo.Allegati
     WHERE Entita = @Entita
       AND IdEntita = @IdEntita
-      AND Attivo = 1
-    ORDER BY DataAllegato DESC,
-             NomeFileOriginale;
+    ORDER BY
+        DataAllegato DESC,
+        NomeFileOriginale;
 END
 GO

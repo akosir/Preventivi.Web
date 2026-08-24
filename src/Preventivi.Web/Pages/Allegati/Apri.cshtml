@@ -1,0 +1,13 @@
+﻿@page
+@model global::Preventivi.Web.Pages.Allegati.ApriModel
+
+@{
+    ViewData["Title"] = "Apri Allegato";
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.MessaggioErrore))
+{
+    <div class="alert alert-danger mt-3">
+        @Model.MessaggioErrore
+    </div>
+}

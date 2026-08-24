@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.SqlClient;
 using Preventivi.Core.Clienti;
 using Preventivi.Web.UI.Modules.Clienti;
+using Preventivi.Core.Allegati;
+using Preventivi.Web.UI.Modules.Allegati;
 
 namespace Preventivi.Web.Pages.Clienti;
 
@@ -10,10 +12,14 @@ public class DettaglioModel : PageModel
 {
     private readonly IClienteRepository _clienteRepository;
 
+    private readonly IAllegatoRepository _allegatoRepository;
+
     public DettaglioModel(
-        IClienteRepository clienteRepository)
+    IClienteRepository clienteRepository,
+    IAllegatoRepository allegatoRepository)
     {
         _clienteRepository = clienteRepository;
+        _allegatoRepository = allegatoRepository;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -23,6 +29,9 @@ public class DettaglioModel : PageModel
     public ClienteFormModel Cliente { get; set; } = new();
 
     public ClientiHeaderModel Header { get; private set; } = new();
+
+    public AllegatiGridModel Allegati { get; private set; }
+    = new();
 
     public async Task<IActionResult> OnGetAsync(
         CancellationToken cancellationToken)
@@ -52,6 +61,14 @@ public class DettaglioModel : PageModel
             Telefono = cliente.Telefono,
             Email = cliente.Email,
             Attivo = cliente.Attivo
+        };
+
+        Allegati = new AllegatiGridModel
+        {
+            Allegati = await _allegatoRepository.GetElencoAsync(
+        "Clienti",
+        IdCliente,
+        cancellationToken)
         };
 
         return Page();

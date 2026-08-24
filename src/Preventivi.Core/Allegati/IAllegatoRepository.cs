@@ -15,9 +15,9 @@ public interface IAllegatoRepository
         AllegatoCreateModel allegato,
         CancellationToken cancellationToken = default);
 
-    Task DisattivaAsync(
-        int idAllegato,
-        CancellationToken cancellationToken = default);
+    Task EliminaAsync(
+       int idAllegato,
+       CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<TipoAllegatoItem>> GetTipiAsync(
         CancellationToken cancellationToken = default);

@@ -1,0 +1,22 @@
+﻿@model global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+
+<div class="d-flex justify-content-end gap-2 mb-3">
+
+    @if (Model.MostraAggiorna)
+    {
+        <a href=""
+           class="pfw-btn pfw-btn-secondary">
+            Aggiorna
+        </a>
+    }
+
+    @if (Model.MostraNuovo &&
+         !string.IsNullOrWhiteSpace(Model.UrlNuovo))
+    {
+        <a href="@Model.UrlNuovo"
+           class="pfw-btn pfw-btn-primary">
+            @Model.TestoNuovo
+        </a>
+    }
+
+</div>

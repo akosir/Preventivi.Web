@@ -1,0 +1,76 @@
+﻿@model global::Preventivi.Web.UI.Modules.Allegati.AllegatoFormModel
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+
+        <label asp-for="TipoAllegato" class="form-label">
+            Tipo Allegato
+        </label>
+
+        <select asp-for="TipoAllegato"
+                class="form-select">
+
+            <option value="">
+                -- Seleziona --
+            </option>
+
+            @foreach (var tipo in Model.TipiAllegato)
+            {
+                <option value="@tipo.CodiceTipo">
+                    @tipo.Descrizione
+                </option>
+            }
+
+        </select>
+
+        <span asp-validation-for="TipoAllegato"
+              class="text-danger"></span>
+
+
+    </div>
+
+    <div class="col-12">
+
+        <label asp-for="Descrizione"
+               class="form-label">
+            Descrizione
+        </label>
+
+        <input asp-for="Descrizione"
+               class="form-control" />
+
+    </div>
+
+    <div class="col-12">
+
+        <label asp-for="Note"
+               class="form-label">
+            Note
+        </label>
+
+        <textarea asp-for="Note"
+                  rows="4"
+                  class="form-control">
+        </textarea>
+
+    </div>
+
+    <div class="col-12">
+
+        <label asp-for="File"
+               class="form-label">
+            File
+        </label>
+
+        <input asp-for="File"
+               type="file"
+               class="form-control" />
+
+        <span asp-validation-for="File"
+              class="text-danger"></span>
+
+
+    </div>
+
+</div>

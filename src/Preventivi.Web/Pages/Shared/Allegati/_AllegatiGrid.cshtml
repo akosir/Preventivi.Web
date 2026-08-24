@@ -1,0 +1,60 @@
+﻿@model global::Preventivi.Web.UI.Modules.Allegati.AllegatiGridModel
+
+<table class="table table-hover">
+
+    <thead>
+
+        <tr>
+
+            <th>Tipo</th>
+
+            <th>Nome file</th>
+
+            <th>Descrizione</th>
+
+            <th>Data</th>
+
+            <th>Utente</th>
+
+            <th>Azioni</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @foreach (var allegato in Model.Allegati)
+        {
+            <tr>
+                <td>@allegato.TipoAllegato</td>
+                <td>@allegato.NomeFileOriginale</td>
+                <td>@allegato.Descrizione</td>
+                <td>@allegato.DataAllegato</td>
+                <td>@allegato.UtenteInserimento</td>
+
+                <td class="d-flex gap-2">
+
+                    <a href="/Allegati/Apri?IdAllegato=@allegato.IdAllegato"
+                       target="_blank"
+                       class="pfw-btn pfw-btn-secondary">
+                        Apri
+                    </a>
+
+                    <a href="/Allegati/Download?IdAllegato=@allegato.IdAllegato"
+                       class="pfw-btn pfw-btn-secondary">
+                        Download
+                    </a>
+
+                    <a href="/Allegati/Elimina?IdAllegato=@allegato.IdAllegato"
+                       class="pfw-btn pfw-btn-danger">
+                        Elimina
+                    </a>
+
+                </td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>
