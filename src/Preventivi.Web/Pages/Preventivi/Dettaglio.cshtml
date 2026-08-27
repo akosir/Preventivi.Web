@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model Preventivi.DettaglioModel
 
 @{
@@ -21,7 +21,6 @@
 
             <div>
                 <div class="d-flex align-items-center gap-3 flex-wrap">
-
                     <h1 class="workspace-title mb-0">
                         Preventivo @Model.Preventivo.NumeroCompleto
                     </h1>
@@ -29,7 +28,6 @@
                     <span class="pfw-badge @GetStatoBadge(Model.Preventivo.Stato)">
                         @Model.Preventivo.Stato
                     </span>
-
                 </div>
 
                 <div class="workspace-subtitle">
@@ -39,378 +37,361 @@
                 </div>
             </div>
 
-            <div class="workspace-actions">
-                <button type="button" class="pfw-btn pfw-btn-secondary">
-                    Duplica
-                </button>
-
-                <button type="button" class="pfw-btn pfw-btn-secondary">
-                    PDF
-                </button>
-
-                <button type="button" class="pfw-btn pfw-btn-primary">
-                    Salva
-                </button>
-            </div>
-
         </div>
 
     </div>
 
-    <div class="row g-3">
+    <section class="pfw-panel mb-3">
 
-        <!-- AREA PRINCIPALE -->
-        <div class="col-12 col-xl-9">
-
-            <!-- DATI TESTATA -->
-            <section class="pfw-panel mb-3">
-
-                <div class="pfw-panel-header">
-                    <div>
-                        <h2 class="pfw-panel-title">Dati preventivo</h2>
-                        <div class="pfw-panel-subtitle">
-                            Informazioni principali del documento
-                        </div>
-                    </div>
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dettaglio preventivo</h2>
+                <div class="pfw-panel-subtitle">
+                    Dati principali e totali calcolati
                 </div>
+            </div>
+        </div>
 
-                <div class="p-3">
+        <div class="p-3">
 
-                    <div class="row g-3">
+            <div class="row g-3 align-items-start">
 
-                        <div class="col-md-6">
+                <div class="col-12 col-xl-5">
+                    <div class="row g-2">
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">NumeroPreventivo</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Preventivo.NumeroPreventivo"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Anno</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Preventivo.Anno"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">DataPreventivo</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Preventivo.DataPreventivo.ToString("dd/MM/yyyy")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">IdCliente</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Preventivo.IdCliente"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
                             <label class="form-label">Cliente</label>
                             <input class="form-control"
                                    value="@Model.Preventivo.Cliente"
                                    readonly />
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Data preventivo</label>
-                            <input class="form-control"
-                                   value="@Model.Preventivo.DataPreventivo.ToString("dd/MM/yyyy")"
-                                   readonly />
+                        <div class="col-12">
+                            <label class="form-label">Oggetto</label>
+                            <textarea class="form-control"
+                                      rows="2"
+                                      readonly>@Model.Preventivo.Oggetto</textarea>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Stato</label>
                             <input class="form-control"
                                    value="@Model.Preventivo.Stato"
                                    readonly />
                         </div>
 
-                        <div class="col-md-8">
-                            <label class="form-label">Oggetto</label>
-                            <input class="form-control"
-                                   value="@Model.Preventivo.Oggetto"
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-4">
+                    <div class="row g-2">
+
+                        <div class="col-12">
+                            <label class="form-label">TotaleCosti</label>
+                            <input class="form-control text-end fw-semibold"
+                                   value="@Model.Preventivo.TotaleCosti.ToString("C2")"
                                    readonly />
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label">Markup predefinito</label>
+                        <div class="col-12">
+                            <label class="form-label">TotaleVendita</label>
+                            <input class="form-control text-end fw-semibold"
+                                   value="@Model.Preventivo.TotaleVendita.ToString("C2")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">MargineValore</label>
+                            <input class="form-control text-end fw-semibold"
+                                   value="@Model.Preventivo.MargineValore.ToString("C2")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-7">
+                            <label class="form-label">Margine %</label>
+                            <input class="form-control text-end fw-semibold"
+                                   value="@Model.Preventivo.MarginePerc.ToString("N2")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-5">
+                            <label class="form-label">Markup</label>
                             <input class="form-control text-end"
-                                   value="@Model.Preventivo.MarkupPercDefault.ToString("N2") %"
+                                   value="@Model.Preventivo.MarkupPercDefault.ToString("N2")"
                                    readonly />
                         </div>
 
                     </div>
-
                 </div>
 
-            </section>
+                <div class="col-12 col-xl-3">
+                    <div class="row g-2">
 
-            <!-- KPI -->
-            <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label class="form-label">Richiesta Cliente</label>
+                            <input class="form-control"
+                                   value="@GetRichiestaClienteTesto()"
+                                   readonly />
+                        </div>
 
-                <div class="col-12 col-md-4">
-                    <div class="pfw-kpi-card workspace-kpi">
-                        <div class="pfw-kpi-label">Totale costi</div>
-                        <div class="pfw-kpi-value">
-                            @Model.Preventivo.TotaleCosti.ToString("C2")
+                        <div class="col-12">
+                            <label class="form-label">Note</label>
+                            <textarea class="form-control"
+                                      rows="5"
+                                      readonly>@Model.Preventivo.Note</textarea>
                         </div>
-                        <div class="pfw-kpi-footer">
-                            Costi complessivi preventivati
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-12 col-md-4">
-                    <div class="pfw-kpi-card workspace-kpi">
-                        <div class="pfw-kpi-label">Totale vendita</div>
-                        <div class="pfw-kpi-value">
-                            @Model.Preventivo.TotaleVendita.ToString("C2")
-                        </div>
-                        <div class="pfw-kpi-footer">
-                            Valore complessivo offerta
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-md-4">
-                    <div class="pfw-kpi-card workspace-kpi">
-                        <div class="pfw-kpi-label">Margine</div>
-                        <div class="pfw-kpi-value">
-                            @Model.Preventivo.MarginePerc.ToString("N2")%
-                        </div>
-                        <div class="pfw-kpi-footer">
-                            @Model.Preventivo.MargineValore.ToString("C2")
-                        </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- AREA OPERATIVA -->
-            <section class="pfw-panel">
+        </div>
 
-                <div class="workspace-tabs">
+    </section>
 
-                    <button type="button" class="workspace-tab active">
-                        Righe
-                    </button>
+    <section class="pfw-panel">
 
-                    <button type="button" class="workspace-tab">
-                        Varianti
-                    </button>
+        <div class="workspace-tabs">
 
-                    <button type="button" class="workspace-tab">
-                        Allegati
-                    </button>
+            <a href="#righe-preventivo"
+               class="workspace-tab active text-decoration-none">
+                Righe Preventivo (@Model.Righe.Count)
+            </a>
 
-                    <button type="button" class="workspace-tab">
-                        Campionature
-                    </button>
+            <a href="#varianti-preventivo"
+               class="workspace-tab text-decoration-none">
+                Varianti Preventivo
+            </a>
 
-                    <button type="button" class="workspace-tab">
-                        Ordini fornitori
-                    </button>
-
-                    <button type="button" class="workspace-tab">
-                        Storico
-                    </button>
-
-                </div>
-
-                <div class="workspace-tab-content">
-
-                    <div class="workspace-righe-toolbar">
-
-                        <div>
-                            <strong>Righe preventivo</strong>
-                            <span class="workspace-righe-count">
-                                @Model.Righe.Count righe
-                            </span>
-                        </div>
-
-                        <button type="button"
-                                class="pfw-btn pfw-btn-primary">
-                            Nuova riga
-                        </button>
-
-                    </div>
-
-                    @if (Model.Righe.Count == 0)
-                    {
-                        <div class="workspace-placeholder">
-
-                            <div class="workspace-placeholder-title">
-                                Nessuna riga presente
-                            </div>
-
-                            <div class="workspace-placeholder-text">
-                                Il preventivo non contiene ancora righe.
-                            </div>
-
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-
-                            <table class="table pfw-table align-middle mb-0">
-
-                                <thead>
-                                    <tr>
-                                        <th>Riga</th>
-                                        <th>Tipo</th>
-                                        <th>Descrizione</th>
-                                        <th class="text-end">Q.tà</th>
-                                        <th class="text-end">Costo</th>
-                                        <th class="text-end">Prezzo unit.</th>
-                                        <th class="text-end">Vendita</th>
-                                        <th class="text-end">Margine</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-
-                                    @foreach (var riga in Model.Righe)
-                                    {
-                                        <tr>
-
-                                            <td class="fw-semibold">
-                                                @riga.RigaNr
-                                            </td>
-
-                                            <td>
-                                                <span class="pfw-badge pfw-badge-secondary">
-                                                    @riga.TipoRiga
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                @riga.DescrizioneVoce
-                                            </td>
-
-                                            <td class="text-end">
-                                                @riga.Quantita.ToString("N2")
-                                            </td>
-
-                                            <td class="text-end">
-                                                @riga.TotaleCosti.ToString("C2")
-                                            </td>
-
-                                            <td class="text-end">
-                                                @riga.PrezzoUnitarioVendita.ToString("C2")
-                                            </td>
-
-                                            <td class="text-end fw-semibold">
-                                                @riga.TotaleVendita.ToString("C2")
-                                            </td>
-
-                                            <td class="text-end">
-                                                @riga.MarginePerc.ToString("N2")%
-                                            </td>
-
-                                            <td class="text-end">
-                                                <a href="#"
-                                                   class="pfw-action-link">
-                                                    Apri
-                                                </a>
-                                            </td>
-
-                                        </tr>
-                                    }
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-                    }
-
-                </div>
-
-            </section>
+            <a href="#allegati-preventivo"
+               class="workspace-tab text-decoration-none">
+                Allegati (@Model.Allegati.Allegati.Count)
+            </a>
 
         </div>
 
-        <!-- SIDEBAR -->
-        <div class="col-12 col-xl-3">
+        <div class="workspace-tab-content">
 
-            <aside class="workspace-sidebar">
+            <div id="righe-preventivo"
+                 class="workspace-righe-toolbar">
 
-                <section class="pfw-panel mb-3">
+                <div>
+                    <strong>Righe preventivo</strong>
+                    <span class="workspace-righe-count">
+                        @Model.Righe.Count righe
+                    </span>
+                </div>
 
-                    <div class="pfw-panel-header">
-                        <div>
-                            <h2 class="pfw-panel-title">Stato attività</h2>
-                        </div>
+            </div>
+
+            @if (Model.Righe.Count == 0)
+            {
+                <div class="workspace-placeholder">
+
+                    <div class="workspace-placeholder-title">
+                        Nessuna riga presente
                     </div>
 
-                    <div class="workspace-sidebar-content">
+                    <div class="workspace-placeholder-text">
+                        Il preventivo non contiene ancora righe.
+                    </div>
 
-                        <div class="workspace-status-row">
-                            <span>Richiesta cliente</span>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
 
-                            @if (Model.Preventivo.IdRichiestaCliente.HasValue)
+                    <table class="table pfw-table align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>RigaNr</th>
+                                <th>Tipo</th>
+                                <th>DescrizioneVoce</th>
+                                <th class="text-end">Quantità</th>
+                                <th class="text-end">Prezzo Unitario Vendita</th>
+                                <th class="text-end">Totale Vendita</th>
+                                <th class="text-end">Totale Costi</th>
+                                <th class="text-end">Margine %</th>
+                                <th class="text-center">Prez. Manuale</th>
+                                <th class="text-center">Azioni</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var riga in Model.Righe)
                             {
-                                <span class="pfw-badge pfw-badge-success">
-                                    Collegata
-                                </span>
+                                <tr>
+                                    <td class="fw-semibold">
+                                        @riga.RigaNr
+                                    </td>
+
+                                    <td>
+                                        <span class="pfw-badge pfw-badge-secondary">
+                                            @riga.TipoRiga
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @riga.DescrizioneVoce
+                                    </td>
+
+                                    <td class="text-end">
+                                        @riga.Quantita.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @riga.PrezzoUnitarioVendita.ToString("C2")
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+                                        @riga.TotaleVendita.ToString("C2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @riga.TotaleCosti.ToString("C2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @riga.MarginePerc.ToString("N2")
+                                    </td>
+
+                                    <td class="text-center">
+                                        <input type="checkbox"
+                                               checked="@riga.PrezzoManuale"
+                                               disabled />
+                                    </td>
+
+                                    <td class="text-center">
+                                        <a asp-page="/Preventivi/Riga/Workspace"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@riga.IdRigaPreventivo"
+                                           class="pfw-action-link">
+                                            Apri
+                                        </a>
+                                    </td>
+                                </tr>
                             }
-                            else
-                            {
-                                <span class="pfw-badge pfw-badge-secondary">
-                                    Assente
-                                </span>
-                            }
-                        </div>
 
-                        <div class="workspace-status-row">
-                            <span>Campionature</span>
-                            <span class="pfw-badge pfw-badge-warning">
-                                Demo
-                            </span>
-                        </div>
+                        </tbody>
 
-                        <div class="workspace-status-row">
-                            <span>Ordini fornitori</span>
-                            <span class="pfw-badge pfw-badge-primary">
-                                Demo
-                            </span>
-                        </div>
+                    </table>
 
-                        <div class="workspace-status-row">
-                            <span>Allegati</span>
-                            <span class="pfw-badge pfw-badge-secondary">
-                                Demo
-                            </span>
-                        </div>
+                </div>
+            }
 
+            <hr id="varianti-preventivo"
+                class="my-4" />
+
+            <div class="workspace-righe-toolbar">
+                <div>
+                    <strong>Varianti preventivo</strong>
+                    <span class="workspace-righe-count">
+                        dati non ancora disponibili
+                    </span>
+                </div>
+            </div>
+
+            <div class="workspace-placeholder">
+                <div class="workspace-placeholder-title">
+                    Modulo varianti non ancora collegato
+                </div>
+
+                <div class="workspace-placeholder-text">
+                    Nel codice non sono ancora presenti repository o stored procedure
+                    per leggere le varianti del preventivo.
+                </div>
+            </div>
+
+            <hr id="allegati-preventivo"
+                class="my-4" />
+
+            @await Html.PartialAsync(
+                "~/Pages/Shared/Allegati/_AllegatiHeader.cshtml",
+                new global::Preventivi.Web.UI.Modules.Allegati.AllegatiHeaderModel
+                {
+                    Titolo = "Allegati preventivo",
+                    Sottotitolo = "Documenti associati al preventivo"
+                })
+
+            @await Html.PartialAsync(
+                "~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml",
+                new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+                {
+                    TestoNuovo = "Nuovo Allegato",
+                    UrlNuovo =
+                        $"/Allegati/Nuovo?Entita=Preventivi&IdEntita={Model.Preventivo.IdPreventivo}",
+                    MostraNuovo = true,
+                    MostraAggiorna = false
+                })
+
+            @if (Model.Allegati.Allegati.Count == 0)
+            {
+                <div class="workspace-placeholder">
+
+                    <div class="workspace-placeholder-title">
+                        Nessun allegato presente
                     </div>
 
-                </section>
-
-                <section class="pfw-panel">
-
-                    <div class="pfw-panel-header">
-                        <div>
-                            <h2 class="pfw-panel-title">Riepilogo</h2>
-                        </div>
+                    <div class="workspace-placeholder-text">
+                        Il preventivo non contiene ancora documenti allegati.
                     </div>
 
-                    <div class="workspace-sidebar-content">
-
-                        <div class="workspace-summary-row">
-                            <span>Numero</span>
-                            <strong>@Model.Preventivo.NumeroCompleto</strong>
-                        </div>
-
-                        <div class="workspace-summary-row">
-                            <span>Stato</span>
-                            <strong>@Model.Preventivo.Stato</strong>
-                        </div>
-
-                        <div class="workspace-summary-row">
-                            <span>Markup</span>
-                            <strong>
-                                @Model.Preventivo.MarkupPercDefault.ToString("N2")%
-                            </strong>
-                        </div>
-
-                        <div class="workspace-summary-row">
-                            <span>Margine</span>
-                            <strong>
-                                @Model.Preventivo.MarginePerc.ToString("N2")%
-                            </strong>
-                        </div>
-
-                    </div>
-
-                </section>
-
-            </aside>
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync(
+                    "~/Pages/Shared/Allegati/_AllegatiGrid.cshtml",
+                    Model.Allegati)
+            }
 
         </div>
 
-    </div>
+    </section>
 
 </div>
 
 @functions
 {
+    private string GetRichiestaClienteTesto()
+    {
+        return Model.Preventivo!.IdRichiestaCliente.HasValue
+            ? Model.Preventivo.IdRichiestaCliente.Value.ToString()
+            : "Assente";
+    }
+
     private static string GetStatoBadge(string stato)
     {
         return stato switch

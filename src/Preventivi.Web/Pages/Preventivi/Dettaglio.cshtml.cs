@@ -1,21 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Preventivi.Core.Allegati;
 using Preventivi.Core.Preventivi;
+using Preventivi.Web.UI.Modules.Allegati;
 
 namespace Preventivi.Web.Pages.Preventivi;
 
 public class DettaglioModel : PageModel
 {
-    private readonly IPreventivoRepository _repository;
+    private readonly IPreventivoRepository _preventivoRepository;
+    private readonly IAllegatoRepository _allegatoRepository;
 
     public PreventivoDettaglio? Preventivo { get; private set; }
 
     public IReadOnlyList<PreventivoRigaListItem> Righe { get; private set; }
         = Array.Empty<PreventivoRigaListItem>();
 
-    public DettaglioModel(IPreventivoRepository repository)
+    public AllegatiGridModel Allegati { get; private set; } = new();
+
+    public DettaglioModel(
+        IPreventivoRepository preventivoRepository,
+        IAllegatoRepository allegatoRepository)
     {
-        _repository = repository;
+        _preventivoRepository = preventivoRepository;
+        _allegatoRepository = allegatoRepository;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -23,7 +31,7 @@ public class DettaglioModel : PageModel
         CancellationToken cancellationToken)
     {
         Preventivo =
-            await _repository.GetDettaglioAsync(
+            await _preventivoRepository.GetDettaglioAsync(
                 id,
                 cancellationToken);
 
@@ -33,9 +41,18 @@ public class DettaglioModel : PageModel
         }
 
         Righe =
-            await _repository.GetRigheAsync(
+            await _preventivoRepository.GetRigheAsync(
                 id,
                 cancellationToken);
+
+        Allegati = new AllegatiGridModel
+        {
+            Allegati =
+                await _allegatoRepository.GetElencoAsync(
+                    "Preventivi",
+                    id,
+                    cancellationToken)
+        };
 
         return Page();
     }

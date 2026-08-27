@@ -79,6 +79,16 @@ public class EliminaModel : PageModel
                 });
         }
 
+        if (allegato.Entita == "Preventivi")
+        {
+            return RedirectToPage(
+                "/Preventivi/Dettaglio",
+                new
+                {
+                    id = allegato.IdEntita
+                });
+        }
+
         return RedirectToPage("/Index");
     }
 }

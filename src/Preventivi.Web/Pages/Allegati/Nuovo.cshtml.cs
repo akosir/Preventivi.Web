@@ -162,6 +162,16 @@ public class NuovoModel : PageModel
                     });
             }
 
+            if (Entita == "Preventivi")
+            {
+                return RedirectToPage(
+                    "/Preventivi/Dettaglio",
+                    new
+                    {
+                        id = IdEntita
+                    });
+            }
+
             return RedirectToPage();
         }
         finally

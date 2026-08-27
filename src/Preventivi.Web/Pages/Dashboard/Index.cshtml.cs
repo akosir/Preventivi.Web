@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Web.UI.KPI;
 using Preventivi.Web.UI.Modules.Dashboard;
@@ -23,7 +24,12 @@ public class IndexModel : PageModel
     public DashboardQuickLinksModel CollegamentiRapidi { get; private set; }
     = new();
 
-    public void OnGet()
+    public IActionResult OnGet()
+    {
+        return RedirectToPage("/Index");
+    }
+
+    private void CreaDashboardDemo()
     {
         Header = new DashboardHeaderModel
         {

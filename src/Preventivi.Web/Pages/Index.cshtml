@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IndexModel
 
 @{
@@ -11,7 +11,7 @@
         <div>
             <h1 class="dashboard-title">Dashboard</h1>
             <p class="dashboard-subtitle">
-                Panoramica operativa del ciclo preventivi
+                Collegamenti ai moduli disponibili
             </p>
         </div>
 
@@ -20,365 +20,55 @@
         </div>
     </div>
 
-    <!-- KPI -->
-    <div class="row g-3 mb-4">
+    <div class="row g-3">
 
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="pfw-kpi-card">
-                <div class="pfw-kpi-header">
-                    <span class="pfw-kpi-label">Richieste aperte</span>
-                    <span class="pfw-kpi-icon">R</span>
-                </div>
-
-                <div class="pfw-kpi-value">15</div>
-
-                <div class="pfw-kpi-footer">
-                    <span class="pfw-status-success">+2</span>
-                    rispetto a ieri
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="pfw-kpi-card">
-                <div class="pfw-kpi-header">
-                    <span class="pfw-kpi-label">Preventivi</span>
-                    <span class="pfw-kpi-icon">P</span>
-                </div>
-
-                <div class="pfw-kpi-value">8</div>
-
-                <div class="pfw-kpi-footer">
-                    <span class="pfw-status-warning">3</span>
-                    da inviare
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="pfw-kpi-card">
-                <div class="pfw-kpi-header">
-                    <span class="pfw-kpi-label">Campionature</span>
-                    <span class="pfw-kpi-icon">C</span>
-                </div>
-
-                <div class="pfw-kpi-value">3</div>
-
-                <div class="pfw-kpi-footer">
-                    <span class="pfw-status-danger">1</span>
-                    urgente
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="pfw-kpi-card">
-                <div class="pfw-kpi-header">
-                    <span class="pfw-kpi-label">Ordini fornitori</span>
-                    <span class="pfw-kpi-icon">O</span>
-                </div>
-
-                <div class="pfw-kpi-value">6</div>
-
-                <div class="pfw-kpi-footer">
-                    <span class="pfw-status-danger">2</span>
-                    in ritardo
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="row g-3 mb-4">
-
-        <!-- ULTIMI PREVENTIVI -->
-        <div class="col-12 col-xl-7">
-
-            <section class="pfw-panel">
+        <div class="col-12 col-md-6 col-xl-4">
+            <section class="pfw-panel h-100">
 
                 <div class="pfw-panel-header">
                     <div>
-                        <h2 class="pfw-panel-title">Ultimi preventivi</h2>
+                        <h2 class="pfw-panel-title">Preventivi</h2>
                         <div class="pfw-panel-subtitle">
-                            Attività più recenti
+                            Elenco e dettaglio dei preventivi
                         </div>
                     </div>
+                </div>
 
-                    <a href="#" class="pfw-panel-link">
-                        Vedi tutti
+                <div class="pfw-panel-body">
+                    <a asp-page="/Preventivi/Index"
+                       class="pfw-btn pfw-btn-primary">
+                        Apri Preventivi
                     </a>
                 </div>
 
-                <div class="table-responsive">
-
-                    <table class="table pfw-table align-middle mb-0">
-
-                        <thead>
-                            <tr>
-                                <th>Preventivo</th>
-                                <th>Cliente</th>
-                                <th>Data</th>
-                                <th class="text-end">Importo</th>
-                                <th>Stato</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            <tr>
-                                <td class="fw-semibold">2026-00125</td>
-                                <td>Rossi S.p.A.</td>
-                                <td>19/08/2026</td>
-                                <td class="text-end">€ 12.450,00</td>
-                                <td>
-                                    <span class="pfw-badge pfw-badge-warning">
-                                        Da inviare
-                                    </span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="fw-semibold">2026-00124</td>
-                                <td>Alfa S.r.l.</td>
-                                <td>18/08/2026</td>
-                                <td class="text-end">€ 8.900,00</td>
-                                <td>
-                                    <span class="pfw-badge pfw-badge-success">
-                                        Accettato
-                                    </span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="fw-semibold">2026-00123</td>
-                                <td>Gamma S.p.A.</td>
-                                <td>18/08/2026</td>
-                                <td class="text-end">€ 4.320,00</td>
-                                <td>
-                                    <span class="pfw-badge pfw-badge-primary">
-                                        In lavorazione
-                                    </span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="fw-semibold">2026-00122</td>
-                                <td>Beta S.r.l.</td>
-                                <td>17/08/2026</td>
-                                <td class="text-end">€ 18.750,00</td>
-                                <td>
-                                    <span class="pfw-badge pfw-badge-secondary">
-                                        Bozza
-                                    </span>
-                                </td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
             </section>
-
         </div>
 
-        <!-- ALERT -->
-        <div class="col-12 col-xl-5">
-
-            <section class="pfw-panel">
+        <div class="col-12 col-md-6 col-xl-4">
+            <section class="pfw-panel h-100">
 
                 <div class="pfw-panel-header">
                     <div>
-                        <h2 class="pfw-panel-title">Alert operativi</h2>
+                        <h2 class="pfw-panel-title">Clienti</h2>
                         <div class="pfw-panel-subtitle">
-                            Situazioni che richiedono attenzione
+                            Anagrafica clienti e allegati cliente
                         </div>
                     </div>
-
-                    <span class="pfw-alert-count">3</span>
                 </div>
 
-                <div class="pfw-alert-list">
+                <div class="pfw-panel-body d-flex flex-wrap gap-2">
+                    <a asp-page="/Clienti/Index"
+                       class="pfw-btn pfw-btn-primary">
+                        Apri Clienti
+                    </a>
 
-                    <div class="pfw-alert-item pfw-alert-item-danger">
-                        <div class="pfw-alert-marker"></div>
-
-                        <div class="pfw-alert-content">
-                            <div class="pfw-alert-title">
-                                Richiesta cliente in scadenza
-                            </div>
-
-                            <div class="pfw-alert-text">
-                                Rossi S.p.A. - scadenza domani
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pfw-alert-item pfw-alert-item-warning">
-                        <div class="pfw-alert-marker"></div>
-
-                        <div class="pfw-alert-content">
-                            <div class="pfw-alert-title">
-                                Campionatura aperta
-                            </div>
-
-                            <div class="pfw-alert-text">
-                                Cliente Beta - verifica tecnica richiesta
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pfw-alert-item">
-                        <div class="pfw-alert-marker"></div>
-
-                        <div class="pfw-alert-content">
-                            <div class="pfw-alert-title">
-                                Preventivo da inviare
-                            </div>
-
-                            <div class="pfw-alert-text">
-                                Preventivo 2026-00125
-                            </div>
-                        </div>
-                    </div>
-
+                    <a asp-page="/Clienti/Nuovo"
+                       class="pfw-btn pfw-btn-secondary">
+                        Nuovo Cliente
+                    </a>
                 </div>
 
             </section>
-
-        </div>
-
-    </div>
-
-    <!-- SEZIONE INFERIORE -->
-    <div class="row g-3">
-
-        <div class="col-12 col-xl-7">
-
-            <section class="pfw-panel">
-
-                <div class="pfw-panel-header">
-                    <div>
-                        <h2 class="pfw-panel-title">
-                            Andamento preventivi
-                        </h2>
-
-                        <div class="pfw-panel-subtitle">
-                            Ultimi 6 mesi
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pfw-chart-placeholder">
-
-                    <div class="pfw-chart-bars">
-
-                        <div class="pfw-chart-column">
-                            <div class="pfw-chart-bar" style="height:40%"></div>
-                            <span>Mar</span>
-                        </div>
-
-                        <div class="pfw-chart-column">
-                            <div class="pfw-chart-bar" style="height:55%"></div>
-                            <span>Apr</span>
-                        </div>
-
-                        <div class="pfw-chart-column">
-                            <div class="pfw-chart-bar" style="height:48%"></div>
-                            <span>Mag</span>
-                        </div>
-
-                        <div class="pfw-chart-column">
-                            <div class="pfw-chart-bar" style="height:72%"></div>
-                            <span>Giu</span>
-                        </div>
-
-                        <div class="pfw-chart-column">
-                            <div class="pfw-chart-bar" style="height:65%"></div>
-                            <span>Lug</span>
-                        </div>
-
-                        <div class="pfw-chart-column">
-                            <div class="pfw-chart-bar" style="height:84%"></div>
-                            <span>Ago</span>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-        </div>
-
-        <div class="col-12 col-xl-5">
-
-            <section class="pfw-panel">
-
-                <div class="pfw-panel-header">
-                    <div>
-                        <h2 class="pfw-panel-title">
-                            Ultime richieste
-                        </h2>
-
-                        <div class="pfw-panel-subtitle">
-                            Pipeline commerciale
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pfw-request-list">
-
-                    <div class="pfw-request-item">
-                        <div>
-                            <div class="fw-semibold">
-                                Espositore promozionale
-                            </div>
-                            <div class="pfw-secondary-text">
-                                Rossi S.p.A.
-                            </div>
-                        </div>
-
-                        <span class="pfw-badge pfw-badge-danger">
-                            Urgente
-                        </span>
-                    </div>
-
-                    <div class="pfw-request-item">
-                        <div>
-                            <div class="fw-semibold">
-                                Nuovo packaging
-                            </div>
-                            <div class="pfw-secondary-text">
-                                Alfa S.r.l.
-                            </div>
-                        </div>
-
-                        <span class="pfw-badge pfw-badge-warning">
-                            Alta
-                        </span>
-                    </div>
-
-                    <div class="pfw-request-item">
-                        <div>
-                            <div class="fw-semibold">
-                                Revisione imballo
-                            </div>
-                            <div class="pfw-secondary-text">
-                                Gamma S.p.A.
-                            </div>
-                        </div>
-
-                        <span class="pfw-badge pfw-badge-primary">
-                            Media
-                        </span>
-                    </div>
-
-                </div>
-
-            </section>
-
         </div>
 
     </div>

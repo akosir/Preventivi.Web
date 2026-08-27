@@ -10,55 +10,8 @@
     new
     {
         title = "Preventivi",
-        subtitle = "Gestione e monitoraggio dei preventivi clienti",
-        primaryActionText = "Nuovo preventivo"
+        subtitle = "Gestione e monitoraggio dei preventivi clienti"
     })
-
-<!-- TOOLBAR FILTRI -->
-
-<section class="pfw-panel mb-3">
-
-    <div class="pfw-filter-bar">
-
-        <div class="pfw-filter-search">
-            <input type="text"
-                   class="form-control"
-                   placeholder="Cerca numero, cliente o descrizione..." />
-        </div>
-
-        <div>
-            <select class="form-select">
-                <option value="">Tutti gli stati</option>
-                <option>Bozza</option>
-                <option>In lavorazione</option>
-                <option>Da inviare</option>
-                <option>Inviato</option>
-                <option>Accettato</option>
-                <option>Respinto</option>
-            </select>
-        </div>
-
-        <div>
-            <select class="form-select">
-                <option value="">Tutti i clienti</option>
-                <option>Rossi S.p.A.</option>
-                <option>Alfa S.r.l.</option>
-                <option>Gamma S.p.A.</option>
-                <option>Beta S.r.l.</option>
-            </select>
-        </div>
-
-        <div>
-            <button type="button"
-                    class="pfw-btn pfw-btn-secondary">
-                Aggiorna
-            </button>
-        </div>
-
-    </div>
-
-</section>
-
 
 <!-- ELENCO PREVENTIVI -->
 
@@ -72,7 +25,7 @@
             </h2>
 
             <div class="pfw-panel-subtitle">
-                8 preventivi trovati
+                @Model.Preventivi.Count preventivi trovati
             </div>
         </div>
 
@@ -138,38 +91,6 @@
             </tbody>
 
         </table>
-
-    </div>
-
-
-    <!-- PAGINAZIONE DEMO -->
-
-    <div class="pfw-table-footer">
-
-        <div class="pfw-secondary-text">
-            Visualizzati 1-5 di 8
-        </div>
-
-        <div class="pfw-pagination">
-
-            <button class="pfw-page-button"
-                    disabled>
-                &lsaquo;
-            </button>
-
-            <button class="pfw-page-button active">
-                1
-            </button>
-
-            <button class="pfw-page-button">
-                2
-            </button>
-
-            <button class="pfw-page-button">
-                &rsaquo;
-            </button>
-
-        </div>
 
     </div>
 

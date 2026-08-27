@@ -1,1 +1,285 @@
-﻿
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.WorkspaceModel
+
+@{
+    ViewData["Title"] = $"Riga {Model.Riga!.RigaNr} - Preventivo {Model.Preventivo!.NumeroCompleto}";
+}
+
+<div class="workspace-page">
+
+    <div class="workspace-header">
+
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Index">Dashboard</a>
+            <span>/</span>
+            <a asp-page="/Preventivi/Index">Preventivi</a>
+            <span>/</span>
+            <a asp-page="/Preventivi/Dettaglio"
+               asp-route-id="@Model.Preventivo.IdPreventivo">
+                @Model.Preventivo.NumeroCompleto
+            </a>
+            <span>/</span>
+            <span>Riga @Model.Riga.RigaNr</span>
+        </div>
+
+        <div class="workspace-top">
+            <div>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <h1 class="workspace-title mb-0">
+                        Riga preventivo @Model.Riga.RigaNr
+                    </h1>
+
+                    <span class="pfw-badge pfw-badge-secondary">
+                        @Model.Riga.TipoRiga
+                    </span>
+                </div>
+
+                <div class="workspace-subtitle">
+                    Preventivo @Model.Preventivo.NumeroCompleto
+                    <span class="mx-1">•</span>
+                    @Model.Preventivo.Cliente
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <section class="pfw-panel mb-3">
+
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dettaglio riga preventivo</h2>
+                <div class="pfw-panel-subtitle">
+                    Dati della riga e valori calcolati
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3">
+
+            <div class="row g-3 align-items-start">
+
+                <div class="col-12 col-lg-4">
+                    <div class="row g-2">
+
+                        <div class="col-12 col-md-4 col-lg-12">
+                            <label class="form-label">RigaNr</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Riga.RigaNr"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12 col-md-4 col-lg-12">
+                            <label class="form-label">IdArticolo</label>
+                            <input class="form-control"
+                                   value="Non disponibile"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12 col-md-4 col-lg-12">
+                            <label class="form-label">IdModelloCiclo</label>
+                            <input class="form-control"
+                                   value="Non disponibile"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">DescrizioneVoce</label>
+                            <textarea class="form-control"
+                                      rows="4"
+                                      readonly>@Model.Riga.DescrizioneVoce</textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <div class="row g-2">
+
+                        <div class="col-12">
+                            <label class="form-label">Quantità</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Riga.Quantita.ToString("N2")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Prezzo unit. Vendita</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Riga.PrezzoUnitarioVendita.ToString("N4")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Prezzo Manuale cad.</label>
+                            <input type="checkbox"
+                                   checked="@Model.Riga.PrezzoManuale"
+                                   disabled />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Markup Libero</label>
+                            <input class="form-control text-end"
+                                   value="Non disponibile"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Costo Libero cad</label>
+                            <input class="form-control text-end"
+                                   value="Non disponibile"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">TipoRiga</label>
+                            <input class="form-control"
+                                   value="@Model.Riga.TipoRiga"
+                                   readonly />
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <div class="row g-2">
+
+                        <div class="col-12">
+                            <label class="form-label">Note</label>
+                            <textarea class="form-control"
+                                      rows="4"
+                                      readonly>Non disponibile</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">TotaleVendita</label>
+                            <input class="form-control text-end fw-semibold"
+                                   value="@Model.Riga.TotaleVendita.ToString("C2")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">TotaleCosti</label>
+                            <input class="form-control text-end fw-semibold"
+                                   value="@Model.Riga.TotaleCosti.ToString("C2")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">MargineValore</label>
+                            <input class="form-control text-end fw-semibold"
+                                   value="@Model.Riga.MargineValore.ToString("C2")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Margine %</label>
+                            <input class="form-control text-end"
+                                   value="@Model.Riga.MarginePerc.ToString("N2")"
+                                   readonly />
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="pfw-panel">
+
+        <div class="workspace-tabs">
+
+            <a href="#componenti-riga"
+               class="workspace-tab active text-decoration-none">
+                Componenti
+            </a>
+
+            <a href="#materiali-riga"
+               class="workspace-tab text-decoration-none">
+                Materiali
+            </a>
+
+            <a href="#lavorazioni-riga"
+               class="workspace-tab text-decoration-none">
+                Lavorazioni
+            </a>
+
+        </div>
+
+        <div class="workspace-tab-content">
+
+            <div id="componenti-riga"
+                 class="workspace-righe-toolbar">
+                <div>
+                    <strong>Componenti</strong>
+                    <span class="workspace-righe-count">
+                        dati non ancora disponibili
+                    </span>
+                </div>
+            </div>
+
+            <div class="workspace-placeholder">
+                <div class="workspace-placeholder-title">
+                    Componenti non ancora collegati
+                </div>
+
+                <div class="workspace-placeholder-text">
+                    Nel progetto non sono ancora presenti repository o stored procedure
+                    per leggere i componenti della riga preventivo.
+                </div>
+            </div>
+
+            <hr id="materiali-riga"
+                class="my-4" />
+
+            <div class="workspace-righe-toolbar">
+                <div>
+                    <strong>Materiali</strong>
+                    <span class="workspace-righe-count">
+                        dati non ancora disponibili
+                    </span>
+                </div>
+            </div>
+
+            <div class="workspace-placeholder">
+                <div class="workspace-placeholder-title">
+                    Materiali non ancora collegati
+                </div>
+
+                <div class="workspace-placeholder-text">
+                    Nel progetto non sono ancora presenti repository o stored procedure
+                    per leggere i materiali della riga preventivo.
+                </div>
+            </div>
+
+            <hr id="lavorazioni-riga"
+                class="my-4" />
+
+            <div class="workspace-righe-toolbar">
+                <div>
+                    <strong>Lavorazioni</strong>
+                    <span class="workspace-righe-count">
+                        dati non ancora disponibili
+                    </span>
+                </div>
+            </div>
+
+            <div class="workspace-placeholder">
+                <div class="workspace-placeholder-title">
+                    Lavorazioni non ancora collegate
+                </div>
+
+                <div class="workspace-placeholder-text">
+                    Nel progetto non sono ancora presenti repository o stored procedure
+                    per leggere le lavorazioni della riga preventivo.
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
