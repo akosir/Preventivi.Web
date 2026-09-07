@@ -1,1 +1,145 @@
-﻿
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.MaterialiModel
+
+@{
+    var modo = Request.Query["modo"].ToString();
+    var idPreventivo = Request.Query["idPreventivo"].ToString();
+    var idRigaPreventivo = Request.Query["idRigaPreventivo"].ToString();
+    var titolo = MaterialiModel.IsNuovo(modo)
+        ? "Nuovo materiale"
+        : MaterialiModel.IsElimina(modo)
+            ? "Elimina materiale"
+            : "Dettaglio materiale";
+
+    ViewData["Title"] = titolo;
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Preventivi/Riga/Workspace"
+               asp-route-idPreventivo="@idPreventivo"
+               asp-route-idRigaPreventivo="@idRigaPreventivo">
+                Riga preventivo
+            </a>
+            <span>/</span>
+            <span>@titolo</span>
+        </div>
+
+        <h1 class="workspace-title">@titolo</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="p-3">
+            @if (MaterialiModel.IsNuovo(modo))
+            {
+                <form method="post"
+                      asp-route-modo="nuovo"
+                      asp-route-idPreventivo="@idPreventivo"
+                      asp-route-idRigaPreventivo="@idRigaPreventivo">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label asp-for="NuovoMateriale.IdNodoDistinta" class="form-label"></label>
+                            <input asp-for="NuovoMateriale.IdNodoDistinta" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label asp-for="NuovoMateriale.IdMateriale" class="form-label"></label>
+                            <input asp-for="NuovoMateriale.IdMateriale" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label asp-for="NuovoMateriale.UM" class="form-label"></label>
+                            <input asp-for="NuovoMateriale.UM" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="NuovoMateriale.DescrizioneMateriale" class="form-label"></label>
+                            <input asp-for="NuovoMateriale.DescrizioneMateriale" class="form-control" />
+                            <span asp-validation-for="NuovoMateriale.DescrizioneMateriale" class="text-danger"></span>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label asp-for="NuovoMateriale.TipoMateriale" class="form-label"></label>
+                            <input asp-for="NuovoMateriale.TipoMateriale" class="form-control" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label asp-for="NuovoMateriale.Quantita" class="form-label"></label>
+                            <input asp-for="NuovoMateriale.Quantita" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label asp-for="NuovoMateriale.CostoUnitario" class="form-label"></label>
+                            <input asp-for="NuovoMateriale.CostoUnitario" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label asp-for="NuovoMateriale.IdFornitoreSuggerito" class="form-label"></label>
+                            <input asp-for="NuovoMateriale.IdFornitoreSuggerito" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-4 d-flex align-items-end">
+                            <div class="form-check">
+                                <input asp-for="NuovoMateriale.DaAcquistare" class="form-check-input" />
+                                <label asp-for="NuovoMateriale.DaAcquistare" class="form-check-label"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Salva</button>
+                        <a class="btn btn-outline-secondary"
+                           asp-page="/Preventivi/Riga/Workspace"
+                           asp-route-idPreventivo="@idPreventivo"
+                           asp-route-idRigaPreventivo="@idRigaPreventivo">
+                            Annulla
+                        </a>
+                    </div>
+                </form>
+            }
+            else if (Model.Materiale is not null)
+            {
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">DescrizioneMateriale</dt>
+                    <dd class="col-sm-9">@Model.Materiale.DescrizioneMateriale</dd>
+                    <dt class="col-sm-3">TipoMateriale</dt>
+                    <dd class="col-sm-9">@Model.Materiale.TipoMateriale</dd>
+                    <dt class="col-sm-3">UM</dt>
+                    <dd class="col-sm-9">@Model.Materiale.UM</dd>
+                    <dt class="col-sm-3">Quantita</dt>
+                    <dd class="col-sm-9">@Model.Materiale.Quantita.ToString("N2")</dd>
+                    <dt class="col-sm-3">CostoUnitario</dt>
+                    <dd class="col-sm-9">@Model.Materiale.CostoUnitario.ToString("C4")</dd>
+                    <dt class="col-sm-3">CostoTotale</dt>
+                    <dd class="col-sm-9">@Model.Materiale.CostoTotale.ToString("C2")</dd>
+                    <dt class="col-sm-3">Da acquistare</dt>
+                    <dd class="col-sm-9">@(Model.Materiale.DaAcquistare ? "Si" : "No")</dd>
+                </dl>
+
+                @if (MaterialiModel.IsElimina(modo))
+                {
+                    <form method="post"
+                          class="mt-3"
+                          asp-route-modo="elimina"
+                          asp-route-idPreventivo="@idPreventivo"
+                          asp-route-idRigaPreventivo="@idRigaPreventivo"
+                          asp-route-id="@Model.Materiale.IdRigaMatPrev">
+                        <button type="submit" class="btn btn-danger">Conferma eliminazione</button>
+                        <a class="btn btn-outline-secondary"
+                           asp-page="/Preventivi/Riga/Workspace"
+                           asp-route-idPreventivo="@idPreventivo"
+                           asp-route-idRigaPreventivo="@idRigaPreventivo">
+                            Annulla
+                        </a>
+                    </form>
+                }
+                else
+                {
+                    <div class="mt-3">
+                        <a class="btn btn-outline-secondary"
+                           asp-page="/Preventivi/Riga/Workspace"
+                           asp-route-idPreventivo="@idPreventivo"
+                           asp-route-idRigaPreventivo="@idRigaPreventivo">
+                            Torna alla riga
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </section>
+</div>

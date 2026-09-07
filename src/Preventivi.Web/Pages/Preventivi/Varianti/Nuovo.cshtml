@@ -1,0 +1,61 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Varianti.NuovoModel
+
+@{
+    ViewData["Title"] = "Nuova variante preventivo";
+}
+
+<section class="pfw-panel">
+
+    <div class="pfw-panel-header">
+        <div>
+            <h1 class="pfw-panel-title">Nuova variante preventivo</h1>
+            <div class="pfw-panel-subtitle">Inserimento variante sul preventivo</div>
+        </div>
+    </div>
+
+    <form method="post" class="p-3">
+        <input type="hidden" asp-for="IdPreventivo" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="row g-3">
+            <div class="col-12 col-md-3">
+                <label class="form-label" asp-for="Variante.CodiceVariante">CodiceVariante</label>
+                <input class="form-control" asp-for="Variante.CodiceVariante" />
+                <span class="text-danger" asp-validation-for="Variante.CodiceVariante"></span>
+            </div>
+
+            <div class="col-12 col-md-9">
+                <label class="form-label" asp-for="Variante.DescrizioneVariante">DescrizioneVariante</label>
+                <input class="form-control" asp-for="Variante.DescrizioneVariante" />
+                <span class="text-danger" asp-validation-for="Variante.DescrizioneVariante"></span>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" asp-for="Variante.Note">Note</label>
+                <textarea class="form-control" asp-for="Variante.Note" rows="4"></textarea>
+            </div>
+
+            <div class="col-12">
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Variante.VarianteScelta" />
+                    <label class="form-check-label" asp-for="Variante.VarianteScelta">VarianteScelta</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <a asp-page="/Preventivi/Dettaglio"
+               asp-route-id="@Model.IdPreventivo"
+               class="pfw-btn pfw-btn-secondary">Annulla</a>
+
+            <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+        </div>
+    </form>
+
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

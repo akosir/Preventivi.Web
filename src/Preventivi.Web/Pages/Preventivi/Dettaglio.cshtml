@@ -189,7 +189,7 @@
 
             <a href="#varianti-preventivo"
                class="workspace-tab text-decoration-none">
-                Varianti Preventivo
+                Varianti Preventivo (@Model.Varianti.Count)
             </a>
 
             <a href="#allegati-preventivo"
@@ -210,6 +210,12 @@
                         @Model.Righe.Count righe
                     </span>
                 </div>
+
+                <a asp-page="/Preventivi/Riga/Nuovo"
+                   asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                   class="pfw-btn pfw-btn-primary">
+                    Nuova riga
+                </a>
 
             </div>
 
@@ -294,6 +300,13 @@
                                     </td>
 
                                     <td class="text-center">
+                                        <a asp-page="/Preventivi/Riga/Elimina"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@riga.IdRigaPreventivo"
+                                           class="pfw-action-link">
+                                            Elimina
+                                        </a>
+
                                         <a asp-page="/Preventivi/Riga/Workspace"
                                            asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
                                            asp-route-idRigaPreventivo="@riga.IdRigaPreventivo"
@@ -318,21 +331,102 @@
                 <div>
                     <strong>Varianti preventivo</strong>
                     <span class="workspace-righe-count">
-                        dati non ancora disponibili
+                        @Model.Varianti.Count varianti
                     </span>
                 </div>
+
+                <a asp-page="/Preventivi/Varianti/Nuovo"
+                   asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                   class="pfw-btn pfw-btn-primary">
+                    Nuova variante
+                </a>
             </div>
 
-            <div class="workspace-placeholder">
-                <div class="workspace-placeholder-title">
-                    Modulo varianti non ancora collegato
-                </div>
+            @if (Model.Varianti.Count == 0)
+            {
+                <div class="workspace-placeholder">
+                    <div class="workspace-placeholder-title">
+                        Nessuna variante presente
+                    </div>
 
-                <div class="workspace-placeholder-text">
-                    Nel codice non sono ancora presenti repository o stored procedure
-                    per leggere le varianti del preventivo.
+                    <div class="workspace-placeholder-text">
+                        Il preventivo non contiene ancora varianti.
+                    </div>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table pfw-table align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Codice</th>
+                                <th>Descrizione</th>
+                                <th class="text-center">Scelta</th>
+                                <th class="text-end">Totale Vendita</th>
+                                <th class="text-end">Totale Costi</th>
+                                <th class="text-end">Margine %</th>
+                                <th class="text-center">Azioni</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var variante in Model.Varianti)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">
+                                        @variante.CodiceVariante
+                                    </td>
+
+                                    <td>
+                                        @variante.DescrizioneVariante
+                                    </td>
+
+                                    <td class="text-center">
+                                        <input type="checkbox"
+                                               checked="@variante.VarianteScelta"
+                                               disabled />
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+                                        @variante.TotaleVendita.ToString("C2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @variante.TotaleCosti.ToString("C2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @variante.MarginePerc.ToString("N2")
+                                    </td>
+
+                                    <td class="text-center">
+                                        <a asp-page="/Preventivi/Varianti/Elimina"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idVariantePreventivo="@variante.IdVariantePreventivo"
+                                           class="pfw-action-link">
+                                            Elimina
+                                        </a>
+
+                                        <a asp-page="/Preventivi/Varianti/Dettaglio"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idVariantePreventivo="@variante.IdVariantePreventivo"
+                                           class="pfw-action-link">
+                                            Apri
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
 
             <hr id="allegati-preventivo"
                 class="my-4" />

@@ -1,0 +1,35 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Varianti.EliminaModel
+
+@{
+    ViewData["Title"] = "Elimina variante preventivo";
+}
+
+<section class="pfw-panel">
+
+    <div class="pfw-panel-header">
+        <div>
+            <h1 class="pfw-panel-title">Elimina variante preventivo</h1>
+            <div class="pfw-panel-subtitle">Conferma eliminazione della variante</div>
+        </div>
+    </div>
+
+    <form method="post" class="p-3">
+        <input type="hidden" asp-for="IdPreventivo" />
+        <input type="hidden" asp-for="IdVariantePreventivo" />
+
+        <p>
+            Vuoi eliminare la variante
+            <strong>@Model.Variante!.CodiceVariante - @Model.Variante.DescrizioneVariante</strong>?
+        </p>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-page="/Preventivi/Dettaglio"
+               asp-route-id="@Model.IdPreventivo"
+               class="pfw-btn pfw-btn-secondary">Annulla</a>
+
+            <button type="submit" class="pfw-btn pfw-btn-danger">Elimina</button>
+        </div>
+    </form>
+
+</section>

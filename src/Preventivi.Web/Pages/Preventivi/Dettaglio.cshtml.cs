@@ -16,6 +16,9 @@ public class DettaglioModel : PageModel
     public IReadOnlyList<PreventivoRigaListItem> Righe { get; private set; }
         = Array.Empty<PreventivoRigaListItem>();
 
+    public IReadOnlyList<PreventivoVarianteItem> Varianti { get; private set; }
+        = Array.Empty<PreventivoVarianteItem>();
+
     public AllegatiGridModel Allegati { get; private set; } = new();
 
     public DettaglioModel(
@@ -42,6 +45,11 @@ public class DettaglioModel : PageModel
 
         Righe =
             await _preventivoRepository.GetRigheAsync(
+                id,
+                cancellationToken);
+
+        Varianti =
+            await _preventivoRepository.GetVariantiAsync(
                 id,
                 cancellationToken);
 

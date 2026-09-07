@@ -1,1 +1,135 @@
-﻿
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.ComponentiModel
+
+@{
+    var modo = Convert.ToString(RouteData.Values["modo"]) ?? Request.Query["modo"].ToString();
+    var idPreventivo = Request.Query["idPreventivo"].ToString();
+    var idRigaPreventivo = Request.Query["idRigaPreventivo"].ToString();
+    var titolo = ComponentiModel.IsNuovo(modo)
+        ? "Nuovo componente"
+        : ComponentiModel.IsElimina(modo)
+            ? "Elimina componente"
+            : "Dettaglio componente";
+
+    ViewData["Title"] = titolo;
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Preventivi/Riga/Workspace"
+               asp-route-idPreventivo="@idPreventivo"
+               asp-route-idRigaPreventivo="@idRigaPreventivo">
+                Riga preventivo
+            </a>
+            <span>/</span>
+            <span>@titolo</span>
+        </div>
+
+        <h1 class="workspace-title">@titolo</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="p-3">
+            @if (ComponentiModel.IsNuovo(modo))
+            {
+                <form method="post"
+                      asp-route-modo="nuovo"
+                      asp-route-idPreventivo="@idPreventivo"
+                      asp-route-idRigaPreventivo="@idRigaPreventivo">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-3">
+                            <label asp-for="NuovoComponente.OrdineVisualizzazione" class="form-label"></label>
+                            <input asp-for="NuovoComponente.OrdineVisualizzazione" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="NuovoComponente.IdNodoDistinta" class="form-label"></label>
+                            <input asp-for="NuovoComponente.IdNodoDistinta" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="NuovoComponente.IdNodoPadre" class="form-label"></label>
+                            <input asp-for="NuovoComponente.IdNodoPadre" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="NuovoComponente.Livello" class="form-label"></label>
+                            <input asp-for="NuovoComponente.Livello" class="form-control text-end" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="NuovoComponente.DescrizioneNodo" class="form-label"></label>
+                            <input asp-for="NuovoComponente.DescrizioneNodo" class="form-control" />
+                            <span asp-validation-for="NuovoComponente.DescrizioneNodo" class="text-danger"></span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="NuovoComponente.QuantitaBase" class="form-label"></label>
+                            <input asp-for="NuovoComponente.QuantitaBase" class="form-control text-end" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="NuovoComponente.QuantitaCalcolata" class="form-label"></label>
+                            <input asp-for="NuovoComponente.QuantitaCalcolata" class="form-control text-end" />
+                        </div>
+                    </div>
+
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Salva</button>
+                        <a class="btn btn-outline-secondary"
+                           asp-page="/Preventivi/Riga/Workspace"
+                           asp-route-idPreventivo="@idPreventivo"
+                           asp-route-idRigaPreventivo="@idRigaPreventivo">
+                            Annulla
+                        </a>
+                    </div>
+                </form>
+            }
+            else if (Model.Componente is not null)
+            {
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">OrdineVisualizzazione</dt>
+                    <dd class="col-sm-9">@Model.Componente.OrdineVisualizzazione</dd>
+                    <dt class="col-sm-3">IdNodoDistinta</dt>
+                    <dd class="col-sm-9">@Model.Componente.IdNodoDistinta</dd>
+                    <dt class="col-sm-3">IdNodoPadre</dt>
+                    <dd class="col-sm-9">@Model.Componente.IdNodoPadre</dd>
+                    <dt class="col-sm-3">DescrizioneNodo</dt>
+                    <dd class="col-sm-9">@Model.Componente.DescrizioneNodo</dd>
+                    <dt class="col-sm-3">Livello</dt>
+                    <dd class="col-sm-9">@Model.Componente.Livello</dd>
+                    <dt class="col-sm-3">QuantitaBase</dt>
+                    <dd class="col-sm-9">@Model.Componente.QuantitaBase.ToString("N2")</dd>
+                    <dt class="col-sm-3">QuantitaCalcolata</dt>
+                    <dd class="col-sm-9">@Model.Componente.QuantitaCalcolata.ToString("N2")</dd>
+                </dl>
+
+                @if (ComponentiModel.IsElimina(modo))
+                {
+                    <form method="post"
+                          class="mt-3"
+                          asp-route-modo="elimina"
+                          asp-route-idPreventivo="@idPreventivo"
+                          asp-route-idRigaPreventivo="@idRigaPreventivo"
+                          asp-route-id="@Model.Componente.IdRigaCompPrev">
+                        <button type="submit" class="btn btn-danger">Conferma eliminazione</button>
+                        <a class="btn btn-outline-secondary"
+                           asp-page="/Preventivi/Riga/Workspace"
+                           asp-route-idPreventivo="@idPreventivo"
+                           asp-route-idRigaPreventivo="@idRigaPreventivo">
+                            Annulla
+                        </a>
+                    </form>
+                }
+                else
+                {
+                    <div class="mt-3">
+                        <a class="btn btn-outline-secondary"
+                           asp-page="/Preventivi/Riga/Workspace"
+                           asp-route-idPreventivo="@idPreventivo"
+                           asp-route-idRigaPreventivo="@idRigaPreventivo">
+                            Torna alla riga
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </section>
+</div>

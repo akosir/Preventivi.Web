@@ -10,7 +10,16 @@ public class WorkspaceModel : PageModel
 
     public PreventivoDettaglio? Preventivo { get; private set; }
 
-    public PreventivoRigaListItem? Riga { get; private set; }
+    public PreventivoRigaDettaglio? Riga { get; private set; }
+
+    public IReadOnlyList<PreventivoRigaComponenteItem> Componenti { get; private set; }
+        = Array.Empty<PreventivoRigaComponenteItem>();
+
+    public IReadOnlyList<PreventivoRigaMaterialeItem> Materiali { get; private set; }
+        = Array.Empty<PreventivoRigaMaterialeItem>();
+
+    public IReadOnlyList<PreventivoRigaLavorazioneItem> Lavorazioni { get; private set; }
+        = Array.Empty<PreventivoRigaLavorazioneItem>();
 
     public WorkspaceModel(
         IPreventivoRepository preventivoRepository)
@@ -39,19 +48,31 @@ public class WorkspaceModel : PageModel
             return NotFound();
         }
 
-        var righe =
-            await _preventivoRepository.GetRigheAsync(
-                idPreventivo,
+        Riga =
+            await _preventivoRepository.GetRigaAsync(
+                idRigaPreventivo,
                 cancellationToken);
 
-        Riga =
-            righe.FirstOrDefault(
-                r => r.IdRigaPreventivo == idRigaPreventivo);
-
-        if (Riga is null)
+        if (Riga is null ||
+            Riga.IdPreventivo != idPreventivo)
         {
             return NotFound();
         }
+
+        Componenti =
+            await _preventivoRepository.GetComponentiAsync(
+                idRigaPreventivo,
+                cancellationToken);
+
+        Materiali =
+            await _preventivoRepository.GetMaterialiAsync(
+                idRigaPreventivo,
+                cancellationToken);
+
+        Lavorazioni =
+            await _preventivoRepository.GetLavorazioniAsync(
+                idRigaPreventivo,
+                cancellationToken);
 
         return Page();
     }

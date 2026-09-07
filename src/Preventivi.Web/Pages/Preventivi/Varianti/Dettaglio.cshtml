@@ -1,0 +1,57 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Varianti.DettaglioModel
+
+@{
+    ViewData["Title"] = "Dettaglio variante preventivo";
+}
+
+<section class="pfw-panel">
+
+    <div class="pfw-panel-header">
+        <div>
+            <h1 class="pfw-panel-title">Dettaglio variante preventivo</h1>
+            <div class="pfw-panel-subtitle">Lettura variante</div>
+        </div>
+    </div>
+
+    <div class="p-3">
+        <div class="row g-3">
+            <div class="col-12 col-md-3">
+                <label class="form-label">CodiceVariante</label>
+                <input class="form-control" value="@Model.Variante!.CodiceVariante" readonly />
+            </div>
+
+            <div class="col-12 col-md-9">
+                <label class="form-label">DescrizioneVariante</label>
+                <input class="form-control" value="@Model.Variante.DescrizioneVariante" readonly />
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">TotaleVendita</label>
+                <input class="form-control text-end" value="@Model.Variante.TotaleVendita.ToString("C2")" readonly />
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">TotaleCosti</label>
+                <input class="form-control text-end" value="@Model.Variante.TotaleCosti.ToString("C2")" readonly />
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">MargineValore</label>
+                <input class="form-control text-end" value="@Model.Variante.MargineValore.ToString("C2")" readonly />
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Margine %</label>
+                <input class="form-control text-end" value="@Model.Variante.MarginePerc.ToString("N2")" readonly />
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <a asp-page="/Preventivi/Dettaglio"
+               asp-route-id="@Model.IdPreventivo"
+               class="pfw-btn pfw-btn-secondary">Torna al preventivo</a>
+        </div>
+    </div>
+
+</section>

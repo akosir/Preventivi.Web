@@ -72,14 +72,14 @@
                         <div class="col-12 col-md-4 col-lg-12">
                             <label class="form-label">IdArticolo</label>
                             <input class="form-control"
-                                   value="Non disponibile"
+                                   value="@Model.Riga.IdArticolo"
                                    readonly />
                         </div>
 
                         <div class="col-12 col-md-4 col-lg-12">
                             <label class="form-label">IdModelloCiclo</label>
                             <input class="form-control"
-                                   value="Non disponibile"
+                                   value="@Model.Riga.IdModelloCiclo"
                                    readonly />
                         </div>
 
@@ -120,14 +120,14 @@
                         <div class="col-12">
                             <label class="form-label">Markup Libero</label>
                             <input class="form-control text-end"
-                                   value="Non disponibile"
+                                   value="@Model.Riga.MarkupPerc.ToString("N2")"
                                    readonly />
                         </div>
 
                         <div class="col-12">
                             <label class="form-label">Costo Libero cad</label>
                             <input class="form-control text-end"
-                                   value="Non disponibile"
+                                   value="@Model.Riga.CostoUnitarioLibero?.ToString("N4")"
                                    readonly />
                         </div>
 
@@ -148,7 +148,7 @@
                             <label class="form-label">Note</label>
                             <textarea class="form-control"
                                       rows="4"
-                                      readonly>Non disponibile</textarea>
+                                      readonly>@Model.Riga.Note</textarea>
                         </div>
 
                         <div class="col-12">
@@ -216,21 +216,77 @@
                 <div>
                     <strong>Componenti</strong>
                     <span class="workspace-righe-count">
-                        dati non ancora disponibili
+                        @Model.Componenti.Count righe
                     </span>
                 </div>
+                <a class="btn btn-sm btn-primary"
+                   asp-page="/Preventivi/Riga/Componenti"
+                   asp-route-modo="nuovo"
+                   asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                   asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo">
+                    Nuovo componente
+                </a>
             </div>
 
-            <div class="workspace-placeholder">
-                <div class="workspace-placeholder-title">
-                    Componenti non ancora collegati
+            @if (Model.Componenti.Count == 0)
+            {
+                <div class="workspace-placeholder">
+                    <div class="workspace-placeholder-title">
+                        Nessun componente presente
+                    </div>
                 </div>
-
-                <div class="workspace-placeholder-text">
-                    Nel progetto non sono ancora presenti repository o stored procedure
-                    per leggere i componenti della riga preventivo.
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ordine</th>
+                                <th>IdNodo</th>
+                                <th>IdPadre</th>
+                                <th>DescrizioneNodo</th>
+                                <th class="text-end">Livello</th>
+                                <th class="text-end">QuantitaBase</th>
+                                <th class="text-end">QuantitaCalcolata</th>
+                                <th class="text-end">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var componente in Model.Componenti)
+                            {
+                                <tr>
+                                    <td>@componente.OrdineVisualizzazione</td>
+                                    <td>@componente.IdNodoDistinta</td>
+                                    <td>@componente.IdNodoPadre</td>
+                                    <td>@componente.DescrizioneNodo</td>
+                                    <td class="text-end">@componente.Livello</td>
+                                    <td class="text-end">@componente.QuantitaBase.ToString("N2")</td>
+                                    <td class="text-end">@componente.QuantitaCalcolata.ToString("N2")</td>
+                                    <td class="text-end">
+                                        <a class="btn btn-sm btn-outline-secondary"
+                                           asp-page="/Preventivi/Riga/Componenti"
+                                           asp-route-modo="dettaglio"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo"
+                                           asp-route-id="@componente.IdRigaCompPrev">
+                                            Apri
+                                        </a>
+                                        <a class="btn btn-sm btn-outline-danger"
+                                           asp-page="/Preventivi/Riga/Componenti"
+                                           asp-route-modo="elimina"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo"
+                                           asp-route-id="@componente.IdRigaCompPrev">
+                                            Elimina
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            }
 
             <hr id="materiali-riga"
                 class="my-4" />
@@ -239,21 +295,81 @@
                 <div>
                     <strong>Materiali</strong>
                     <span class="workspace-righe-count">
-                        dati non ancora disponibili
+                        @Model.Materiali.Count righe
                     </span>
                 </div>
+                <a class="btn btn-sm btn-primary"
+                   asp-page="/Preventivi/Riga/Materiali"
+                   asp-route-modo="nuovo"
+                   asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                   asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo">
+                    Nuovo materiale
+                </a>
             </div>
 
-            <div class="workspace-placeholder">
-                <div class="workspace-placeholder-title">
-                    Materiali non ancora collegati
+            @if (Model.Materiali.Count == 0)
+            {
+                <div class="workspace-placeholder">
+                    <div class="workspace-placeholder-title">
+                        Nessun materiale presente
+                    </div>
                 </div>
-
-                <div class="workspace-placeholder-text">
-                    Nel progetto non sono ancora presenti repository o stored procedure
-                    per leggere i materiali della riga preventivo.
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>DescrizioneMateriale</th>
+                                <th>Tipo</th>
+                                <th>UM</th>
+                                <th class="text-end">Quantita</th>
+                                <th class="text-end">CostoUnitario</th>
+                                <th class="text-end">CostoTotale</th>
+                                <th>Da acquistare</th>
+                                <th class="text-end">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var materiale in Model.Materiali)
+                            {
+                                <tr>
+                                    <td>@materiale.DescrizioneMateriale</td>
+                                    <td>@materiale.TipoMateriale</td>
+                                    <td>@materiale.UM</td>
+                                    <td class="text-end">@materiale.Quantita.ToString("N2")</td>
+                                    <td class="text-end">@materiale.CostoUnitario.ToString("C4")</td>
+                                    <td class="text-end">@materiale.CostoTotale.ToString("C2")</td>
+                                    <td>
+                                        <input type="checkbox"
+                                               checked="@materiale.DaAcquistare"
+                                               disabled />
+                                    </td>
+                                    <td class="text-end">
+                                        <a class="btn btn-sm btn-outline-secondary"
+                                           asp-page="/Preventivi/Riga/Materiali"
+                                           asp-route-modo="dettaglio"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo"
+                                           asp-route-id="@materiale.IdRigaMatPrev">
+                                            Apri
+                                        </a>
+                                        <a class="btn btn-sm btn-outline-danger"
+                                           asp-page="/Preventivi/Riga/Materiali"
+                                           asp-route-modo="elimina"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo"
+                                           asp-route-id="@materiale.IdRigaMatPrev">
+                                            Elimina
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            }
 
             <hr id="lavorazioni-riga"
                 class="my-4" />
@@ -262,21 +378,87 @@
                 <div>
                     <strong>Lavorazioni</strong>
                     <span class="workspace-righe-count">
-                        dati non ancora disponibili
+                        @Model.Lavorazioni.Count righe
                     </span>
                 </div>
+                <a class="btn btn-sm btn-primary"
+                   asp-page="/Preventivi/Riga/Lavorazioni"
+                   asp-route-modo="nuovo"
+                   asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                   asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo">
+                    Nuova lavorazione
+                </a>
             </div>
 
-            <div class="workspace-placeholder">
-                <div class="workspace-placeholder-title">
-                    Lavorazioni non ancora collegate
+            @if (Model.Lavorazioni.Count == 0)
+            {
+                <div class="workspace-placeholder">
+                    <div class="workspace-placeholder-title">
+                        Nessuna lavorazione presente
+                    </div>
                 </div>
-
-                <div class="workspace-placeholder-text">
-                    Nel progetto non sono ancora presenti repository o stored procedure
-                    per leggere le lavorazioni della riga preventivo.
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-end">Sequenza</th>
+                                <th>DescrizioneLavorazione</th>
+                                <th class="text-end">Setup</th>
+                                <th class="text-end">Tempo pezzo</th>
+                                <th class="text-end">Quantita</th>
+                                <th class="text-end">Tempo totale</th>
+                                <th class="text-end">Costo orario</th>
+                                <th class="text-end">Costo fisso</th>
+                                <th class="text-end">Costo totale</th>
+                                <th>Esterno</th>
+                                <th class="text-end">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var lavorazione in Model.Lavorazioni)
+                            {
+                                <tr>
+                                    <td class="text-end">@lavorazione.Sequenza</td>
+                                    <td>@lavorazione.DescrizioneLavorazione</td>
+                                    <td class="text-end">@lavorazione.TempoSetupMin.ToString("N2")</td>
+                                    <td class="text-end">@lavorazione.TempoPezzoMin.ToString("N2")</td>
+                                    <td class="text-end">@lavorazione.Quantita.ToString("N2")</td>
+                                    <td class="text-end">@lavorazione.TempoTotaleMin.ToString("N2")</td>
+                                    <td class="text-end">@lavorazione.CostoOrario.ToString("C2")</td>
+                                    <td class="text-end">@lavorazione.CostoFisso.ToString("C2")</td>
+                                    <td class="text-end">@lavorazione.CostoTotale.ToString("C2")</td>
+                                    <td>
+                                        <input type="checkbox"
+                                               checked="@lavorazione.DaAcquistareEsterno"
+                                               disabled />
+                                    </td>
+                                    <td class="text-end">
+                                        <a class="btn btn-sm btn-outline-secondary"
+                                           asp-page="/Preventivi/Riga/Lavorazioni"
+                                           asp-route-modo="dettaglio"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo"
+                                           asp-route-id="@lavorazione.IdRigaLavPrev">
+                                            Apri
+                                        </a>
+                                        <a class="btn btn-sm btn-outline-danger"
+                                           asp-page="/Preventivi/Riga/Lavorazioni"
+                                           asp-route-modo="elimina"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo"
+                                           asp-route-id="@lavorazione.IdRigaLavPrev">
+                                            Elimina
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            }
 
         </div>
 

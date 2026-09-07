@@ -1,0 +1,43 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.EliminaModel
+
+@{
+    ViewData["Title"] = "Elimina riga preventivo";
+}
+
+<section class="pfw-panel">
+
+    <div class="pfw-panel-header">
+        <div>
+            <h1 class="pfw-panel-title">Elimina riga preventivo</h1>
+            <div class="pfw-panel-subtitle">
+                Conferma eliminazione della riga
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="p-3">
+
+        <input type="hidden" asp-for="IdPreventivo" />
+        <input type="hidden" asp-for="IdRigaPreventivo" />
+
+        <p>
+            Vuoi eliminare la riga
+            <strong>@Model.Riga!.RigaNr - @Model.Riga.DescrizioneVoce</strong>?
+        </p>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-page="/Preventivi/Dettaglio"
+               asp-route-id="@Model.IdPreventivo"
+               class="pfw-btn pfw-btn-secondary">
+                Annulla
+            </a>
+
+            <button type="submit" class="pfw-btn pfw-btn-danger">
+                Elimina
+            </button>
+        </div>
+
+    </form>
+
+</section>
