@@ -2,7 +2,7 @@
 @model global::Preventivi.Web.Pages.Preventivi.Riga.ComponentiModel
 
 @{
-    var modo = Convert.ToString(RouteData.Values["modo"]) ?? Request.Query["modo"].ToString();
+    var modo = Request.Query["modo"].ToString();
     var idPreventivo = Request.Query["idPreventivo"].ToString();
     var idRigaPreventivo = Request.Query["idRigaPreventivo"].ToString();
     var titolo = ComponentiModel.IsNuovo(modo)
@@ -33,42 +33,146 @@
         <div class="p-3">
             @if (ComponentiModel.IsNuovo(modo))
             {
+                <form method="get"
+                      class="pfw-panel mb-3">
+                    <div class="p-3">
+                        <input type="hidden" name="modo" value="nuovo" />
+                        <input type="hidden" name="idPreventivo" value="@idPreventivo" />
+                        <input type="hidden" name="idRigaPreventivo" value="@idRigaPreventivo" />
+
+                        <div class="row g-3 align-items-end">
+                            <div class="col-12 col-md-3">
+                                <label class="form-label" for="Origine">Origine componente</label>
+                                <select class="form-select" id="Origine" name="Origine">
+                                    <option value="@ComponentiModel.OrigineLibero"
+                                            selected="@(Model.Origine == ComponentiModel.OrigineLibero)">
+                                        Libero
+                                    </option>
+                                    <option value="@ComponentiModel.OrigineArticolo"
+                                            selected="@(Model.Origine == ComponentiModel.OrigineArticolo)">
+                                        Da anagrafica articolo
+                                    </option>
+                                    <option value="@ComponentiModel.OrigineDistinta"
+                                            selected="@(Model.Origine == ComponentiModel.OrigineDistinta)">
+                                        Da distinta esistente
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="form-label" for="RicercaArticolo">Cerca articolo/distinta</label>
+                                <input class="form-control"
+                                       id="RicercaArticolo"
+                                       name="RicercaArticolo"
+                                       value="@Model.RicercaArticolo"
+                                       placeholder="Codice o descrizione..." />
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <label class="form-label" for="IdArticoloSelezionato">Articolo</label>
+                                <select class="form-select"
+                                        id="IdArticoloSelezionato"
+                                        name="IdArticoloSelezionato">
+                                    <option value="">Seleziona...</option>
+                                    @foreach (var articolo in Model.Articoli)
+                                    {
+                                        <option value="@articolo.IdArticolo"
+                                                selected="@(Model.IdArticoloSelezionato == articolo.IdArticolo)">
+                                            @articolo.Display
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-2">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    Aggiorna
+                                </button>
+                            </div>
+
+                            @if (Model.Origine == ComponentiModel.OrigineDistinta &&
+                                 Model.NodiDistinta.Count > 0)
+                            {
+                                <div class="col-12">
+                                    <label class="form-label" for="IdNodoDistintaSelezionato">Nodo distinta</label>
+                                    <select class="form-select"
+                                            id="IdNodoDistintaSelezionato"
+                                            name="IdNodoDistintaSelezionato">
+                                        <option value="">Seleziona nodo...</option>
+                                        @foreach (var nodo in Model.NodiDistinta)
+                                        {
+                                            <option value="@nodo.IdNodoDistinta"
+                                                    selected="@(Model.IdNodoDistintaSelezionato == nodo.IdNodoDistinta)">
+                                                @nodo.Display
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </form>
+
                 <form method="post"
                       asp-route-modo="nuovo"
                       asp-route-idPreventivo="@idPreventivo"
                       asp-route-idRigaPreventivo="@idRigaPreventivo">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                    <input type="hidden" asp-for="Origine" />
+                    <input type="hidden" asp-for="RicercaArticolo" />
+                    <input type="hidden" asp-for="IdArticoloSelezionato" />
+                    <input type="hidden" asp-for="IdNodoDistintaSelezionato" />
+                    <input type="hidden" asp-for="NuovoComponente.IdNodoDistinta" />
+                    <input type="hidden" asp-for="NuovoComponente.IdNodoPadre" />
+
                     <div class="row g-3">
-                        <div class="col-12 col-md-3">
-                            <label asp-for="NuovoComponente.OrdineVisualizzazione" class="form-label"></label>
-                            <input asp-for="NuovoComponente.OrdineVisualizzazione" class="form-control text-end" />
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="NuovoComponente.IdNodoDistinta" class="form-label"></label>
-                            <input asp-for="NuovoComponente.IdNodoDistinta" class="form-control text-end" />
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="NuovoComponente.IdNodoPadre" class="form-label"></label>
-                            <input asp-for="NuovoComponente.IdNodoPadre" class="form-control text-end" />
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="NuovoComponente.Livello" class="form-label"></label>
-                            <input asp-for="NuovoComponente.Livello" class="form-control text-end" />
-                        </div>
                         <div class="col-12">
-                            <label asp-for="NuovoComponente.DescrizioneNodo" class="form-label"></label>
-                            <input asp-for="NuovoComponente.DescrizioneNodo" class="form-control" />
+                            <label asp-for="NuovoComponente.DescrizioneNodo" class="form-label">
+                                Descrizione componente
+                            </label>
+                            <input asp-for="NuovoComponente.DescrizioneNodo"
+                                   class="form-control"
+                                   readonly="@(Model.Origine == ComponentiModel.OrigineDistinta)" />
                             <span asp-validation-for="NuovoComponente.DescrizioneNodo" class="text-danger"></span>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label asp-for="NuovoComponente.QuantitaBase" class="form-label"></label>
+                            <label asp-for="NuovoComponente.QuantitaBase" class="form-label">
+                                Quantità base
+                            </label>
                             <input asp-for="NuovoComponente.QuantitaBase" class="form-control text-end" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label asp-for="NuovoComponente.QuantitaCalcolata" class="form-label"></label>
+                            <label asp-for="NuovoComponente.QuantitaCalcolata" class="form-label">
+                                Quantità calcolata
+                            </label>
                             <input asp-for="NuovoComponente.QuantitaCalcolata" class="form-control text-end" />
                         </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="NuovoComponente.Livello" class="form-label">
+                                Livello
+                            </label>
+                            <input asp-for="NuovoComponente.Livello"
+                                   class="form-control text-end"
+                                   readonly="@(Model.Origine == ComponentiModel.OrigineDistinta)" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="NuovoComponente.OrdineVisualizzazione" class="form-label">
+                                Ordine visualizzazione
+                            </label>
+                            <input asp-for="NuovoComponente.OrdineVisualizzazione" class="form-control text-end" />
+                        </div>
+
+                        @if (Model.Origine == ComponentiModel.OrigineDistinta &&
+                             Model.NodoDistintaSelezionato is not null)
+                        {
+                            <div class="col-12">
+                                <div class="alert alert-info mb-0">
+                                    Nodo distinta selezionato:
+                                    <strong>@Model.NodoDistintaSelezionato.Display</strong>
+                                </div>
+                            </div>
+                        }
                     </div>
 
                     <div class="mt-3 d-flex gap-2">
@@ -84,6 +188,11 @@
             }
             else if (Model.Componente is not null)
             {
+                var returnUrl = ComponentiModel.GetComponentiReturnUrl(
+                    int.Parse(idPreventivo),
+                    int.Parse(idRigaPreventivo),
+                    Model.Componente.IdRigaCompPrev);
+
                 <dl class="row mb-0">
                     <dt class="col-sm-3">OrdineVisualizzazione</dt>
                     <dd class="col-sm-9">@Model.Componente.OrdineVisualizzazione</dd>
@@ -120,6 +229,197 @@
                 }
                 else
                 {
+                    <section class="pfw-panel mt-4">
+                        <div class="workspace-tabs">
+                            <a href="#materiali-componente" class="workspace-tab active text-decoration-none">
+                                Materiali (@Model.Materiali.Count)
+                            </a>
+                            <a href="#lavorazioni-componente" class="workspace-tab text-decoration-none">
+                                Lavorazioni (@Model.Lavorazioni.Count)
+                            </a>
+                            <a href="#allegati-componente" class="workspace-tab text-decoration-none">
+                                Allegati (@Model.Allegati.Allegati.Count)
+                            </a>
+                        </div>
+
+                        <div class="workspace-tab-content">
+                            <div id="materiali-componente" class="workspace-righe-toolbar">
+                                <div>
+                                    <strong>Materiali</strong>
+                                    <span class="workspace-righe-count">@Model.Materiali.Count righe</span>
+                                </div>
+                                <a class="btn btn-sm btn-primary"
+                                   asp-page="/Preventivi/Riga/Materiali"
+                                   asp-route-modo="nuovo"
+                                   asp-route-idPreventivo="@idPreventivo"
+                                   asp-route-idRigaPreventivo="@idRigaPreventivo"
+                                   asp-route-idComponente="@Model.Componente.IdRigaCompPrev">
+                                    Nuovo materiale
+                                </a>
+                            </div>
+
+                            @if (Model.Materiali.Count == 0)
+                            {
+                                <div class="workspace-placeholder">
+                                    <div class="workspace-placeholder-title">Nessun materiale presente</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>DescrizioneMateriale</th>
+                                                <th>Tipo</th>
+                                                <th>UM</th>
+                                                <th class="text-end">Quantita</th>
+                                                <th class="text-end">CostoUnitario</th>
+                                                <th class="text-end">CostoTotale</th>
+                                                <th>Da acquistare</th>
+                                                <th class="text-end">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var materiale in Model.Materiali)
+                                            {
+                                                <tr>
+                                                    <td>@materiale.DescrizioneMateriale</td>
+                                                    <td>@materiale.TipoMateriale</td>
+                                                    <td>@materiale.UM</td>
+                                                    <td class="text-end">@materiale.Quantita.ToString("N2")</td>
+                                                    <td class="text-end">@materiale.CostoUnitario.ToString("C4")</td>
+                                                    <td class="text-end">@materiale.CostoTotale.ToString("C2")</td>
+                                                    <td>
+                                                        <input type="checkbox" checked="@materiale.DaAcquistare" disabled />
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <a class="btn btn-sm btn-outline-secondary"
+                                                           asp-page="/Preventivi/Riga/Materiali"
+                                                           asp-route-modo="dettaglio"
+                                                           asp-route-idPreventivo="@idPreventivo"
+                                                           asp-route-idRigaPreventivo="@idRigaPreventivo"
+                                                           asp-route-idComponente="@Model.Componente.IdRigaCompPrev"
+                                                           asp-route-id="@materiale.IdRigaMatPrev">
+                                                            Apri
+                                                        </a>
+                                                        <a class="btn btn-sm btn-outline-danger"
+                                                           asp-page="/Preventivi/Riga/Materiali"
+                                                           asp-route-modo="elimina"
+                                                           asp-route-idPreventivo="@idPreventivo"
+                                                           asp-route-idRigaPreventivo="@idRigaPreventivo"
+                                                           asp-route-idComponente="@Model.Componente.IdRigaCompPrev"
+                                                           asp-route-id="@materiale.IdRigaMatPrev">
+                                                            Elimina
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+
+                            <hr id="lavorazioni-componente" class="my-4" />
+
+                            <div class="workspace-righe-toolbar">
+                                <div>
+                                    <strong>Lavorazioni</strong>
+                                    <span class="workspace-righe-count">@Model.Lavorazioni.Count righe</span>
+                                </div>
+                                <a class="btn btn-sm btn-primary"
+                                   asp-page="/Preventivi/Riga/Lavorazioni"
+                                   asp-route-modo="nuovo"
+                                   asp-route-idPreventivo="@idPreventivo"
+                                   asp-route-idRigaPreventivo="@idRigaPreventivo"
+                                   asp-route-idComponente="@Model.Componente.IdRigaCompPrev">
+                                    Nuova lavorazione
+                                </a>
+                            </div>
+
+                            @if (Model.Lavorazioni.Count == 0)
+                            {
+                                <div class="workspace-placeholder">
+                                    <div class="workspace-placeholder-title">Nessuna lavorazione presente</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-end">Sequenza</th>
+                                                <th>DescrizioneLavorazione</th>
+                                                <th class="text-end">Tempo totale</th>
+                                                <th class="text-end">Costo totale</th>
+                                                <th>Esterno</th>
+                                                <th class="text-end">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var lavorazione in Model.Lavorazioni)
+                                            {
+                                                <tr>
+                                                    <td class="text-end">@lavorazione.Sequenza</td>
+                                                    <td>@lavorazione.DescrizioneLavorazione</td>
+                                                    <td class="text-end">@lavorazione.TempoTotaleMin.ToString("N2")</td>
+                                                    <td class="text-end">@lavorazione.CostoTotale.ToString("C2")</td>
+                                                    <td>
+                                                        <input type="checkbox" checked="@lavorazione.DaAcquistareEsterno" disabled />
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <a class="btn btn-sm btn-outline-secondary"
+                                                           asp-page="/Preventivi/Riga/Lavorazioni"
+                                                           asp-route-modo="dettaglio"
+                                                           asp-route-idPreventivo="@idPreventivo"
+                                                           asp-route-idRigaPreventivo="@idRigaPreventivo"
+                                                           asp-route-idComponente="@Model.Componente.IdRigaCompPrev"
+                                                           asp-route-id="@lavorazione.IdRigaLavPrev">
+                                                            Apri
+                                                        </a>
+                                                        <a class="btn btn-sm btn-outline-danger"
+                                                           asp-page="/Preventivi/Riga/Lavorazioni"
+                                                           asp-route-modo="elimina"
+                                                           asp-route-idPreventivo="@idPreventivo"
+                                                           asp-route-idRigaPreventivo="@idRigaPreventivo"
+                                                           asp-route-idComponente="@Model.Componente.IdRigaCompPrev"
+                                                           asp-route-id="@lavorazione.IdRigaLavPrev">
+                                                            Elimina
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+
+                            <hr id="allegati-componente" class="my-4" />
+
+                            @await Html.PartialAsync(
+                                "~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml",
+                                new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+                                {
+                                    TestoNuovo = "Nuovo allegato",
+                                    UrlNuovo = $"/Allegati/Nuovo?Entita=PreventiviRigheComponenti&IdEntita={Model.Componente.IdRigaCompPrev}&ReturnUrl={Uri.EscapeDataString(returnUrl)}"
+                                })
+
+                            @if (Model.Allegati.Allegati.Count == 0)
+                            {
+                                <div class="workspace-placeholder">
+                                    <div class="workspace-placeholder-title">Nessun allegato presente</div>
+                                </div>
+                            }
+                            else
+                            {
+                                @await Html.PartialAsync(
+                                    "~/Pages/Shared/Allegati/_AllegatiGrid.cshtml",
+                                    Model.Allegati)
+                            }
+                        </div>
+                    </section>
+
                     <div class="mt-3">
                         <a class="btn btn-outline-secondary"
                            asp-page="/Preventivi/Riga/Workspace"

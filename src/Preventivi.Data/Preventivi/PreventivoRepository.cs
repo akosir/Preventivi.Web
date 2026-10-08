@@ -98,6 +98,126 @@ public sealed class PreventivoRepository : IPreventivoRepository
             cancellationToken: cancellationToken);
     }
 
+    public async Task<IReadOnlyList<ArticoloLookupItem>> CercaArticoliAsync(
+        string? ricerca,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<ArticoloLookupItem>(
+            "dbo.Articoli_Ricerca",
+            [NullableShortText("@Ricerca", ricerca, 100)],
+            cancellationToken);
+    }
+
+    public async Task<ArticoloLookupItem?> GetArticoloAsync(
+        int idArticolo,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QuerySingleAsync<ArticoloLookupItem>(
+            "dbo.Articoli_Dettaglio_Lookup",
+            [new SqlParameter("@IdArticolo", idArticolo)],
+            cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<DistintaNodoLookupItem>> GetNodiDistintaAsync(
+        int idArticolo,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<DistintaNodoLookupItem>(
+            "dbo.DistintaBaseNodi_Elenco",
+            [new SqlParameter("@IdArticolo", idArticolo)],
+            cancellationToken);
+    }
+
+    public async Task<DistintaNodoLookupItem?> GetNodoDistintaAsync(
+        int idNodoDistinta,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QuerySingleAsync<DistintaNodoLookupItem>(
+            "dbo.DistintaBaseNodi_Dettaglio",
+            [new SqlParameter("@IdNodoDistinta", idNodoDistinta)],
+            cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<MaterialeLookupItem>> CercaMaterialiAsync(
+        string? ricerca,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<MaterialeLookupItem>(
+            "dbo.Materiali_Ricerca",
+            [NullableShortText("@Ricerca", ricerca, 100)],
+            cancellationToken);
+    }
+
+    public async Task<MaterialeLookupItem?> GetMaterialeAnagraficaAsync(
+        int idMateriale,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QuerySingleAsync<MaterialeLookupItem>(
+            "dbo.Materiali_Dettaglio_Lookup",
+            [new SqlParameter("@IdMateriale", idMateriale)],
+            cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<DistintaMaterialeLookupItem>> GetMaterialiDistintaAsync(
+        int idNodoDistinta,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<DistintaMaterialeLookupItem>(
+            "dbo.DistintaMateriali_Elenco",
+            [new SqlParameter("@IdNodoDistinta", idNodoDistinta)],
+            cancellationToken);
+    }
+
+    public async Task<DistintaMaterialeLookupItem?> GetMaterialeDistintaAsync(
+        int idDistintaMateriale,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QuerySingleAsync<DistintaMaterialeLookupItem>(
+            "dbo.DistintaMateriali_Dettaglio",
+            [new SqlParameter("@IdDistintaMateriale", idDistintaMateriale)],
+            cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<LavorazioneLookupItem>> CercaLavorazioniAsync(
+        string? ricerca,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<LavorazioneLookupItem>(
+            "dbo.Lavorazioni_Ricerca",
+            [NullableShortText("@Ricerca", ricerca, 100)],
+            cancellationToken);
+    }
+
+    public async Task<LavorazioneLookupItem?> GetLavorazioneAnagraficaAsync(
+        int idLavorazione,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QuerySingleAsync<LavorazioneLookupItem>(
+            "dbo.Lavorazioni_Dettaglio_Lookup",
+            [new SqlParameter("@IdLavorazione", idLavorazione)],
+            cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<DistintaLavorazioneLookupItem>> GetLavorazioniDistintaAsync(
+        int idNodoDistinta,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<DistintaLavorazioneLookupItem>(
+            "dbo.DistintaLavorazioni_Elenco",
+            [new SqlParameter("@IdNodoDistinta", idNodoDistinta)],
+            cancellationToken);
+    }
+
+    public async Task<DistintaLavorazioneLookupItem?> GetLavorazioneDistintaAsync(
+        int idDistintaLavorazione,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QuerySingleAsync<DistintaLavorazioneLookupItem>(
+            "dbo.DistintaLavorazioni_Dettaglio",
+            [new SqlParameter("@IdDistintaLavorazione", idDistintaLavorazione)],
+            cancellationToken);
+    }
+
     public async Task<IReadOnlyList<PreventivoVarianteItem>> GetVariantiAsync(
         int idPreventivo,
         CancellationToken cancellationToken = default)
@@ -201,11 +321,15 @@ public sealed class PreventivoRepository : IPreventivoRepository
 
     public async Task<IReadOnlyList<PreventivoRigaMaterialeItem>> GetMaterialiAsync(
         int idRigaPreventivo,
+        int? idNodoDistinta,
         CancellationToken cancellationToken = default)
     {
         return await _db.QueryAsync<PreventivoRigaMaterialeItem>(
             "dbo.Preventivi_Righe_Materiali_Elenco",
-            [new SqlParameter("@IdRigaPreventivo", idRigaPreventivo)],
+            [
+                new SqlParameter("@IdRigaPreventivo", idRigaPreventivo),
+                NullableInt("@IdNodoDistinta", idNodoDistinta)
+            ],
             cancellationToken);
     }
 
@@ -255,11 +379,15 @@ public sealed class PreventivoRepository : IPreventivoRepository
 
     public async Task<IReadOnlyList<PreventivoRigaLavorazioneItem>> GetLavorazioniAsync(
         int idRigaPreventivo,
+        int? idNodoDistinta,
         CancellationToken cancellationToken = default)
     {
         return await _db.QueryAsync<PreventivoRigaLavorazioneItem>(
             "dbo.Preventivi_Righe_Lavorazioni_Elenco",
-            [new SqlParameter("@IdRigaPreventivo", idRigaPreventivo)],
+            [
+                new SqlParameter("@IdRigaPreventivo", idRigaPreventivo),
+                NullableInt("@IdNodoDistinta", idNodoDistinta)
+            ],
             cancellationToken);
     }
 

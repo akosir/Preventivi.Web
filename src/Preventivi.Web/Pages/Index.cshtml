@@ -11,7 +11,7 @@
         <div>
             <h1 class="dashboard-title">Dashboard</h1>
             <p class="dashboard-subtitle">
-                Collegamenti ai moduli disponibili
+                Panoramica operativa del ciclo preventivi
             </p>
         </div>
 
@@ -20,57 +20,174 @@
         </div>
     </div>
 
+    <div class="row g-3 mb-4">
+        @foreach (var indicatore in Model.Indicatori)
+        {
+            <div class="col-12 col-md-6 col-xl-3">
+                <section class="pfw-kpi-card">
+                    <div class="pfw-kpi-header">
+                        <div class="pfw-kpi-label">@indicatore.Titolo</div>
+                        <div class="pfw-kpi-icon">@indicatore.Sigla</div>
+                    </div>
+                    <div class="pfw-kpi-value">@indicatore.Valore</div>
+                    <div class="pfw-kpi-footer">@indicatore.Nota</div>
+                </section>
+            </div>
+        }
+    </div>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-xl-7">
+            <section class="pfw-panel h-100">
+                <div class="pfw-panel-header">
+                    <div>
+                        <h2 class="pfw-panel-title">Ultimi preventivi</h2>
+                        <div class="pfw-panel-subtitle">Attività più recenti</div>
+                    </div>
+                </div>
+
+                @if (Model.UltimiPreventivi.Count == 0)
+                {
+                    <div class="pfw-panel-body">
+                        <div class="workspace-placeholder">
+                            <div class="workspace-placeholder-title">
+                                Nessun preventivo presente
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table pfw-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Preventivo</th>
+                                    <th>Cliente</th>
+                                    <th>Data</th>
+                                    <th class="text-end">Importo</th>
+                                    <th>Stato</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var preventivo in Model.UltimiPreventivi)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@preventivo.NumeroCompleto</td>
+                                        <td>@preventivo.Cliente</td>
+                                        <td>@preventivo.DataPreventivo.ToString("dd/MM/yyyy")</td>
+                                        <td class="text-end fw-semibold">@preventivo.TotaleVendita.ToString("C2")</td>
+                                        <td>
+                                            <span class="pfw-badge @IndexModel.GetStatoBadge(preventivo.Stato)">
+                                                @preventivo.Stato
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+        </div>
+
+        <div class="col-12 col-xl-5">
+            <section class="pfw-panel h-100 dashboard-alert-panel">
+                <div class="pfw-panel-header">
+                    <div>
+                        <h2 class="pfw-panel-title">Alert operativi</h2>
+                        <div class="pfw-panel-subtitle">
+                            Situazioni che richiedono attenzione
+                        </div>
+                    </div>
+                    <div class="pfw-alert-count">@Model.AlertCount</div>
+                </div>
+
+                @if (Model.AlertOperativi.Count == 0)
+                {
+                    <div class="pfw-panel-body">
+                        <div class="workspace-placeholder">
+                            <div class="workspace-placeholder-title">
+                                Nessun alert operativo
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="pfw-alert-list">
+                        @foreach (var alert in Model.AlertOperativi)
+                        {
+                            <div class="pfw-alert-item pfw-alert-item-@alert.Livello">
+                                <div class="pfw-alert-marker"></div>
+                                <div class="pfw-alert-content">
+                                    <div class="pfw-alert-title">@alert.Titolo</div>
+                                    <div class="pfw-alert-text">@alert.Testo</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+        </div>
+
+    </div>
+
     <div class="row g-3">
-
-        <div class="col-12 col-md-6 col-xl-4">
+        <div class="col-12 col-xl-7">
             <section class="pfw-panel h-100">
-
                 <div class="pfw-panel-header">
                     <div>
-                        <h2 class="pfw-panel-title">Preventivi</h2>
-                        <div class="pfw-panel-subtitle">
-                            Elenco e dettaglio dei preventivi
-                        </div>
+                        <h2 class="pfw-panel-title">Andamento preventivi</h2>
+                        <div class="pfw-panel-subtitle">Ultimi 6 mesi</div>
                     </div>
                 </div>
 
-                <div class="pfw-panel-body">
-                    <a asp-page="/Preventivi/Index"
-                       class="pfw-btn pfw-btn-primary">
-                        Apri Preventivi
-                    </a>
+                <div class="pfw-chart-placeholder">
+                    <div class="pfw-chart-bars">
+                        @foreach (var mese in Model.AndamentoPreventivi)
+                        {
+                            <div class="pfw-chart-column"
+                                 title="@($"{mese.Conteggio} preventivi")">
+                                <div class="pfw-chart-bar"
+                                     style="height:@mese.AltezzaPercentuale%">
+                                </div>
+                                <span>@mese.Mese</span>
+                            </div>
+                        }
+                    </div>
                 </div>
-
             </section>
         </div>
 
-        <div class="col-12 col-md-6 col-xl-4">
+        <div class="col-12 col-xl-5">
             <section class="pfw-panel h-100">
-
                 <div class="pfw-panel-header">
                     <div>
-                        <h2 class="pfw-panel-title">Clienti</h2>
-                        <div class="pfw-panel-subtitle">
-                            Anagrafica clienti e allegati cliente
-                        </div>
+                        <h2 class="pfw-panel-title">Note operative</h2>
+                        <div class="pfw-panel-subtitle">Copertura dati dashboard</div>
                     </div>
                 </div>
 
-                <div class="pfw-panel-body d-flex flex-wrap gap-2">
-                    <a asp-page="/Clienti/Index"
-                       class="pfw-btn pfw-btn-primary">
-                        Apri Clienti
-                    </a>
-
-                    <a asp-page="/Clienti/Nuovo"
-                       class="pfw-btn pfw-btn-secondary">
-                        Nuovo Cliente
-                    </a>
+                <div class="pfw-request-list">
+                    <div class="pfw-request-item">
+                        <div>
+                            <div class="fw-semibold">Preventivi</div>
+                            <div class="pfw-secondary-text">Dati collegati al database reale</div>
+                        </div>
+                        <span class="pfw-badge pfw-badge-success">Attivo</span>
+                    </div>
+                    <div class="pfw-request-item">
+                        <div>
+                            <div class="fw-semibold">Richieste, campionature e ordini</div>
+                            <div class="pfw-secondary-text">In attesa del collegamento ai dati reali</div>
+                        </div>
+                        <span class="pfw-badge pfw-badge-secondary">Non collegato</span>
+                    </div>
                 </div>
-
             </section>
         </div>
-
     </div>
 
 </div>

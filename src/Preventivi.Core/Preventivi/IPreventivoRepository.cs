@@ -28,6 +28,54 @@ public interface IPreventivoRepository
     Task<IReadOnlyList<TipoRigaPreventivoItem>> GetTipiRigaAsync(
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<ArticoloLookupItem>> CercaArticoliAsync(
+        string? ricerca,
+        CancellationToken cancellationToken = default);
+
+    Task<ArticoloLookupItem?> GetArticoloAsync(
+        int idArticolo,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<DistintaNodoLookupItem>> GetNodiDistintaAsync(
+        int idArticolo,
+        CancellationToken cancellationToken = default);
+
+    Task<DistintaNodoLookupItem?> GetNodoDistintaAsync(
+        int idNodoDistinta,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<MaterialeLookupItem>> CercaMaterialiAsync(
+        string? ricerca,
+        CancellationToken cancellationToken = default);
+
+    Task<MaterialeLookupItem?> GetMaterialeAnagraficaAsync(
+        int idMateriale,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<DistintaMaterialeLookupItem>> GetMaterialiDistintaAsync(
+        int idNodoDistinta,
+        CancellationToken cancellationToken = default);
+
+    Task<DistintaMaterialeLookupItem?> GetMaterialeDistintaAsync(
+        int idDistintaMateriale,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<LavorazioneLookupItem>> CercaLavorazioniAsync(
+        string? ricerca,
+        CancellationToken cancellationToken = default);
+
+    Task<LavorazioneLookupItem?> GetLavorazioneAnagraficaAsync(
+        int idLavorazione,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<DistintaLavorazioneLookupItem>> GetLavorazioniDistintaAsync(
+        int idNodoDistinta,
+        CancellationToken cancellationToken = default);
+
+    Task<DistintaLavorazioneLookupItem?> GetLavorazioneDistintaAsync(
+        int idDistintaLavorazione,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<PreventivoVarianteItem>> GetVariantiAsync(
         int idPreventivo,
         CancellationToken cancellationToken = default);
@@ -62,6 +110,7 @@ public interface IPreventivoRepository
 
     Task<IReadOnlyList<PreventivoRigaMaterialeItem>> GetMaterialiAsync(
         int idRigaPreventivo,
+        int? idNodoDistinta,
         CancellationToken cancellationToken = default);
 
     Task<PreventivoRigaMaterialeItem?> GetMaterialeAsync(
@@ -78,6 +127,7 @@ public interface IPreventivoRepository
 
     Task<IReadOnlyList<PreventivoRigaLavorazioneItem>> GetLavorazioniAsync(
         int idRigaPreventivo,
+        int? idNodoDistinta,
         CancellationToken cancellationToken = default);
 
     Task<PreventivoRigaLavorazioneItem?> GetLavorazioneAsync(

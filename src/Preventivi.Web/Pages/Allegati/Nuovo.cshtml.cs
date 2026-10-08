@@ -28,6 +28,9 @@ public class NuovoModel : PageModel
     [BindProperty(SupportsGet = true)]
     public int IdEntita { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? ReturnUrl { get; set; }
+
     [BindProperty]
     public AllegatoFormModel Form { get; set; } = new();
 
@@ -172,6 +175,11 @@ public class NuovoModel : PageModel
                     });
             }
 
+            if (IsLocalReturnUrl(ReturnUrl))
+            {
+                return LocalRedirect(ReturnUrl!);
+            }
+
             return RedirectToPage();
         }
         finally
@@ -182,5 +190,12 @@ public class NuovoModel : PageModel
             }
         }
 
+    }
+
+    private static bool IsLocalReturnUrl(string? returnUrl)
+    {
+        return !string.IsNullOrWhiteSpace(returnUrl) &&
+            returnUrl.StartsWith("/", StringComparison.Ordinal) &&
+            !returnUrl.StartsWith("//", StringComparison.Ordinal);
     }
 }

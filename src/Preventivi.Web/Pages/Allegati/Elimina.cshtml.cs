@@ -23,6 +23,9 @@ public class EliminaModel : PageModel
     [BindProperty(SupportsGet = true)]
     public int IdAllegato { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? ReturnUrl { get; set; }
+
     public string NomeFileOriginale { get; private set; } = "";
 
     public async Task<IActionResult> OnGetAsync(
@@ -89,6 +92,18 @@ public class EliminaModel : PageModel
                 });
         }
 
+        if (IsLocalReturnUrl(ReturnUrl))
+        {
+            return LocalRedirect(ReturnUrl!);
+        }
+
         return RedirectToPage("/Index");
+    }
+
+    private static bool IsLocalReturnUrl(string? returnUrl)
+    {
+        return !string.IsNullOrWhiteSpace(returnUrl) &&
+            returnUrl.StartsWith("/", StringComparison.Ordinal) &&
+            !returnUrl.StartsWith("//", StringComparison.Ordinal);
     }
 }

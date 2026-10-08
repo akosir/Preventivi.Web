@@ -46,7 +46,7 @@
                         Download
                     </a>
 
-                    <a href="/Allegati/Elimina?IdAllegato=@allegato.IdAllegato"
+                    <a href="/Allegati/Elimina?IdAllegato=@allegato.IdAllegato@(string.IsNullOrWhiteSpace(Model.ReturnUrl) ? "" : $"&ReturnUrl={Uri.EscapeDataString(Model.ReturnUrl)}")"
                        class="pfw-btn pfw-btn-danger">
                         Elimina
                     </a>

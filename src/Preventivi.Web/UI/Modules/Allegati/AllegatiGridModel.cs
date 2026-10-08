@@ -6,4 +6,6 @@ public sealed class AllegatiGridModel
 {
     public IReadOnlyList<AllegatoListItem> Allegati { get; init; }
         = Array.Empty<AllegatoListItem>();
+
+    public string? ReturnUrl { get; init; }
 }

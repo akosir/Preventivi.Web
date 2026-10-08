@@ -15,12 +15,6 @@ public class WorkspaceModel : PageModel
     public IReadOnlyList<PreventivoRigaComponenteItem> Componenti { get; private set; }
         = Array.Empty<PreventivoRigaComponenteItem>();
 
-    public IReadOnlyList<PreventivoRigaMaterialeItem> Materiali { get; private set; }
-        = Array.Empty<PreventivoRigaMaterialeItem>();
-
-    public IReadOnlyList<PreventivoRigaLavorazioneItem> Lavorazioni { get; private set; }
-        = Array.Empty<PreventivoRigaLavorazioneItem>();
-
     public WorkspaceModel(
         IPreventivoRepository preventivoRepository)
     {
@@ -61,16 +55,6 @@ public class WorkspaceModel : PageModel
 
         Componenti =
             await _preventivoRepository.GetComponentiAsync(
-                idRigaPreventivo,
-                cancellationToken);
-
-        Materiali =
-            await _preventivoRepository.GetMaterialiAsync(
-                idRigaPreventivo,
-                cancellationToken);
-
-        Lavorazioni =
-            await _preventivoRepository.GetLavorazioniAsync(
                 idRigaPreventivo,
                 cancellationToken);
 

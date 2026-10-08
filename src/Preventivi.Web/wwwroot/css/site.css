@@ -343,6 +343,11 @@ body {
     font-weight: 700;
 }
 
+.dashboard-alert-panel {
+    border-color: #f2c7c2;
+    box-shadow: 0 8px 24px rgba(160, 54, 45, .08);
+}
+
 .pfw-alert-list {
     padding: 6px 0;
 }
