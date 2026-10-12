@@ -17,6 +17,10 @@ public class ComponentiModel : PageModel
 
     public PreventivoRigaComponenteItem? Componente { get; private set; }
 
+    public bool EliminazioneRichiesta { get; private set; }
+    public int? IdPreventivoEliminazione { get; private set; }
+    public int? IdRigaEliminazione { get; private set; }
+
     public IReadOnlyList<PreventivoRigaMaterialeItem> Materiali { get; private set; }
         = Array.Empty<PreventivoRigaMaterialeItem>();
 
@@ -65,6 +69,12 @@ public class ComponentiModel : PageModel
         int? id,
         CancellationToken cancellationToken)
     {
+        if (IsElimina(modo))
+        {
+            await PreparaEliminazioneAsync(idPreventivo, idRigaPreventivo, id, cancellationToken);
+            return Page();
+        }
+
         if (!IsRequestValid(modo, idPreventivo, idRigaPreventivo, id))
         {
             return BadRequest();
@@ -128,18 +138,23 @@ public class ComponentiModel : PageModel
         int? id,
         CancellationToken cancellationToken)
     {
-        if (!IsRequestValid(modo, idPreventivo, idRigaPreventivo, id))
-        {
-            return BadRequest();
-        }
-
         if (IsElimina(modo))
         {
+            if (!await PreparaEliminazioneAsync(idPreventivo, idRigaPreventivo, id, cancellationToken))
+            {
+                return Page();
+            }
+
             await _preventivoRepository.EliminaComponenteAsync(
-                id!.Value,
+                Componente!.IdRigaCompPrev,
                 cancellationToken);
 
             return RedirectToWorkspace(idPreventivo, idRigaPreventivo);
+        }
+
+        if (!IsRequestValid(modo, idPreventivo, idRigaPreventivo, id))
+        {
+            return BadRequest();
         }
 
         if (!IsNuovo(modo))
@@ -221,6 +236,55 @@ public class ComponentiModel : PageModel
                 idRigaPreventivo,
                 id = idComponente
             });
+    }
+
+    private async Task<bool> PreparaEliminazioneAsync(
+        int idPreventivo,
+        int idRigaPreventivo,
+        int? id,
+        CancellationToken cancellationToken)
+    {
+        EliminazioneRichiesta = true;
+        Componente = null;
+        IdPreventivoEliminazione = null;
+        IdRigaEliminazione = null;
+
+        // Le altre proprieta associate appartengono al form di creazione.
+        var parametri = new[] { "modo", nameof(idPreventivo), nameof(idRigaPreventivo), nameof(id) };
+        if (idPreventivo <= 0 || idRigaPreventivo <= 0 || id is not > 0 ||
+            parametri.Any(nome => ModelState.TryGetValue(nome, out var stato) && stato.Errors.Count > 0))
+        {
+            ModelState.AddModelError(string.Empty, "Richiesta di eliminazione non valida.");
+            return false;
+        }
+
+        var preventivo = await _preventivoRepository.GetDettaglioAsync(idPreventivo, cancellationToken);
+        if (preventivo is null)
+        {
+            ModelState.AddModelError(string.Empty, "Preventivo non trovato.");
+            return false;
+        }
+
+        var riga = await _preventivoRepository.GetRigaAsync(idRigaPreventivo, cancellationToken);
+        if (riga is null || riga.IdPreventivo != idPreventivo)
+        {
+            ModelState.AddModelError(string.Empty, "Riga non trovata nel preventivo indicato.");
+            return false;
+        }
+
+        IdPreventivoEliminazione = idPreventivo;
+        IdRigaEliminazione = idRigaPreventivo;
+
+        var componente = await _preventivoRepository.GetComponenteAsync(id.Value, cancellationToken);
+        if (componente is null || componente.IdRigaPreventivo != idRigaPreventivo)
+        {
+            ModelState.AddModelError(string.Empty,
+                "Componente non trovato nella riga indicata. Potrebbe essere già stato eliminato.");
+            return false;
+        }
+
+        Componente = componente;
+        return true;
     }
 
     public IActionResult RedirectToWorkspace(

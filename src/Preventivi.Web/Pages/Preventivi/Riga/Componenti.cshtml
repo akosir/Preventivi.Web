@@ -2,9 +2,13 @@
 @model global::Preventivi.Web.Pages.Preventivi.Riga.ComponentiModel
 
 @{
-    var modo = Request.Query["modo"].ToString();
-    var idPreventivo = Request.Query["idPreventivo"].ToString();
-    var idRigaPreventivo = Request.Query["idRigaPreventivo"].ToString();
+    var modo = Model.EliminazioneRichiesta ? "elimina" : Request.Query["modo"].ToString();
+    var idPreventivo = Model.EliminazioneRichiesta
+        ? Model.IdPreventivoEliminazione?.ToString()
+        : Request.Query["idPreventivo"].ToString();
+    var idRigaPreventivo = Model.EliminazioneRichiesta
+        ? Model.IdRigaEliminazione?.ToString()
+        : Request.Query["idRigaPreventivo"].ToString();
     var titolo = ComponentiModel.IsNuovo(modo)
         ? "Nuovo componente"
         : ComponentiModel.IsElimina(modo)
@@ -17,12 +21,15 @@
 <div class="workspace-page">
     <div class="workspace-header">
         <div class="workspace-breadcrumb">
-            <a asp-page="/Preventivi/Riga/Workspace"
-               asp-route-idPreventivo="@idPreventivo"
-               asp-route-idRigaPreventivo="@idRigaPreventivo">
-                Riga preventivo
-            </a>
-            <span>/</span>
+            @if (!Model.EliminazioneRichiesta || Model.IdRigaEliminazione.HasValue)
+            {
+                <a asp-page="/Preventivi/Riga/Workspace"
+                   asp-route-idPreventivo="@idPreventivo"
+                   asp-route-idRigaPreventivo="@idRigaPreventivo">
+                    Riga preventivo
+                </a>
+                <span>/</span>
+            }
             <span>@titolo</span>
         </div>
 
@@ -31,6 +38,11 @@
 
     <section class="pfw-panel">
         <div class="p-3">
+            @if (Model.EliminazioneRichiesta)
+            {
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+            }
+
             @if (ComponentiModel.IsNuovo(modo))
             {
                 <form method="get"
@@ -188,10 +200,7 @@
             }
             else if (Model.Componente is not null)
             {
-                var returnUrl = ComponentiModel.GetComponentiReturnUrl(
-                    int.Parse(idPreventivo),
-                    int.Parse(idRigaPreventivo),
-                    Model.Componente.IdRigaCompPrev);
+                var returnUrl = Model.Allegati.ReturnUrl ?? string.Empty;
 
                 <dl class="row mb-0">
                     <dt class="col-sm-3">OrdineVisualizzazione</dt>
