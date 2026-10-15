@@ -6,6 +6,8 @@ public sealed class PreventivoRigaLavorazioneItem
 
     public int IdRigaPreventivo { get; set; }
 
+    public int? IdRigaCompPrev { get; set; }
+
     public int? IdNodoDistinta { get; set; }
 
     public int? IdLavorazione { get; set; }

@@ -35,6 +35,9 @@ public class ComponentiModel : PageModel
     public IReadOnlyList<DistintaNodoLookupItem> NodiDistinta { get; private set; }
         = Array.Empty<DistintaNodoLookupItem>();
 
+    public IReadOnlyList<PreventivoRigaComponenteItem> ComponentiDisponibili { get; private set; }
+        = Array.Empty<PreventivoRigaComponenteItem>();
+
     public ArticoloLookupItem? ArticoloSelezionato { get; private set; }
 
     public DistintaNodoLookupItem? NodoDistintaSelezionato { get; private set; }
@@ -80,6 +83,14 @@ public class ComponentiModel : PageModel
             return BadRequest();
         }
 
+        if (!await RigaAppartieneAlPreventivoAsync(
+                idPreventivo,
+                idRigaPreventivo,
+                cancellationToken))
+        {
+            return NotFound();
+        }
+
         if (IsNuovo(modo))
         {
             await PreparaNuovoComponenteAsync(
@@ -105,13 +116,13 @@ public class ComponentiModel : PageModel
             Materiali =
                 await _preventivoRepository.GetMaterialiAsync(
                     idRigaPreventivo,
-                    Componente.IdNodoDistinta,
+                    Componente.IdRigaCompPrev,
                     cancellationToken);
 
             Lavorazioni =
                 await _preventivoRepository.GetLavorazioniAsync(
                     idRigaPreventivo,
-                    Componente.IdNodoDistinta,
+                    Componente.IdRigaCompPrev,
                     cancellationToken);
 
             Allegati = new AllegatiGridModel
@@ -162,6 +173,14 @@ public class ComponentiModel : PageModel
             return BadRequest();
         }
 
+        if (!await RigaAppartieneAlPreventivoAsync(
+                idPreventivo,
+                idRigaPreventivo,
+                cancellationToken))
+        {
+            return NotFound();
+        }
+
         NormalizeOrigine();
 
         await PreparaNuovoComponenteAsync(
@@ -206,6 +225,42 @@ public class ComponentiModel : PageModel
             {
                 NuovoComponente.DescrizioneNodo = ArticoloSelezionato.Display;
             }
+
+            NuovoComponente.IdArticoloOrigine = ArticoloSelezionato?.IdArticolo;
+            NuovoComponente.IdNodoDistinta = null;
+            NuovoComponente.IdNodoPadre = null;
+        }
+
+        if (Origine == OrigineLibero)
+        {
+            NuovoComponente.IdArticoloOrigine = null;
+            NuovoComponente.IdNodoDistinta = null;
+            NuovoComponente.IdNodoPadre = null;
+        }
+
+        NuovoComponente.TipoOrigineComponente = Origine;
+
+        if (NuovoComponente.IdRigaCompPrevPadre is > 0 &&
+            ComponentiDisponibili.All(
+                componente => componente.IdRigaCompPrev != NuovoComponente.IdRigaCompPrevPadre))
+        {
+            ModelState.AddModelError(
+                nameof(NuovoComponente.IdRigaCompPrevPadre),
+                "Il componente padre non appartiene alla riga indicata.");
+        }
+
+        if (NuovoComponente.QuantitaBase <= 0)
+        {
+            ModelState.AddModelError(
+                nameof(NuovoComponente.QuantitaBase),
+                "La quantita base deve essere maggiore di zero.");
+        }
+
+        if (NuovoComponente.Livello < 0)
+        {
+            ModelState.AddModelError(
+                nameof(NuovoComponente.Livello),
+                "Il livello non puo essere negativo.");
         }
 
         if (string.IsNullOrWhiteSpace(NuovoComponente.DescrizioneNodo))
@@ -306,6 +361,11 @@ public class ComponentiModel : PageModel
     {
         NormalizeOrigine();
 
+        ComponentiDisponibili =
+            await _preventivoRepository.GetComponentiAsync(
+                idRigaPreventivo,
+                cancellationToken);
+
         Articoli =
             await _preventivoRepository.CercaArticoliAsync(
                 RicercaArticolo,
@@ -345,11 +405,6 @@ public class ComponentiModel : PageModel
             NuovoComponente.QuantitaBase = 1;
         }
 
-        if (NuovoComponente.QuantitaCalcolata == 0)
-        {
-            NuovoComponente.QuantitaCalcolata = NuovoComponente.QuantitaBase;
-        }
-
         if (NuovoComponente.OrdineVisualizzazione is null)
         {
             NuovoComponente.OrdineVisualizzazione = 10;
@@ -361,11 +416,45 @@ public class ComponentiModel : PageModel
     {
         NuovoComponente.IdNodoDistinta = nodo.IdNodoDistinta;
         NuovoComponente.IdNodoPadre = nodo.IdNodoPadre;
+        NuovoComponente.IdArticoloOrigine = nodo.IdArticolo;
         NuovoComponente.DescrizioneNodo = nodo.DescrizioneNodo;
         NuovoComponente.Livello = nodo.Livello;
         NuovoComponente.QuantitaBase = nodo.QuantitaBase;
-        NuovoComponente.QuantitaCalcolata = nodo.QuantitaBase;
         NuovoComponente.OrdineVisualizzazione = nodo.OrdineVisualizzazione;
+
+        if (NuovoComponente.IdRigaCompPrevPadre is null && nodo.IdNodoPadre is > 0)
+        {
+            var padriCandidati = ComponentiDisponibili
+                .Where(componente => componente.IdNodoDistinta == nodo.IdNodoPadre)
+                .ToArray();
+
+            if (padriCandidati.Length == 1)
+            {
+                NuovoComponente.IdRigaCompPrevPadre = padriCandidati[0].IdRigaCompPrev;
+            }
+        }
+    }
+
+    private async Task<bool> RigaAppartieneAlPreventivoAsync(
+        int idPreventivo,
+        int idRigaPreventivo,
+        CancellationToken cancellationToken)
+    {
+        var preventivo =
+            await _preventivoRepository.GetDettaglioAsync(
+                idPreventivo,
+                cancellationToken);
+        if (preventivo is null)
+        {
+            return false;
+        }
+
+        var riga =
+            await _preventivoRepository.GetRigaAsync(
+                idRigaPreventivo,
+                cancellationToken);
+
+        return riga?.IdPreventivo == idPreventivo;
     }
 
     private void NormalizeOrigine()

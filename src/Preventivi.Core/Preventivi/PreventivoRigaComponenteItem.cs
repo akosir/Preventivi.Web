@@ -6,6 +6,12 @@ public sealed class PreventivoRigaComponenteItem
 
     public int IdRigaPreventivo { get; set; }
 
+    public int? IdRigaCompPrevPadre { get; set; }
+
+    public string TipoOrigineComponente { get; set; } = string.Empty;
+
+    public int? IdArticoloOrigine { get; set; }
+
     public int? IdNodoDistinta { get; set; }
 
     public int? IdNodoPadre { get; set; }

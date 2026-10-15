@@ -294,12 +294,14 @@ public sealed class PreventivoRepository : IPreventivoRepository
         var parameters = new[]
         {
             new SqlParameter("@IdRigaPreventivo", componente.IdRigaPreventivo),
+            NullableInt("@IdRigaCompPrevPadre", componente.IdRigaCompPrevPadre),
+            Text("@TipoOrigineComponente", componente.TipoOrigineComponente, 20),
+            NullableInt("@IdArticoloOrigine", componente.IdArticoloOrigine),
             NullableInt("@IdNodoDistinta", componente.IdNodoDistinta),
             NullableInt("@IdNodoPadre", componente.IdNodoPadre),
             Text("@DescrizioneNodo", componente.DescrizioneNodo, 400),
             new SqlParameter("@Livello", componente.Livello),
             Decimal("@QuantitaBase", componente.QuantitaBase, 18, 4),
-            Decimal("@QuantitaCalcolata", componente.QuantitaCalcolata, 18, 4),
             NullableInt("@OrdineVisualizzazione", componente.OrdineVisualizzazione)
         };
 
@@ -321,14 +323,14 @@ public sealed class PreventivoRepository : IPreventivoRepository
 
     public async Task<IReadOnlyList<PreventivoRigaMaterialeItem>> GetMaterialiAsync(
         int idRigaPreventivo,
-        int? idNodoDistinta,
+        int? idRigaCompPrev,
         CancellationToken cancellationToken = default)
     {
         return await _db.QueryAsync<PreventivoRigaMaterialeItem>(
             "dbo.Preventivi_Righe_Materiali_Elenco",
             [
                 new SqlParameter("@IdRigaPreventivo", idRigaPreventivo),
-                NullableInt("@IdNodoDistinta", idNodoDistinta)
+                NullableInt("@IdRigaCompPrev", idRigaCompPrev)
             ],
             cancellationToken);
     }
@@ -350,6 +352,7 @@ public sealed class PreventivoRepository : IPreventivoRepository
         var parameters = new[]
         {
             new SqlParameter("@IdRigaPreventivo", materiale.IdRigaPreventivo),
+            NullableInt("@IdRigaCompPrev", materiale.IdRigaCompPrev),
             NullableInt("@IdNodoDistinta", materiale.IdNodoDistinta),
             NullableInt("@IdMateriale", materiale.IdMateriale),
             Text("@DescrizioneMateriale", materiale.DescrizioneMateriale, 400),
@@ -379,14 +382,14 @@ public sealed class PreventivoRepository : IPreventivoRepository
 
     public async Task<IReadOnlyList<PreventivoRigaLavorazioneItem>> GetLavorazioniAsync(
         int idRigaPreventivo,
-        int? idNodoDistinta,
+        int? idRigaCompPrev,
         CancellationToken cancellationToken = default)
     {
         return await _db.QueryAsync<PreventivoRigaLavorazioneItem>(
             "dbo.Preventivi_Righe_Lavorazioni_Elenco",
             [
                 new SqlParameter("@IdRigaPreventivo", idRigaPreventivo),
-                NullableInt("@IdNodoDistinta", idNodoDistinta)
+                NullableInt("@IdRigaCompPrev", idRigaCompPrev)
             ],
             cancellationToken);
     }
@@ -408,6 +411,7 @@ public sealed class PreventivoRepository : IPreventivoRepository
         var parameters = new[]
         {
             new SqlParameter("@IdRigaPreventivo", lavorazione.IdRigaPreventivo),
+            NullableInt("@IdRigaCompPrev", lavorazione.IdRigaCompPrev),
             NullableInt("@IdNodoDistinta", lavorazione.IdNodoDistinta),
             NullableInt("@IdLavorazione", lavorazione.IdLavorazione),
             Text("@DescrizioneLavorazione", lavorazione.DescrizioneLavorazione, 300),

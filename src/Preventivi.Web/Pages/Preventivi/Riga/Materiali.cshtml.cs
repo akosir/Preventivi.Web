@@ -67,6 +67,14 @@ public class MaterialiModel : PageModel
             return BadRequest();
         }
 
+        if (!await RigaAppartieneAlPreventivoAsync(
+                idPreventivo,
+                idRigaPreventivo,
+                cancellationToken))
+        {
+            return NotFound();
+        }
+
         Componente =
             await _preventivoRepository.GetComponenteAsync(
                 idComponente,
@@ -94,7 +102,7 @@ public class MaterialiModel : PageModel
 
         if (Materiale is null ||
             Materiale.IdRigaPreventivo != idRigaPreventivo ||
-            Materiale.IdNodoDistinta != Componente.IdNodoDistinta)
+            Materiale.IdRigaCompPrev != Componente.IdRigaCompPrev)
         {
             return NotFound();
         }
@@ -132,6 +140,14 @@ public class MaterialiModel : PageModel
             return BadRequest();
         }
 
+        if (!await RigaAppartieneAlPreventivoAsync(
+                idPreventivo,
+                idRigaPreventivo,
+                cancellationToken))
+        {
+            return NotFound();
+        }
+
         Componente =
             await _preventivoRepository.GetComponenteAsync(
                 idComponente,
@@ -152,7 +168,7 @@ public class MaterialiModel : PageModel
 
             if (materiale is null ||
                 materiale.IdRigaPreventivo != idRigaPreventivo ||
-                materiale.IdNodoDistinta != Componente.IdNodoDistinta)
+                materiale.IdRigaCompPrev != Componente.IdRigaCompPrev)
             {
                 return NotFound();
             }
@@ -221,6 +237,7 @@ public class MaterialiModel : PageModel
         }
 
         NuovoMateriale.IdRigaPreventivo = idRigaPreventivo;
+        NuovoMateriale.IdRigaCompPrev = Componente.IdRigaCompPrev;
         NuovoMateriale.IdNodoDistinta = Componente.IdNodoDistinta;
 
         if (!ModelState.IsValid)
@@ -308,6 +325,7 @@ public class MaterialiModel : PageModel
         }
 
         NuovoMateriale.IdRigaPreventivo = idRigaPreventivo;
+        NuovoMateriale.IdRigaCompPrev = Componente?.IdRigaCompPrev;
         NuovoMateriale.IdNodoDistinta = Componente?.IdNodoDistinta;
 
         if (NuovoMateriale.Quantita == 0)
@@ -356,6 +374,28 @@ public class MaterialiModel : PageModel
         }
 
         Origine = OrigineLibero;
+    }
+
+    private async Task<bool> RigaAppartieneAlPreventivoAsync(
+        int idPreventivo,
+        int idRigaPreventivo,
+        CancellationToken cancellationToken)
+    {
+        var preventivo =
+            await _preventivoRepository.GetDettaglioAsync(
+                idPreventivo,
+                cancellationToken);
+        if (preventivo is null)
+        {
+            return false;
+        }
+
+        var riga =
+            await _preventivoRepository.GetRigaAsync(
+                idRigaPreventivo,
+                cancellationToken);
+
+        return riga?.IdPreventivo == idPreventivo;
     }
 
     public static string GetMaterialeReturnUrl(

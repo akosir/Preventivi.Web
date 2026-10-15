@@ -67,6 +67,14 @@ public class LavorazioniModel : PageModel
             return BadRequest();
         }
 
+        if (!await RigaAppartieneAlPreventivoAsync(
+                idPreventivo,
+                idRigaPreventivo,
+                cancellationToken))
+        {
+            return NotFound();
+        }
+
         Componente =
             await _preventivoRepository.GetComponenteAsync(
                 idComponente,
@@ -94,7 +102,7 @@ public class LavorazioniModel : PageModel
 
         if (Lavorazione is null ||
             Lavorazione.IdRigaPreventivo != idRigaPreventivo ||
-            Lavorazione.IdNodoDistinta != Componente.IdNodoDistinta)
+            Lavorazione.IdRigaCompPrev != Componente.IdRigaCompPrev)
         {
             return NotFound();
         }
@@ -132,6 +140,14 @@ public class LavorazioniModel : PageModel
             return BadRequest();
         }
 
+        if (!await RigaAppartieneAlPreventivoAsync(
+                idPreventivo,
+                idRigaPreventivo,
+                cancellationToken))
+        {
+            return NotFound();
+        }
+
         Componente =
             await _preventivoRepository.GetComponenteAsync(
                 idComponente,
@@ -152,7 +168,7 @@ public class LavorazioniModel : PageModel
 
             if (lavorazione is null ||
                 lavorazione.IdRigaPreventivo != idRigaPreventivo ||
-                lavorazione.IdNodoDistinta != Componente.IdNodoDistinta)
+                lavorazione.IdRigaCompPrev != Componente.IdRigaCompPrev)
             {
                 return NotFound();
             }
@@ -221,6 +237,7 @@ public class LavorazioniModel : PageModel
         }
 
         NuovaLavorazione.IdRigaPreventivo = idRigaPreventivo;
+        NuovaLavorazione.IdRigaCompPrev = Componente.IdRigaCompPrev;
         NuovaLavorazione.IdNodoDistinta = Componente.IdNodoDistinta;
 
         if (!ModelState.IsValid)
@@ -308,6 +325,7 @@ public class LavorazioniModel : PageModel
         }
 
         NuovaLavorazione.IdRigaPreventivo = idRigaPreventivo;
+        NuovaLavorazione.IdRigaCompPrev = Componente?.IdRigaCompPrev;
         NuovaLavorazione.IdNodoDistinta = Componente?.IdNodoDistinta;
 
         if (NuovaLavorazione.Sequenza is null)
@@ -362,6 +380,28 @@ public class LavorazioniModel : PageModel
         }
 
         Origine = OrigineLibero;
+    }
+
+    private async Task<bool> RigaAppartieneAlPreventivoAsync(
+        int idPreventivo,
+        int idRigaPreventivo,
+        CancellationToken cancellationToken)
+    {
+        var preventivo =
+            await _preventivoRepository.GetDettaglioAsync(
+                idPreventivo,
+                cancellationToken);
+        if (preventivo is null)
+        {
+            return false;
+        }
+
+        var riga =
+            await _preventivoRepository.GetRigaAsync(
+                idRigaPreventivo,
+                cancellationToken);
+
+        return riga?.IdPreventivo == idPreventivo;
     }
 
     public static string GetLavorazioneReturnUrl(

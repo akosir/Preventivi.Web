@@ -110,7 +110,7 @@ public interface IPreventivoRepository
 
     Task<IReadOnlyList<PreventivoRigaMaterialeItem>> GetMaterialiAsync(
         int idRigaPreventivo,
-        int? idNodoDistinta,
+        int? idRigaCompPrev,
         CancellationToken cancellationToken = default);
 
     Task<PreventivoRigaMaterialeItem?> GetMaterialeAsync(
@@ -127,7 +127,7 @@ public interface IPreventivoRepository
 
     Task<IReadOnlyList<PreventivoRigaLavorazioneItem>> GetLavorazioniAsync(
         int idRigaPreventivo,
-        int? idNodoDistinta,
+        int? idRigaCompPrev,
         CancellationToken cancellationToken = default);
 
     Task<PreventivoRigaLavorazioneItem?> GetLavorazioneAsync(

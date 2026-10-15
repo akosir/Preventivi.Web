@@ -47,7 +47,10 @@
                         <div class="row g-3 align-items-end">
                             <div class="col-12 col-md-3">
                                 <label class="form-label" for="Origine">Origine lavorazione</label>
-                                <select class="form-select" id="Origine" name="Origine">
+                                <select class="form-select"
+                                        id="Origine"
+                                        name="Origine"
+                                        onchange="this.form.submit()">
                                     <option value="@LavorazioniModel.OrigineLibero"
                                             selected="@(Model.Origine == LavorazioniModel.OrigineLibero)">
                                         Libera
@@ -69,7 +72,8 @@
                                     <label class="form-label" for="IdDistintaLavorazioneSelezionata">Lavorazione da distinta</label>
                                     <select class="form-select"
                                             id="IdDistintaLavorazioneSelezionata"
-                                            name="IdDistintaLavorazioneSelezionata">
+                                            name="IdDistintaLavorazioneSelezionata"
+                                            onchange="this.form.submit()">
                                         <option value="">Seleziona...</option>
                                         @foreach (var lavorazione in Model.LavorazioniDistinta)
                                         {
@@ -95,7 +99,8 @@
                                     <label class="form-label" for="IdLavorazioneSelezionata">Lavorazione</label>
                                     <select class="form-select"
                                             id="IdLavorazioneSelezionata"
-                                            name="IdLavorazioneSelezionata">
+                                            name="IdLavorazioneSelezionata"
+                                            onchange="this.form.submit()">
                                         <option value="">Seleziona...</option>
                                         @foreach (var lavorazione in Model.LavorazioniAnagrafica)
                                         {

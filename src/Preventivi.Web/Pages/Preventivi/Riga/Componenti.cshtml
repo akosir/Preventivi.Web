@@ -153,12 +153,22 @@
                                 Quantità base
                             </label>
                             <input asp-for="NuovoComponente.QuantitaBase" class="form-control text-end" />
+                            <span asp-validation-for="NuovoComponente.QuantitaBase" class="text-danger"></span>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label asp-for="NuovoComponente.QuantitaCalcolata" class="form-label">
-                                Quantità calcolata
+                            <label asp-for="NuovoComponente.IdRigaCompPrevPadre" class="form-label">
+                                Componente padre
                             </label>
-                            <input asp-for="NuovoComponente.QuantitaCalcolata" class="form-control text-end" />
+                            <select asp-for="NuovoComponente.IdRigaCompPrevPadre" class="form-select">
+                                <option value="">Nessun padre (componente radice)</option>
+                                @foreach (var componente in Model.ComponentiDisponibili)
+                                {
+                                    <option value="@componente.IdRigaCompPrev">
+                                        @componente.DescrizioneNodo
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="NuovoComponente.IdRigaCompPrevPadre" class="text-danger"></span>
                         </div>
                         <div class="col-12 col-md-6">
                             <label asp-for="NuovoComponente.Livello" class="form-label">
@@ -203,6 +213,12 @@
                 var returnUrl = Model.Allegati.ReturnUrl ?? string.Empty;
 
                 <dl class="row mb-0">
+                    <dt class="col-sm-3">Origine</dt>
+                    <dd class="col-sm-9">@Model.Componente.TipoOrigineComponente</dd>
+                    <dt class="col-sm-3">Componente padre</dt>
+                    <dd class="col-sm-9">@Model.Componente.IdRigaCompPrevPadre</dd>
+                    <dt class="col-sm-3">Articolo origine</dt>
+                    <dd class="col-sm-9">@Model.Componente.IdArticoloOrigine</dd>
                     <dt class="col-sm-3">OrdineVisualizzazione</dt>
                     <dd class="col-sm-9">@Model.Componente.OrdineVisualizzazione</dd>
                     <dt class="col-sm-3">IdNodoDistinta</dt>
