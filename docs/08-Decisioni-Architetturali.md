@@ -364,6 +364,46 @@ Documentare le nuove decisioni approvate nel registro decisioni del repository, 
 
 DA-019 disciplina la consultazione delle fonti prima delle modifiche. DA-020 disciplina la registrazione delle approvazioni. Le due decisioni hanno responsabilità distinte.
 
+### DA-021 — Baseline completa dello schema SQL
+
+**Stato:** [D] Approvata esplicitamente.
+
+**Data di approvazione:** 16 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work dedicata
+a TEC-002.
+
+**Decisione**
+
+Versionare una baseline dell'intero schema installato del database, comprese
+le aree applicative non ancora operative o funzionalmente congelate.
+
+La baseline esclude:
+
+- dati operativi e dati iniziali;
+- utenti, ruoli e permessi del database;
+- credenziali e stringhe di connessione;
+- backup e altri contenuti contenenti dati.
+
+**Relazioni**
+
+La decisione attua DA-014 per la riproducibilita dello schema e non modifica
+lo stato funzionale dei moduli rappresentati nel database.
+
+**Riscontri [C] al 16 ottobre 2026**
+
+La baseline TEC-002 e stata estratta in sola lettura dallo schema installato
+di `PreventiviProduzione`. L'inventario comprende 49 tabelle, 517 colonne,
+75 chiavi esterne, 26 viste e 74 stored procedure. I controlli statici
+confermano inoltre 48 chiavi primarie, 161 default, 20 check e 101 strutture
+indicizzate.
+
+La baseline non contiene `USE`, dati o riferimenti di connessione. Il 16
+ottobre 2026 e stata installata su un database temporaneo vuoto: i conteggi
+degli oggetti sono risultati conformi, il refresh di viste e procedure e
+`DBCC CHECKDB` sono terminati senza errori. Il database temporaneo e stato
+eliminato e non risultano database TEC-002 residui sul server.
+
 ## 5. Riscontri e chiarimenti aperti
 
 Questa sezione non aggiunge decisioni approvate.
@@ -426,9 +466,12 @@ Questi riscontri rappresentano aspetti da verificare rispetto a DA-017, non dero
 
 **[C]** Tutte le 35 procedure richiamate da `PreventivoRepository` risultano definite negli script versionati; molte sono raccolte in `Preventivi_Schede_Workspace.sql`.
 
-La copertura delle procedure non equivale alla disponibilità dello schema completo per un’installazione da zero.
+La copertura delle procedure non equivaleva alla disponibilità dello schema completo per un’installazione da zero.
 
-**[P]** Allineare la documentazione di installazione e completare la rappresentazione dello schema, mantenendo DA-014 come regola di riferimento.
+**[C]** Al 16 ottobre 2026, TEC-002 ha aggiunto la baseline completa dello
+schema installato e ha allineato le istruzioni di installazione. La
+completezza inventariale e l'esecuzione della baseline su un database vuoto
+sono state verificate con esito positivo.
 
 ### 5.8 Riferimenti storici nei documenti
 
