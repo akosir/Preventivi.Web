@@ -37,4 +37,26 @@ public class DettaglioModel : PageModel
 
         return Page();
     }
+
+    public async Task<IActionResult> OnPostSelezionaAsync(
+        CancellationToken cancellationToken)
+    {
+        var variante =
+            await _preventivoRepository.GetVarianteAsync(
+                IdVariantePreventivo,
+                cancellationToken);
+
+        if (variante is null)
+        {
+            return NotFound();
+        }
+
+        await _preventivoRepository.SelezionaVarianteAsync(
+            variante.IdVariantePreventivo,
+            cancellationToken);
+
+        return RedirectToPage(
+            "/Preventivi/Dettaglio",
+            new { id = variante.IdPreventivo });
+    }
 }

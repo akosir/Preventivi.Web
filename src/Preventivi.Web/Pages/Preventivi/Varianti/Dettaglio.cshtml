@@ -48,6 +48,16 @@
         </div>
 
         <div class="d-flex justify-content-end gap-2 mt-4">
+            @if (!Model.Variante.VarianteScelta)
+            {
+                <form method="post" asp-page-handler="Seleziona">
+                    <input type="hidden" asp-for="IdVariantePreventivo" />
+                    <button type="submit" class="pfw-btn pfw-btn-primary">
+                        Imposta come scelta
+                    </button>
+                </form>
+            }
+
             <a asp-page="/Preventivi/Dettaglio"
                asp-route-id="@Model.IdPreventivo"
                class="pfw-btn pfw-btn-secondary">Torna al preventivo</a>

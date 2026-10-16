@@ -16,8 +16,6 @@ public sealed class PreventivoRigaCreateModel
 
     public decimal PrezzoUnitarioVendita { get; set; }
 
-    public decimal TotaleCosti { get; set; }
-
     public string? Note { get; set; }
 
     public decimal MarkupPerc { get; set; }

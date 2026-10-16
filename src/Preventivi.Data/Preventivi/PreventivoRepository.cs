@@ -65,7 +65,6 @@ public sealed class PreventivoRepository : IPreventivoRepository
             Text("@DescrizioneVoce", riga.DescrizioneVoce, 500),
             Decimal("@Quantita", riga.Quantita, 18, 4),
             Decimal("@PrezzoUnitarioVendita", riga.PrezzoUnitarioVendita, 18, 4),
-            Decimal("@TotaleCosti", riga.TotaleCosti, 18, 2),
             NullableText("@Note", riga.Note),
             Decimal("@MarkupPerc", riga.MarkupPerc, 9, 2),
             new SqlParameter("@PrezzoManuale", SqlDbType.Bit) { Value = riga.PrezzoManuale },
@@ -263,6 +262,16 @@ public sealed class PreventivoRepository : IPreventivoRepository
     {
         await _db.ExecuteAsync(
             "dbo.Preventivi_Varianti_Elimina",
+            [new SqlParameter("@IdVariantePreventivo", idVariantePreventivo)],
+            cancellationToken);
+    }
+
+    public async Task SelezionaVarianteAsync(
+        int idVariantePreventivo,
+        CancellationToken cancellationToken = default)
+    {
+        await _db.ExecuteAsync(
+            "dbo.Preventivi_Varianti_Seleziona",
             [new SqlParameter("@IdVariantePreventivo", idVariantePreventivo)],
             cancellationToken);
     }

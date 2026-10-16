@@ -440,6 +440,34 @@ La copertura delle procedure non equivale alla disponibilità dello schema compl
 
 **[P]** Mantenere esplicito il riferimento temporale quando si aggiornano questi documenti.
 
+### 5.9 Decisioni funzionali TEC-009
+
+**Classificazione:** [D].
+
+**Stato:** approvate.
+
+**Data di approvazione:** 16 ottobre 2026.
+
+**Fonte dell’approvazione:** conferme esplicite nella sessione Work dedicata a TEC-009.
+
+Le decisioni approvate per il ricalcolo economico sono:
+
+- **164:** `QuantitaCalcolata` del componente rappresenta il fabbisogno di riferimento;
+- **165:** `Quantita` di materiali e lavorazioni rappresenta la quantità operativa totale ed è modificabile;
+- **166:** la quantità operativa non viene moltiplicata nuovamente per `QuantitaCalcolata`;
+- **167:** eventuali quantità unitarie e totali future devono utilizzare campi distinti, senza reinterpretare il campo storico;
+- **168:** creazione ed eliminazione di materiali e lavorazioni ricalcolano atomicamente riga, variante e testata;
+- **169:** le righe libere devono essere riconciliate prima del ricalcolo e conservano il costo unitario libero;
+- **170:** ogni riga utilizza il proprio `MarkupPerc`; il markup di testata è soltanto il valore predefinito iniziale;
+- **171:** la testata comprende le righe comuni e le righe della sola variante attiva selezionata; senza variante selezionata comprende soltanto le righe comuni;
+- **172:** una riga libera non può contenere componenti, materiali o lavorazioni;
+- **173:** `TotaleCosti` è sempre calcolato: per le righe strutturate deriva da materiali e lavorazioni, per le righe libere da quantità per costo unitario libero;
+- **174:** la selezione di una variante sostituisce atomicamente la precedente; è ammessa l’assenza di una variante selezionata.
+
+**Riscontri [C] al 16 ottobre 2026**
+
+Gli script TEC-009 da `01` a `07` e le modifiche applicative collegate sono stati preparati localmente. Gli script dal `02` al `07` risultano applicati e verificati sul database `PreventiviProduzione`; la diagnostica finale non rileva ambiguità bloccanti e conferma l’allineamento dei totali memorizzati.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

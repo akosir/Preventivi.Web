@@ -88,6 +88,10 @@ public interface IPreventivoRepository
         PreventivoVarianteCreateModel variante,
         CancellationToken cancellationToken = default);
 
+    Task SelezionaVarianteAsync(
+        int idVariantePreventivo,
+        CancellationToken cancellationToken = default);
+
     Task EliminaVarianteAsync(
         int idVariantePreventivo,
         CancellationToken cancellationToken = default);

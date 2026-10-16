@@ -29,13 +29,23 @@ public class NuovoModel : PageModel
             return BadRequest();
         }
 
+        var preventivo =
+            await _preventivoRepository.GetDettaglioAsync(
+                IdPreventivo,
+                cancellationToken);
+
+        if (preventivo is null)
+        {
+            return NotFound();
+        }
+
         await CaricaTipiAsync(cancellationToken);
 
         Riga = new PreventivoRigaCreateModel
         {
             IdPreventivo = IdPreventivo,
             Quantita = 1,
-            MarkupPerc = 0,
+            MarkupPerc = preventivo.MarkupPercDefault,
             IdTipoRiga = TipiRiga.FirstOrDefault()?.IdTipoRiga ?? 0
         };
 
@@ -51,6 +61,12 @@ public class NuovoModel : PageModel
 
         Riga.IdPreventivo = IdPreventivo;
 
+        await CaricaTipiAsync(cancellationToken);
+
+        var tipoRiga =
+            TipiRiga.FirstOrDefault(
+                tipo => tipo.IdTipoRiga == Riga.IdTipoRiga);
+
         if (string.IsNullOrWhiteSpace(Riga.DescrizioneVoce))
         {
             ModelState.AddModelError(
@@ -64,6 +80,24 @@ public class NuovoModel : PageModel
                 "Riga.IdTipoRiga",
                 "Selezionare il tipo riga.");
         }
+        else if (tipoRiga is null)
+        {
+            ModelState.AddModelError(
+                "Riga.IdTipoRiga",
+                "Il tipo riga selezionato non è disponibile.");
+        }
+
+        if (tipoRiga?.RigaLibera == true && Riga.CostoUnitarioLibero is null)
+        {
+            ModelState.AddModelError(
+                "Riga.CostoUnitarioLibero",
+                "Inserire il costo unitario della riga libera.");
+        }
+
+        if (tipoRiga?.RigaLibera == false)
+        {
+            Riga.CostoUnitarioLibero = null;
+        }
 
         if (Riga.Quantita <= 0)
         {
@@ -74,7 +108,6 @@ public class NuovoModel : PageModel
 
         if (!ModelState.IsValid)
         {
-            await CaricaTipiAsync(cancellationToken);
             return Page();
         }
 
