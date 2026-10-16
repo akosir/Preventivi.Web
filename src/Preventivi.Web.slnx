@@ -1,6 +1,8 @@
 <Solution>
   <Project Path="Preventivi.Core/Preventivi.Core.csproj" Id="1e7fde18-3ff4-4062-94f7-61f156459690" />
   <Project Path="Preventivi.Data/Preventivi.Data.csproj" Id="fb051e82-d72b-464d-aaaa-be5d8dcc8deb" />
+  <Project Path="Preventivi.Data.Tests/Preventivi.Data.Tests.csproj" Id="2d43e012-0380-4cb0-bdad-66ec58225302" />
   <Project Path="Preventivi.Shared/Preventivi.Shared.csproj" Id="8e0931fb-a46d-47b9-879f-89da4d59fec5" />
   <Project Path="Preventivi.Web/Preventivi.Web.csproj" Id="15882d38-3641-455e-ae41-54e68cd9c83a" />
+  <Project Path="Preventivi.Web.Tests/Preventivi.Web.Tests.csproj" Id="5776a471-66cc-43be-8e58-e98259820377" />
 </Solution>

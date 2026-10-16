@@ -6,6 +6,7 @@ namespace Preventivi.Web.Pages;
 public class TestDbModel : PageModel
 {
     private readonly SqlConnectionFactory _connectionFactory;
+    private readonly ILogger<TestDbModel> _logger;
 
     public bool ConnessioneOk { get; private set; }
 
@@ -15,9 +16,12 @@ public class TestDbModel : PageModel
 
     public string Errore { get; private set; } = string.Empty;
 
-    public TestDbModel(SqlConnectionFactory connectionFactory)
+    public TestDbModel(
+        SqlConnectionFactory connectionFactory,
+        ILogger<TestDbModel> logger)
     {
         _connectionFactory = connectionFactory;
+        _logger = logger;
     }
 
     public async Task OnGetAsync()
@@ -35,8 +39,9 @@ public class TestDbModel : PageModel
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Verifica della connessione al database non riuscita.");
             ConnessioneOk = false;
-            Errore = ex.Message;
+            Errore = "Connessione al database non disponibile.";
         }
     }
 }

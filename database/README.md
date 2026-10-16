@@ -50,3 +50,21 @@ la baseline TEC-002, che incorpora gia lo stato risultante al 16 ottobre
 
 La baseline non contiene `USE` e non crea il database: la destinazione resta
 una scelta esplicita dell'operatore.
+
+## Sicurezza applicativa TEC-005
+
+Per attivare l'autenticazione su un database esistente eseguire, dopo la
+baseline o gli aggiornamenti applicabili:
+
+1. `03_StoredProcedure/Sicurezza/TEC-005_01_Autenticazione.sql`;
+2. inizializzare la prima password amministrativa con il comando locale
+   documentato dall'applicazione;
+3. creare, quando concordato con l'amministratore SQL, l'account a privilegi
+   minimi mediante `00_Installazione/TEC-005_02_AccountApplicativo.sql` in
+   modalita SQLCMD e aggiornare la configurazione esterna della connessione.
+
+Il secondo script non contiene password reali, non modifica login esistenti e
+non deve essere eseguito senza una variabile `PreventiviWebPassword` fornita
+dall'operatore. La rotazione della precedente credenziale SQL resta
+un'operazione amministrativa separata e coordinata con gli altri eventuali
+utilizzatori dell'account.

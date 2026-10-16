@@ -165,15 +165,25 @@ Registra:
 - `DatabaseExecutor` come scoped;
 - repository come scoped;
 - servizio applicativo e servizio storage degli allegati come scoped;
+- autenticazione cookie, password hasher e servizi di sicurezza come scoped;
 - binding della sezione `Storage` a `StorageOptions`.
 
-**[C]** La connection string è letta dalla chiave `PreventiviDb`. Se assente, l’avvio genera un errore esplicito.
+**[C]** La connection string è letta dalla chiave `PreventiviDb`. Se assente,
+l’avvio genera un errore esplicito. Il file versionato non contiene il valore:
+in Development viene utilizzato il Secret Store locale e negli ambienti
+installati deve essere fornita una configurazione esterna.
 
-**[C]** La pipeline comprende HTTPS redirection, routing, authorization, static assets e Razor Pages.
+**[C]** La pipeline comprende HTTPS redirection, routing, autenticazione,
+autorizzazione, static assets e Razor Pages. Gli asset necessari al login sono
+accessibili anonimamente; le pagine utilizzano una policy autenticata di
+fallback.
 
 **[C]** Fuori dall’ambiente Development viene configurato `UseExceptionHandler("/Error")`, insieme a HSTS.
 
-**[C]** La presenza di `UseAuthorization()` non dimostra l’esistenza di un sistema completo di autenticazione e autorizzazione. Nel punto di composizione esaminato non è configurato un meccanismo di autenticazione.
+**[C]** Al 16 ottobre 2026 TEC-005 ha introdotto localmente autenticazione
+cookie, ruoli, permessi per modulo, protezione degli allegati e restrizioni
+Development per `Dev` e `TestDb`. Le procedure SQL necessarie risultano
+preparate ma non ancora applicate al database installato.
 
 **[P]** Separare la configurazione tecnica necessaria all’avvio dai parametri gestionali. La centralizzazione dei parametri gestionali in SQL Server non implica lo spostamento della connection string nel database stesso.
 
@@ -471,7 +481,7 @@ Preventivo
 | Campionature | Pagina con contenuti dimostrativi e azioni non operative |
 | Ordini | Non risulta un modulo operativo equivalente nelle pagine della soluzione |
 | Articoli, materiali, lavorazioni | Lookup utilizzati dai preventivi; non equivalgono ad anagrafiche Web complete |
-| Dev e TestDb | Pagine dimostrative o diagnostiche; non costituiscono una suite di test |
+| Dev e TestDb | Pagine dimostrative o diagnostiche riservate a `ADMIN` in Development; non costituiscono una suite di test |
 
 **[C]** Il riferimento a WMS e K-Count nel documento Workspace esprime il contesto di riutilizzo del framework; non dimostra che tali moduli siano implementati in questa applicazione.
 
@@ -503,9 +513,13 @@ Preventivo
 
 **[C]** Sono presenti validazioni `ModelState` e gestione dedicata di alcuni errori degli allegati, come il file mancante.
 
-**[C]** La copertura non è uniforme: per esempio l’assenza di `PercorsoRootAllegati` genera un’eccezione non tradotta esplicitamente nei PageModel allegati esaminati.
+**[C]** TEC-004 e TEC-011 hanno introdotto errori storage prevedibili,
+logging tecnico e messaggi UI senza percorsi fisici per salvataggio, apertura,
+download ed eliminazione degli allegati.
 
-**[C]** La pagina diagnostica `TestDb` espone `ex.Message`. Questo comportamento deve essere distinto dal trattamento previsto per la UI operativa.
+**[C]** La pagina diagnostica `TestDb` registra il dettaglio tecnico nel log e
+mostra soltanto un messaggio neutro. La pagina è limitata a `ADMIN` in
+Development.
 
 ### 11.3 SQL e documentazione
 

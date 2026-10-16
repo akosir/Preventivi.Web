@@ -1,2 +1,8 @@
-﻿body {
+.pfw-field-required .form-label::after {
+    content: " *";
+    color: var(--app-danger);
+}
+
+.pfw-field-required .form-control {
+    border-left: 3px solid var(--app-danger);
 }

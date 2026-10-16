@@ -1,0 +1,24 @@
+@page
+@model global::Preventivi.Web.Pages.Account.LoginModel
+
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Accesso";
+}
+
+<main class="account-page">
+    <section class="account-login" aria-labelledby="account-title">
+        <div class="account-brand" aria-hidden="true">P</div>
+        <h1 id="account-title">Preventivi Web</h1>
+        <p class="account-subtitle">Accesso all'area di lavoro</p>
+
+        <form method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+            @await Html.PartialAsync("Shared/Account/_LoginForm", Model.Form)
+        </form>
+    </section>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

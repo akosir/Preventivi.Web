@@ -59,23 +59,33 @@
                     Dashboard
                 </a>
 
-                <div class="app-menu-section">
-                    Preventivi
-                </div>
+                @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                    User,
+                    global::Preventivi.Core.Sicurezza.PermessiApplicazione.Preventivi))
+                {
+                    <div class="app-menu-section">
+                        Preventivi
+                    </div>
 
-                <a class="app-menu-item"
-                   asp-page="/Preventivi/Index">
-                    Preventivi
-                </a>
+                    <a class="app-menu-item"
+                       asp-page="/Preventivi/Index">
+                        Preventivi
+                    </a>
+                }
 
-                <div class="app-menu-section">
-                    Anagrafiche
-                </div>
+                @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                    User,
+                    global::Preventivi.Core.Sicurezza.PermessiApplicazione.Clienti))
+                {
+                    <div class="app-menu-section">
+                        Anagrafiche
+                    </div>
 
-                <a class="app-menu-item"
-                   asp-page="/Clienti/Index">
-                    Clienti
-                </a>
+                    <a class="app-menu-item"
+                       asp-page="/Clienti/Index">
+                        Clienti
+                    </a>
+                }
 
             </nav>
 
@@ -93,15 +103,32 @@
                     </div>
                 </div>
 
+                @{
+                    var nomeUtente = User.FindFirst(
+                        global::System.Security.Claims.ClaimTypes.GivenName)?.Value
+                        ?? User.Identity?.Name
+                        ?? "Utente";
+                    var inizialeUtente = nomeUtente.Length > 0
+                        ? nomeUtente[..1].ToUpperInvariant()
+                        : "U";
+                }
+
                 <div class="app-user">
 
                     <span class="app-user-name">
-                        Utente
+                        @nomeUtente
                     </span>
 
                     <div class="app-user-avatar">
-                        U
+                        @inizialeUtente
                     </div>
+
+                    <form method="post" asp-page="/Account/Logout">
+                        <button type="submit"
+                                class="pfw-btn pfw-btn-secondary">
+                            Esci
+                        </button>
+                    </form>
 
                 </div>
 

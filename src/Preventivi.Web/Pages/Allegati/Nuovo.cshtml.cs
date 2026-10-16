@@ -4,6 +4,7 @@ using Preventivi.Core.Allegati;
 using Preventivi.Web.UI.Modules.Allegati;
 using Preventivi.Core.Allegati.Storage;
 using Preventivi.Data.Allegati;
+using Preventivi.Web.Sicurezza;
 
 
 namespace Preventivi.Web.Pages.Allegati;
@@ -11,15 +12,17 @@ namespace Preventivi.Web.Pages.Allegati;
 public class NuovoModel : PageModel
 {
     private readonly IAllegatoRepository _allegatoRepository;
-
     private readonly IAllegatoStorageService _storageService;
+    private readonly ILogger<NuovoModel> _logger;
 
     public NuovoModel(
-    IAllegatoRepository allegatoRepository,
-    IAllegatoStorageService storageService)
+        IAllegatoRepository allegatoRepository,
+        IAllegatoStorageService storageService,
+        ILogger<NuovoModel> logger)
     {
         _allegatoRepository = allegatoRepository;
         _storageService = storageService;
+        _logger = logger;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -38,9 +41,14 @@ public class NuovoModel : PageModel
     public async Task<IActionResult> OnGetAsync(
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(Entita))
+        if (!AllegatoEntita.IsValida(Entita))
         {
-            return BadRequest("Entità non specificata.");
+            return BadRequest("Entità non valida.");
+        }
+
+        if (!AutorizzazioneApplicazione.PuoAccedereAllEntitaAllegato(User, Entita))
+        {
+            return Forbid();
         }
 
         if (IdEntita <= 0)
@@ -58,11 +66,15 @@ public class NuovoModel : PageModel
     public async Task<IActionResult> OnPostAsync(
     CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(Entita))
+        if (!AllegatoEntita.IsValida(Entita))
         {
             ModelState.AddModelError(
                 string.Empty,
-                "Entità non specificata.");
+                "Entità non valida.");
+        }
+        else if (!AutorizzazioneApplicazione.PuoAccedereAllEntitaAllegato(User, Entita))
+        {
+            return Forbid();
         }
 
         if (IdEntita <= 0)
@@ -155,7 +167,7 @@ public class NuovoModel : PageModel
             TempData["MessaggioSuccesso"] =
                 "Allegato inserito correttamente.";
 
-            if (Entita == "Clienti")
+            if (Entita == AllegatoEntita.Clienti)
             {
                 return RedirectToPage(
                     "/Clienti/Dettaglio",
@@ -165,7 +177,7 @@ public class NuovoModel : PageModel
                     });
             }
 
-            if (Entita == "Preventivi")
+            if (Entita == AllegatoEntita.Preventivi)
             {
                 return RedirectToPage(
                     "/Preventivi/Dettaglio",
@@ -181,6 +193,23 @@ public class NuovoModel : PageModel
             }
 
             return RedirectToPage();
+        }
+        catch (AllegatoStorageException exception)
+        {
+            _logger.LogError(
+                exception,
+                "Errore storage durante il salvataggio dell'allegato per {Entita} {IdEntita}.",
+                Entita,
+                IdEntita);
+
+            ModelState.AddModelError(
+                string.Empty,
+                "Non è stato possibile salvare l'allegato. Verificare la configurazione dello storage.");
+
+            Form.TipiAllegato =
+                await _allegatoRepository.GetTipiAsync(cancellationToken);
+
+            return Page();
         }
         finally
         {

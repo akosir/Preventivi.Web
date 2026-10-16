@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Allegati;
 using Preventivi.Core.Allegati.Application;
+using Preventivi.Core.Allegati.Storage;
+using Preventivi.Web.Sicurezza;
 
 
 namespace Preventivi.Web.Pages.Allegati;
@@ -11,13 +13,16 @@ public class EliminaModel : PageModel
 
     private readonly IAllegatoApplicationService _applicationService;
     private readonly IAllegatoRepository _allegatoRepository;
+    private readonly ILogger<EliminaModel> _logger;
 
     public EliminaModel(
-    IAllegatoApplicationService applicationService,
-    IAllegatoRepository allegatoRepository)
+        IAllegatoApplicationService applicationService,
+        IAllegatoRepository allegatoRepository,
+        ILogger<EliminaModel> logger)
     {
         _applicationService = applicationService;
         _allegatoRepository = allegatoRepository;
+        _logger = logger;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -46,6 +51,13 @@ public class EliminaModel : PageModel
             return NotFound();
         }
 
+        if (!AutorizzazioneApplicazione.PuoAccedereAllEntitaAllegato(
+            User,
+            allegato.Entita))
+        {
+            return Forbid();
+        }
+
         NomeFileOriginale =
             allegato.NomeFileOriginale;
 
@@ -65,14 +77,38 @@ public class EliminaModel : PageModel
             return NotFound();
         }
 
-        await _applicationService.EliminaAsync(
-    IdAllegato,
-    cancellationToken);
+        if (!AutorizzazioneApplicazione.PuoAccedereAllEntitaAllegato(
+            User,
+            allegato.Entita))
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            await _applicationService.EliminaAsync(
+                IdAllegato,
+                cancellationToken);
+        }
+        catch (AllegatoStorageException exception)
+        {
+            _logger.LogError(
+                exception,
+                "Errore storage durante l'eliminazione dell'allegato {IdAllegato}.",
+                IdAllegato);
+
+            NomeFileOriginale = allegato.NomeFileOriginale;
+            ModelState.AddModelError(
+                string.Empty,
+                "Non è stato possibile eliminare l'allegato. Verificare la configurazione dello storage.");
+
+            return Page();
+        }
 
         TempData["MessaggioSuccesso"] =
             "Allegato eliminato definitivamente.";
 
-        if (allegato.Entita == "Clienti")
+        if (allegato.Entita == AllegatoEntita.Clienti)
         {
             return RedirectToPage(
                 "/Clienti/Dettaglio",
@@ -82,7 +118,7 @@ public class EliminaModel : PageModel
                 });
         }
 
-        if (allegato.Entita == "Preventivi")
+        if (allegato.Entita == AllegatoEntita.Preventivi)
         {
             return RedirectToPage(
                 "/Preventivi/Dettaglio",

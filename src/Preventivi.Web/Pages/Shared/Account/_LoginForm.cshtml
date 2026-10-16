@@ -1,0 +1,30 @@
+@model global::Preventivi.Web.UI.Modules.Account.LoginFormModel
+
+<div class="pfw-panel">
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly"
+             class="alert alert-danger mb-3"
+             role="alert"></div>
+
+        <div class="mb-3 pfw-field-required">
+            <label asp-for="Username" class="form-label"></label>
+            <input asp-for="Username"
+                   class="form-control"
+                   autocomplete="username"
+                   autofocus />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 pfw-field-required">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password"
+                   class="form-control"
+                   autocomplete="current-password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="pfw-btn pfw-btn-primary account-submit">
+            Accedi
+        </button>
+    </div>
+</div>

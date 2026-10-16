@@ -22,6 +22,10 @@
 
         <form method="post">
 
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"
+                 role="alert"></div>
+
             <input type="hidden"
                    asp-for="IdAllegato" />
 

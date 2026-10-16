@@ -55,6 +55,8 @@ Tutte le voci della tabella raccolgono contenuti già approvati o già classific
 | DA-018 | Prosecuzione esclusivamente Web | Approvazione esplicita riportata in AGENTS |
 | DA-019 | Continuità documentale | Approvazione esplicita riportata in AGENTS |
 | DA-020 | Registrazione delle nuove decisioni | Approvazione esplicita riportata in AGENTS |
+| DA-021 | Baseline completa dello schema SQL | Approvazione esplicita TEC-002 |
+| DA-022 | Regole obbligatorie dell'interfaccia Preventivi | Approvazione esplicita nella sessione Work |
 
 ## 3. Decisioni storiche conservate
 
@@ -404,6 +406,60 @@ degli oggetti sono risultati conformi, il refresh di viste e procedure e
 `DBCC CHECKDB` sono terminati senza errori. Il database temporaneo e stato
 eliminato e non risultano database TEC-002 residui sul server.
 
+### DA-022 — Regole obbligatorie dell'interfaccia Preventivi
+
+**Stato:** [D] Approvata esplicitamente.
+
+**Data di approvazione:** 16 ottobre 2026.
+
+**Fonte dell'approvazione:** richiesta esplicita nella sessione Work.
+
+**Ambito**
+
+Questa decisione deve essere consultata obbligatoriamente prima di creare o
+modificare qualsiasi elemento della parte grafica dell'applicazione.
+
+**Decisione**
+
+Tutte le maschere e le pagine devono:
+
+1. utilizzare i componenti UI appositamente realizzati per il progetto;
+2. seguire il framework CSS del progetto presente in `wwwroot`;
+3. nascere con l'insieme dei campi gia completo rispetto alla funzione
+   concordata;
+4. evidenziare graficamente i campi di testo obbligatori o richiesti;
+5. fornire, per i campi identificativi dove necessario, un menu a tendina di
+   lookup collegato alla rispettiva tabella;
+6. esporre, salvo diverso accordo, le azioni `Nuovo`, `Modifica` ed `Elimina`
+   tramite i componenti UI del progetto.
+
+Ogni modulo esistente o nuovo deve disporre nella dashboard di un
+collegamento alla propria gestione. Il collegamento deve puntare a una
+gestione realmente esistente e raggiungibile: collegamenti fittizi o
+segnaposto non soddisfano la decisione.
+
+E inoltre approvata la realizzazione di:
+
+- una pagina capace di ricercare dinamicamente nelle diverse anagrafiche,
+  fra cui Preventivi, Lavorazioni e Materiali, con filtri avanzati e risultati
+  stampabili;
+- report stampabili dei preventivi differenziati in base all'uso successivo,
+  compresa almeno la stampa delle sole righe destinate al cliente e la stampa
+  interna per sezioni comprendente l'intero preventivo.
+
+**Relazioni**
+
+La decisione integra Decisione 001, Decisione 003, DA-009, DA-011 e DA-013.
+Non modifica la separazione tra componenti UI, layout e logica di dominio.
+
+**Riscontri [C] al 16 ottobre 2026**
+
+La registrazione di questa decisione non attesta che tutte le pagine
+esistenti siano gia conformi, ne che la ricerca dinamica e i report siano gia
+implementati. La conformita deve essere verificata negli interventi grafici
+successivi; ricerca e reportistica restano funzionalita approvate da
+realizzare e collaudare.
+
 ## 5. Riscontri e chiarimenti aperti
 
 Questa sezione non aggiunge decisioni approvate.
@@ -511,6 +567,99 @@ Le decisioni approvate per il ricalcolo economico sono:
 
 Gli script TEC-009 da `01` a `07` e le modifiche applicative collegate sono stati preparati localmente. Gli script dal `02` al `07` risultano applicati e verificati sul database `PreventiviProduzione`; la diagnostica finale non rileva ambiguità bloccanti e conferma l’allineamento dei totali memorizzati.
 
+### 5.10 Decisioni TEC-004 e TEC-011 — Sicurezza e configurazione storage allegati
+
+**Classificazione:** [D].
+
+**Stato:** approvate.
+
+**Data di approvazione:** 16 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work dedicata
+a TEC-004 e TEC-011.
+
+Le decisioni approvate sono:
+
+- **175:** le sole chiavi di entita consentite per gli allegati sono
+  `Clienti`, `Preventivi`, `PreventiviRigheComponenti`,
+  `PreventiviRigheMateriali` e `PreventiviRigheLavorazioni`; la whitelist e
+  centralizzata e il confronto e esatto;
+- **176:** la root dello storage deve essere un percorso assoluto; ogni
+  percorso canonico costruito deve rimanere al suo interno;
+- **177:** percorsi relativi e nomi dei file archiviati non possono essere
+  assoluti, contenere `..` o segmenti di directory impropri;
+- **178:** salvataggio, apertura ed eliminazione rifiutano i percorsi non
+  validi prima di qualsiasi operazione sul filesystem, senza fallback;
+- **179:** root mancante o non valida e metadati di percorso non validi
+  producono errori dedicati e prevedibili; l'errore tecnico viene registrato,
+  mentre l'interfaccia non espone percorsi fisici;
+- **180:** la validazione e applicata sia all'ingresso Web sia nello storage
+  come difesa in profondita. La verifica dell'esistenza e dell'autorizzazione
+  di `IdEntita` resta nell'ambito di TEC-005;
+- **181:** viene introdotto il primo progetto di test automatici, limitato in
+  questa fase alla sicurezza dei percorsi dello storage allegati.
+
+**Riscontri [C] al 16 ottobre 2026**
+
+L'implementazione e i test relativi a queste decisioni sono presenti
+localmente. La suite mirata dello storage allegati ha superato 14 test su 14;
+non sono state apportate modifiche al database.
+
+### 5.11 Decisioni TEC-005 — Autenticazione e autorizzazione
+
+**Classificazione:** [D].
+
+**Stato:** approvate.
+
+**Data di approvazione:** 16 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work dedicata
+a TEC-005.
+
+Le decisioni approvate sono:
+
+- **182:** utilizzare `UtentiApplicazione`, `RuoliApplicazione` e
+  `UtentiRuoli` come fonte dell'identita, senza aggiungere lo schema ASP.NET
+  Identity;
+- **183:** memorizzare le password esclusivamente tramite il password hasher
+  ASP.NET Core e mai in testo in chiaro;
+- **184:** utilizzare autenticazione cookie e negare per impostazione
+  predefinita l'accesso anonimo, salvo Login ed Error;
+- **185:** caricare soltanto ruoli attivi di utenti attivi; il ruolo `ADMIN`
+  dispone dell'accesso applicativo completo;
+- **186:** mantenere una mappatura esplicita fra i nomi storici Access e i
+  moduli Web; un permesso assente nega l'accesso, salvo `ADMIN`;
+- **187:** applicare l'autorizzazione ai PageModel e agli handler, comprese le
+  operazioni dirette sugli allegati, senza affidarsi al solo menu;
+- **188:** utilizzare un cookie non persistente, con scadenza mobile di dodici
+  ore e chiusura alla chiusura del browser;
+- **189:** rendere `Dev` e `TestDb` accessibili soltanto in Development e al
+  ruolo `ADMIN`, senza mostrare errori tecnici nella UI;
+- **190:** inizializzare la prima password amministrativa tramite comando
+  locale interattivo, senza segreti nei file o nella cronologia dei comandi;
+- **191:** rimuovere le credenziali SQL dal repository, ruotare la credenziale
+  esposta e utilizzare configurazione esterna con un account applicativo a
+  privilegi minimi;
+- **192:** verificare automaticamente password, cookie, ruoli, permessi e
+  protezione delle operazioni.
+
+**Riscontri [C] al 16 ottobre 2026**
+
+L'implementazione applicativa e presente localmente. Sono stati aggiunti
+login, logout, cookie di sessione, policy per modulo, protezione degli
+allegati, restrizioni per le pagine diagnostiche e comando di inizializzazione
+della password amministrativa. La connessione di sviluppo e stata trasferita
+nel Secret Store locale e il file versionato non contiene piu la credenziale.
+
+I 16 test automatici della sicurezza Web e i 14 test dello storage allegati
+sono terminati senza errori. Nel browser e stata verificata la pagina Login e
+il reindirizzamento anonimo dalla dashboard.
+
+Le due procedure TEC-005 e lo script per l'account SQL a privilegi minimi sono
+soltanto preparati nel repository: non sono stati applicati al database. La
+password amministrativa non e stata inizializzata, l'account SQL dedicato non
+e stato creato e la precedente credenziale SQL non e stata ruotata.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]
@@ -544,7 +693,6 @@ Restano proposte, fra le altre:
 - coordinamento delle cancellazioni e degli allegati;
 - gestione dei fallimenti fra filesystem e SQL Server;
 - conversione tipizzata dei parametri;
-- strategia di autenticazione e autorizzazione;
 - strategia di test e verifica;
 - regole operative contrassegnate `[P]` in `AGENTS.md`.
 

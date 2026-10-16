@@ -158,6 +158,33 @@ Non rinominare automaticamente classi, modelli o componenti
 esistenti non conformi durante interventi non correlati.
 Le classi di librerie esterne mantengono i propri nomi.
 
+### Regole obbligatorie per l'interfaccia
+
+[D] Prima di creare o modificare qualsiasi elemento grafico,
+consultare DA-022 in `docs/08-Decisioni-Architetturali.md`.
+
+[D] Ogni maschera o pagina deve utilizzare i componenti UI del
+progetto e il framework CSS presente in `wwwroot`.
+
+[D] Le pagine devono nascere complete dei campi concordati. I campi
+di testo obbligatori o richiesti devono essere evidenziati; i campi
+identificativi, dove necessario, devono disporre del lookup verso la
+rispettiva tabella.
+
+[D] Salvo diverso accordo, le pagine devono esporre le azioni
+`Nuovo`, `Modifica` ed `Elimina` tramite i componenti UI del progetto.
+
+[D] Ogni modulo esistente o nuovo deve avere nella dashboard un
+collegamento alla propria gestione. Il collegamento deve essere reale
+e raggiungibile; non utilizzare destinazioni fittizie o segnaposto.
+
+[D] Sono approvate una ricerca dinamica trasversale alle anagrafiche,
+con filtri avanzati e risultati stampabili, e la reportistica dei
+preventivi differenziata per uso cliente e uso interno.
+
+[P] Non dichiarare conformi le pagine esistenti e non dichiarare
+completate ricerca o reportistica senza una verifica specifica.
+
 ## 5. Regole C# e Razor Pages
 
 [P] Conservare nullable reference types e distinguere
@@ -184,6 +211,29 @@ Mantenere SQL nei repository e rendering nei file Razor.
 
 [P] Non fidarsi dei soli identificativi ricevuti da route,
 query string o campi nascosti.
+
+### Sicurezza applicativa
+
+[D] L'identita applicativa deriva da `UtentiApplicazione`, dai ruoli attivi e
+dai permessi menu esplicitamente mappati ai moduli Web.
+
+[D] Tutte le pagine sono autenticate per impostazione predefinita. Le sole
+eccezioni anonime sono le pagine strettamente necessarie al login e alla
+gestione dell'errore.
+
+[D] Il ruolo `ADMIN` dispone dell'accesso completo. Per gli altri ruoli un
+permesso mancante nega l'accesso; il solo occultamento del collegamento nel
+menu non costituisce autorizzazione.
+
+[D] Ogni operazione diretta, compresi apertura, download, inserimento ed
+eliminazione degli allegati, deve verificare il permesso del modulo padre.
+
+[D] Password, stringhe di connessione e altri segreti non devono essere
+versionati. Utilizzare Secret Store in Development e configurazione esterna
+nell'ambiente installato.
+
+[D] Le pagine `Dev` e `TestDb` sono riservate a `ADMIN` e al solo ambiente
+Development.
 
 [P] Utilizzare ModelState per gli errori di input e ricaricare
 le liste necessarie quando si ripresenta il form.

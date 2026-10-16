@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Preventivi;
+using Preventivi.Core.Sicurezza;
+using Preventivi.Web.Sicurezza;
 
 namespace Preventivi.Web.Pages;
 
@@ -21,6 +23,8 @@ public class IndexModel : PageModel
 
     public int AlertCount => AlertOperativi.Count;
 
+    public bool PuoVisualizzarePreventivi { get; private set; }
+
     public IndexModel(IPreventivoRepository preventivoRepository)
     {
         _preventivoRepository = preventivoRepository;
@@ -28,6 +32,25 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
+        PuoVisualizzarePreventivi =
+            AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                User,
+                PermessiApplicazione.Preventivi);
+
+        if (!PuoVisualizzarePreventivi)
+        {
+            Indicatori =
+            [
+                new DashboardKpiItem(
+                    "Preventivi",
+                    "-",
+                    "Accesso non autorizzato",
+                    "P")
+            ];
+            AndamentoPreventivi = CreaAndamentoPreventivi([]);
+            return;
+        }
+
         var preventivi =
             await _preventivoRepository.GetElencoAsync(cancellationToken);
 

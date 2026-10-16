@@ -47,7 +47,17 @@
                     </div>
                 </div>
 
-                @if (Model.UltimiPreventivi.Count == 0)
+                @if (!Model.PuoVisualizzarePreventivi)
+                {
+                    <div class="pfw-panel-body">
+                        <div class="workspace-placeholder">
+                            <div class="workspace-placeholder-title">
+                                Dati preventivi non disponibili per il profilo
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (Model.UltimiPreventivi.Count == 0)
                 {
                     <div class="pfw-panel-body">
                         <div class="workspace-placeholder">
@@ -174,9 +184,15 @@
                     <div class="pfw-request-item">
                         <div>
                             <div class="fw-semibold">Preventivi</div>
-                            <div class="pfw-secondary-text">Dati collegati al database reale</div>
+                            <div class="pfw-secondary-text">
+                                @(Model.PuoVisualizzarePreventivi
+                                    ? "Dati collegati al database reale"
+                                    : "Accesso non autorizzato per il profilo")
+                            </div>
                         </div>
-                        <span class="pfw-badge pfw-badge-success">Attivo</span>
+                        <span class="pfw-badge @(Model.PuoVisualizzarePreventivi ? "pfw-badge-success" : "pfw-badge-secondary")">
+                            @(Model.PuoVisualizzarePreventivi ? "Attivo" : "Non disponibile")
+                        </span>
                     </div>
                     <div class="pfw-request-item">
                         <div>
