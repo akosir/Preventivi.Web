@@ -5,7 +5,7 @@
     ViewData["Title"] = $"Preventivo {Model.Preventivo!.NumeroCompleto}";
 }
 
-<div class="workspace-page">
+<div class="workspace-page preventivi-page preventivo-workspace">
 
     <div class="workspace-header">
 
@@ -41,7 +41,7 @@
 
     </div>
 
-    <section class="pfw-panel mb-3">
+    <section class="pfw-panel">
 
         <div class="pfw-panel-header">
             <div>
@@ -52,128 +52,59 @@
             </div>
         </div>
 
-        <div class="p-3">
-
-            <div class="row g-3 align-items-start">
-
-                <div class="col-12 col-xl-5">
-                    <div class="row g-2">
-
-                        <div class="col-12 col-md-6">
-                            <label class="form-label">NumeroPreventivo</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Preventivo.NumeroPreventivo"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12 col-md-6">
-                            <label class="form-label">Anno</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Preventivo.Anno"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12 col-md-6">
-                            <label class="form-label">DataPreventivo</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Preventivo.DataPreventivo.ToString("dd/MM/yyyy")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12 col-md-6">
-                            <label class="form-label">IdCliente</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Preventivo.IdCliente"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Cliente</label>
-                            <input class="form-control"
-                                   value="@Model.Preventivo.Cliente"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Oggetto</label>
-                            <textarea class="form-control"
-                                      rows="2"
-                                      readonly>@Model.Preventivo.Oggetto</textarea>
-                        </div>
-
-                        <div class="col-12 col-md-6">
-                            <label class="form-label">Stato</label>
-                            <input class="form-control"
-                                   value="@Model.Preventivo.Stato"
-                                   readonly />
-                        </div>
-
+        <div class="preventivo-summary-grid">
+            <div class="preventivo-data-grid">
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Numero</div>
+                    <div class="preventivo-data-value">@Model.Preventivo.NumeroCompleto</div>
+                </div>
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Data preventivo</div>
+                    <div class="preventivo-data-value">@Model.Preventivo.DataPreventivo.ToString("dd/MM/yyyy")</div>
+                </div>
+                <div class="preventivo-data-item preventivo-data-item-wide">
+                    <div class="preventivo-data-label">Cliente</div>
+                    <div class="preventivo-data-value">
+                        @Model.Preventivo.Cliente
+                        <span class="ms-2 text-muted">#@Model.Preventivo.IdCliente</span>
                     </div>
                 </div>
-
-                <div class="col-12 col-xl-4">
-                    <div class="row g-2">
-
-                        <div class="col-12">
-                            <label class="form-label">TotaleCosti</label>
-                            <input class="form-control text-end fw-semibold"
-                                   value="@Model.Preventivo.TotaleCosti.ToString("C2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">TotaleVendita</label>
-                            <input class="form-control text-end fw-semibold"
-                                   value="@Model.Preventivo.TotaleVendita.ToString("C2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">MargineValore</label>
-                            <input class="form-control text-end fw-semibold"
-                                   value="@Model.Preventivo.MargineValore.ToString("C2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-7">
-                            <label class="form-label">Margine %</label>
-                            <input class="form-control text-end fw-semibold"
-                                   value="@Model.Preventivo.MarginePerc.ToString("N2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-5">
-                            <label class="form-label">Markup</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Preventivo.MarkupPercDefault.ToString("N2")"
-                                   readonly />
-                        </div>
-
-                    </div>
+                <div class="preventivo-data-item preventivo-data-item-wide">
+                    <div class="preventivo-data-label">Oggetto</div>
+                    <div class="preventivo-data-value preventivo-data-value-multiline">@Model.Preventivo.Oggetto</div>
                 </div>
-
-                <div class="col-12 col-xl-3">
-                    <div class="row g-2">
-
-                        <div class="col-12">
-                            <label class="form-label">Richiesta Cliente</label>
-                            <input class="form-control"
-                                   value="@GetRichiestaClienteTesto()"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Note</label>
-                            <textarea class="form-control"
-                                      rows="5"
-                                      readonly>@Model.Preventivo.Note</textarea>
-                        </div>
-
-                    </div>
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Richiesta cliente</div>
+                    <div class="preventivo-data-value">@GetRichiestaClienteTesto()</div>
                 </div>
-
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Markup predefinito</div>
+                    <div class="preventivo-data-value justify-content-end">@Model.Preventivo.MarkupPercDefault.ToString("N2") %</div>
+                </div>
+                <div class="preventivo-data-item preventivo-data-item-wide">
+                    <div class="preventivo-data-label">Note</div>
+                    <div class="preventivo-data-value preventivo-data-value-multiline">@(string.IsNullOrWhiteSpace(Model.Preventivo.Note) ? "Nessuna nota" : Model.Preventivo.Note)</div>
+                </div>
             </div>
 
+            <div class="preventivo-metrics" aria-label="Riepilogo economico">
+                <div class="preventivo-metric">
+                    <span class="preventivo-metric-label">Totale costi</span>
+                    <strong class="preventivo-metric-value">@Model.Preventivo.TotaleCosti.ToString("C2")</strong>
+                </div>
+                <div class="preventivo-metric preventivo-metric-primary">
+                    <span class="preventivo-metric-label">Totale vendita</span>
+                    <strong class="preventivo-metric-value">@Model.Preventivo.TotaleVendita.ToString("C2")</strong>
+                </div>
+                <div class="preventivo-metric">
+                    <span class="preventivo-metric-label">Margine valore</span>
+                    <strong class="preventivo-metric-value">@Model.Preventivo.MargineValore.ToString("C2")</strong>
+                </div>
+                <div class="preventivo-metric">
+                    <span class="preventivo-metric-label">Margine percentuale</span>
+                    <strong class="preventivo-metric-value">@Model.Preventivo.MarginePerc.ToString("N2") %</strong>
+                </div>
+            </div>
         </div>
 
     </section>
@@ -202,11 +133,11 @@
         <div class="workspace-tab-content">
 
             <div id="righe-preventivo"
-                 class="workspace-righe-toolbar">
+                 class="preventivo-section-toolbar">
 
                 <div>
-                    <strong>Righe preventivo</strong>
-                    <span class="workspace-righe-count">
+                    <span class="preventivo-section-title">Righe preventivo</span>
+                    <span class="preventivo-section-count">
                         @Model.Righe.Count righe
                     </span>
                 </div>
@@ -235,22 +166,22 @@
             }
             else
             {
-                <div class="table-responsive">
+                <div class="preventivi-table-wrap">
 
-                    <table class="table pfw-table align-middle mb-0">
+                    <table class="table pfw-table preventivi-table align-middle">
 
                         <thead>
                             <tr>
-                                <th>RigaNr</th>
+                                <th>Riga</th>
                                 <th>Tipo</th>
-                                <th>DescrizioneVoce</th>
+                                <th>Descrizione</th>
                                 <th class="text-end">Quantità</th>
-                                <th class="text-end">Prezzo Unitario Vendita</th>
-                                <th class="text-end">Totale Vendita</th>
-                                <th class="text-end">Totale Costi</th>
+                                <th class="text-end">Prezzo unitario</th>
+                                <th class="text-end">Totale vendita</th>
+                                <th class="text-end">Totale costi</th>
                                 <th class="text-end">Margine %</th>
-                                <th class="text-center">Prez. Manuale</th>
-                                <th class="text-center">Azioni</th>
+                                <th class="text-center">Prezzo manuale</th>
+                                <th class="text-end">Azioni</th>
                             </tr>
                         </thead>
 
@@ -299,20 +230,21 @@
                                                disabled />
                                     </td>
 
-                                    <td class="text-center">
-                                        <a asp-page="/Preventivi/Riga/Elimina"
-                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
-                                           asp-route-idRigaPreventivo="@riga.IdRigaPreventivo"
-                                           class="pfw-action-link">
-                                            Elimina
-                                        </a>
-
-                                        <a asp-page="/Preventivi/Riga/Workspace"
-                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
-                                           asp-route-idRigaPreventivo="@riga.IdRigaPreventivo"
-                                           class="pfw-action-link">
-                                            Apri
-                                        </a>
+                                    <td class="text-end">
+                                        <div class="preventivi-actions">
+                                            <a asp-page="/Preventivi/Riga/Workspace"
+                                               asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                               asp-route-idRigaPreventivo="@riga.IdRigaPreventivo"
+                                               class="pfw-btn pfw-btn-secondary pfw-btn-compact">
+                                                Apri
+                                            </a>
+                                            <a asp-page="/Preventivi/Riga/Elimina"
+                                               asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                               asp-route-idRigaPreventivo="@riga.IdRigaPreventivo"
+                                               class="pfw-btn pfw-btn-danger pfw-btn-compact">
+                                                Elimina
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -327,10 +259,10 @@
             <hr id="varianti-preventivo"
                 class="my-4" />
 
-            <div class="workspace-righe-toolbar">
+            <div class="preventivo-section-toolbar">
                 <div>
-                    <strong>Varianti preventivo</strong>
-                    <span class="workspace-righe-count">
+                    <span class="preventivo-section-title">Varianti preventivo</span>
+                    <span class="preventivo-section-count">
                         @Model.Varianti.Count varianti
                     </span>
                 </div>
@@ -356,19 +288,19 @@
             }
             else
             {
-                <div class="table-responsive">
+                <div class="preventivi-table-wrap">
 
-                    <table class="table pfw-table align-middle mb-0">
+                    <table class="table pfw-table preventivi-table align-middle">
 
                         <thead>
                             <tr>
                                 <th>Codice</th>
                                 <th>Descrizione</th>
                                 <th class="text-center">Scelta</th>
-                                <th class="text-end">Totale Vendita</th>
-                                <th class="text-end">Totale Costi</th>
+                                <th class="text-end">Totale vendita</th>
+                                <th class="text-end">Totale costi</th>
                                 <th class="text-end">Margine %</th>
-                                <th class="text-center">Azioni</th>
+                                <th class="text-end">Azioni</th>
                             </tr>
                         </thead>
 
@@ -403,20 +335,21 @@
                                         @variante.MarginePerc.ToString("N2")
                                     </td>
 
-                                    <td class="text-center">
-                                        <a asp-page="/Preventivi/Varianti/Elimina"
-                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
-                                           asp-route-idVariantePreventivo="@variante.IdVariantePreventivo"
-                                           class="pfw-action-link">
-                                            Elimina
-                                        </a>
-
-                                        <a asp-page="/Preventivi/Varianti/Dettaglio"
-                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
-                                           asp-route-idVariantePreventivo="@variante.IdVariantePreventivo"
-                                           class="pfw-action-link">
-                                            Apri
-                                        </a>
+                                    <td class="text-end">
+                                        <div class="preventivi-actions">
+                                            <a asp-page="/Preventivi/Varianti/Dettaglio"
+                                               asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                               asp-route-idVariantePreventivo="@variante.IdVariantePreventivo"
+                                               class="pfw-btn pfw-btn-secondary pfw-btn-compact">
+                                                Apri
+                                            </a>
+                                            <a asp-page="/Preventivi/Varianti/Elimina"
+                                               asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                               asp-route-idVariantePreventivo="@variante.IdVariantePreventivo"
+                                               class="pfw-btn pfw-btn-danger pfw-btn-compact">
+                                                Elimina
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             }

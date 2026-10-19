@@ -23,7 +23,9 @@ builder.Services
     .AddCookie(options =>
         AutorizzazioneApplicazione.ConfiguraCookie(
             options,
-            builder.Environment.IsDevelopment()));
+            builder.Configuration.GetValue<bool?>(
+                "Sicurezza:RichiediHttpsCookie")
+            ?? !builder.Environment.IsDevelopment()));
 
 builder.Services.AddAuthorization(options =>
     AutorizzazioneApplicazione.ConfiguraPolicy(

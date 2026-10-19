@@ -5,6 +5,7 @@
     ViewData["Title"] = "Dettaglio variante preventivo";
 }
 
+<div class="preventivi-page">
 <section class="pfw-panel">
 
     <div class="pfw-panel-header">
@@ -17,27 +18,27 @@
     <div class="p-3">
         <div class="row g-3">
             <div class="col-12 col-md-3">
-                <label class="form-label">CodiceVariante</label>
+                <label class="form-label">Codice variante</label>
                 <input class="form-control" value="@Model.Variante!.CodiceVariante" readonly />
             </div>
 
             <div class="col-12 col-md-9">
-                <label class="form-label">DescrizioneVariante</label>
+                <label class="form-label">Descrizione variante</label>
                 <input class="form-control" value="@Model.Variante.DescrizioneVariante" readonly />
             </div>
 
             <div class="col-12 col-md-3">
-                <label class="form-label">TotaleVendita</label>
+                <label class="form-label">Totale vendita</label>
                 <input class="form-control text-end" value="@Model.Variante.TotaleVendita.ToString("C2")" readonly />
             </div>
 
             <div class="col-12 col-md-3">
-                <label class="form-label">TotaleCosti</label>
+                <label class="form-label">Totale costi</label>
                 <input class="form-control text-end" value="@Model.Variante.TotaleCosti.ToString("C2")" readonly />
             </div>
 
             <div class="col-12 col-md-3">
-                <label class="form-label">MargineValore</label>
+                <label class="form-label">Margine valore</label>
                 <input class="form-control text-end" value="@Model.Variante.MargineValore.ToString("C2")" readonly />
             </div>
 
@@ -65,3 +66,4 @@
     </div>
 
 </section>
+</div>

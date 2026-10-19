@@ -1,123 +1,96 @@
-﻿@page
+@page
 @model Preventivi.IndexModel
 
 @{
     ViewData["Title"] = "Preventivi";
 }
 
-@await Component.InvokeAsync(
-    "PFWPageHeader",
-    new
-    {
-        title = "Preventivi",
-        subtitle = "Gestione e monitoraggio dei preventivi clienti"
-    })
-
-<!-- ELENCO PREVENTIVI -->
-
-<section class="pfw-panel">
-
-    <div class="pfw-panel-header">
-
+<div class="preventivi-page">
+    <header class="preventivi-page-header">
         <div>
-            <h2 class="pfw-panel-title">
-                Elenco preventivi
-            </h2>
+            <h1 class="preventivi-page-title">Preventivi</h1>
+            <div class="preventivi-page-subtitle">
+                Consulta i preventivi clienti e accedi al dettaglio operativo.
+            </div>
+        </div>
+    </header>
 
-            <div class="pfw-panel-subtitle">
-                @Model.Preventivi.Count preventivi trovati
+    <section class="pfw-panel" aria-labelledby="elenco-preventivi-title">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 id="elenco-preventivi-title" class="pfw-panel-title">
+                    Elenco preventivi
+                </h2>
+                <div class="pfw-panel-subtitle">
+                    @Model.Preventivi.Count @(Model.Preventivi.Count == 1 ? "preventivo trovato" : "preventivi trovati")
+                </div>
             </div>
         </div>
 
-    </div>
-
-    <div class="table-responsive">
-
-        <table class="table pfw-table pfw-table-clickable align-middle mb-0">
-
-            <thead>
-                <tr>
-                    <th>Numero</th>
-                    <th>Cliente</th>
-                    <th>Oggetto</th>
-                    <th>Data</th>
-                    <th class="text-end">Totale</th>
-                    <th>Stato</th>
-                    <th class="text-center">Azioni</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                @foreach (var preventivo in Model.Preventivi)
-                {
-                    <tr>
-                        <td class="fw-semibold">
-                            @preventivo.NumeroCompleto
-                        </td>
-
-                        <td>
-                            @preventivo.Cliente
-                        </td>
-
-                        <td>
-                            @preventivo.Oggetto
-                        </td>
-
-                        <td>
-                            @preventivo.DataPreventivo.ToString("dd/MM/yyyy")
-                        </td>
-
-                        <td class="text-end fw-semibold">
-                            @preventivo.TotaleVendita.ToString("C2")
-                        </td>
-
-                        <td>
-                            <span class="pfw-badge @GetStatoBadge(preventivo.Stato)">
-                                @preventivo.Stato
-                            </span>
-                        </td>
-
-                        <td class="text-center">
-                            <a asp-page="/Preventivi/Dettaglio"
-                               asp-route-id="@preventivo.IdPreventivo"
-                               class="pfw-action-link">
-                                Apri
-                            </a>
-                        </td>
-                    </tr>
-                }
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</section>
+        @if (Model.Preventivi.Count == 0)
+        {
+            <div class="pfw-empty-row">Nessun preventivo disponibile.</div>
+        }
+        else
+        {
+            <div class="preventivi-table-wrap">
+                <table class="table pfw-table preventivi-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Preventivo</th>
+                            <th>Cliente</th>
+                            <th>Oggetto</th>
+                            <th>Data</th>
+                            <th class="text-end">Totale vendita</th>
+                            <th>Stato</th>
+                            <th class="text-end">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var preventivo in Model.Preventivi)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="preventivi-cell-primary">@preventivo.NumeroCompleto</div>
+                                    <div class="preventivi-cell-secondary">Preventivo cliente</div>
+                                </td>
+                                <td class="fw-semibold">@preventivo.Cliente</td>
+                                <td>@preventivo.Oggetto</td>
+                                <td>@preventivo.DataPreventivo.ToString("dd/MM/yyyy")</td>
+                                <td class="text-end fw-semibold">@preventivo.TotaleVendita.ToString("C2")</td>
+                                <td>
+                                    <span class="pfw-badge @GetStatoBadge(preventivo.Stato)">
+                                        @preventivo.Stato
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="preventivi-actions">
+                                        <a asp-page="/Preventivi/Dettaglio"
+                                           asp-route-id="@preventivo.IdPreventivo"
+                                           class="pfw-btn pfw-btn-secondary pfw-btn-compact">
+                                            Apri
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>
 
 @functions {
-
     private static string GetStatoBadge(string stato)
     {
         return stato switch
         {
             "Accettato" => "pfw-badge-success",
-
-            "Pronto da Inviare"
-                or "Da Verificare"
-                => "pfw-badge-warning",
-
-            "Respinto"
-                or "Annullato"
-                => "pfw-badge-danger",
-
-            "Inviato"
-                or "In Produzione"
-                => "pfw-badge-primary",
-
+            "Pronto da Inviare" or "Da Verificare" => "pfw-badge-warning",
+            "Respinto" or "Annullato" => "pfw-badge-danger",
+            "Inviato" or "In Produzione" => "pfw-badge-primary",
             _ => "pfw-badge-secondary"
         };
     }
-
 }

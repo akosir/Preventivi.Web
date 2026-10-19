@@ -5,7 +5,7 @@
     ViewData["Title"] = $"Riga {Model.Riga!.RigaNr} - Preventivo {Model.Preventivo!.NumeroCompleto}";
 }
 
-<div class="workspace-page">
+<div class="workspace-page preventivi-page preventivo-workspace">
 
     <div class="workspace-header">
 
@@ -44,7 +44,7 @@
 
     </div>
 
-    <section class="pfw-panel mb-3">
+    <section class="pfw-panel">
 
         <div class="pfw-panel-header">
             <div>
@@ -55,135 +55,72 @@
             </div>
         </div>
 
-        <div class="p-3">
-
-            <div class="row g-3 align-items-start">
-
-                <div class="col-12 col-lg-4">
-                    <div class="row g-2">
-
-                        <div class="col-12 col-md-4 col-lg-12">
-                            <label class="form-label">RigaNr</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Riga.RigaNr"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12 col-md-4 col-lg-12">
-                            <label class="form-label">IdArticolo</label>
-                            <input class="form-control"
-                                   value="@Model.Riga.IdArticolo"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12 col-md-4 col-lg-12">
-                            <label class="form-label">IdModelloCiclo</label>
-                            <input class="form-control"
-                                   value="@Model.Riga.IdModelloCiclo"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">DescrizioneVoce</label>
-                            <textarea class="form-control"
-                                      rows="4"
-                                      readonly>@Model.Riga.DescrizioneVoce</textarea>
-                        </div>
-
-                    </div>
+        <div class="preventivo-summary-grid">
+            <div class="preventivo-data-grid">
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Numero riga</div>
+                    <div class="preventivo-data-value">@Model.Riga.RigaNr</div>
                 </div>
-
-                <div class="col-12 col-lg-4">
-                    <div class="row g-2">
-
-                        <div class="col-12">
-                            <label class="form-label">Quantità</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Riga.Quantita.ToString("N2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Prezzo unit. Vendita</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Riga.PrezzoUnitarioVendita.ToString("N4")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Prezzo Manuale cad.</label>
-                            <input type="checkbox"
-                                   checked="@Model.Riga.PrezzoManuale"
-                                   disabled />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Markup Libero</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Riga.MarkupPerc.ToString("N2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Costo Libero cad</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Riga.CostoUnitarioLibero?.ToString("N4")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">TipoRiga</label>
-                            <input class="form-control"
-                                   value="@Model.Riga.TipoRiga"
-                                   readonly />
-                        </div>
-
-                    </div>
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Tipo riga</div>
+                    <div class="preventivo-data-value">@Model.Riga.TipoRiga</div>
                 </div>
-
-                <div class="col-12 col-lg-4">
-                    <div class="row g-2">
-
-                        <div class="col-12">
-                            <label class="form-label">Note</label>
-                            <textarea class="form-control"
-                                      rows="4"
-                                      readonly>@Model.Riga.Note</textarea>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">TotaleVendita</label>
-                            <input class="form-control text-end fw-semibold"
-                                   value="@Model.Riga.TotaleVendita.ToString("C2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">TotaleCosti</label>
-                            <input class="form-control text-end fw-semibold"
-                                   value="@Model.Riga.TotaleCosti.ToString("C2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">MargineValore</label>
-                            <input class="form-control text-end fw-semibold"
-                                   value="@Model.Riga.MargineValore.ToString("C2")"
-                                   readonly />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Margine %</label>
-                            <input class="form-control text-end"
-                                   value="@Model.Riga.MarginePerc.ToString("N2")"
-                                   readonly />
-                        </div>
-
-                    </div>
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Articolo</div>
+                    <div class="preventivo-data-value">@(Model.Riga.IdArticolo?.ToString() ?? "Non associato")</div>
                 </div>
-
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Modello ciclo</div>
+                    <div class="preventivo-data-value">@(Model.Riga.IdModelloCiclo?.ToString() ?? "Non associato")</div>
+                </div>
+                <div class="preventivo-data-item preventivo-data-item-wide">
+                    <div class="preventivo-data-label">Descrizione</div>
+                    <div class="preventivo-data-value preventivo-data-value-multiline">@Model.Riga.DescrizioneVoce</div>
+                </div>
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Quantità</div>
+                    <div class="preventivo-data-value justify-content-end">@Model.Riga.Quantita.ToString("N2")</div>
+                </div>
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Prezzo unitario vendita</div>
+                    <div class="preventivo-data-value justify-content-end">@Model.Riga.PrezzoUnitarioVendita.ToString("C4")</div>
+                </div>
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Markup libero</div>
+                    <div class="preventivo-data-value justify-content-end">@Model.Riga.MarkupPerc.ToString("N2") %</div>
+                </div>
+                <div class="preventivo-data-item">
+                    <div class="preventivo-data-label">Costo libero unitario</div>
+                    <div class="preventivo-data-value justify-content-end">@(Model.Riga.CostoUnitarioLibero?.ToString("C4") ?? "Non previsto")</div>
+                </div>
+                <div class="preventivo-data-item preventivo-data-item-wide">
+                    <div class="preventivo-data-label">Note</div>
+                    <div class="preventivo-data-value preventivo-data-value-multiline">@(string.IsNullOrWhiteSpace(Model.Riga.Note) ? "Nessuna nota" : Model.Riga.Note)</div>
+                </div>
             </div>
 
+            <div class="preventivo-metrics" aria-label="Riepilogo economico riga">
+                <div class="preventivo-metric">
+                    <span class="preventivo-metric-label">Totale costi</span>
+                    <strong class="preventivo-metric-value">@Model.Riga.TotaleCosti.ToString("C2")</strong>
+                </div>
+                <div class="preventivo-metric preventivo-metric-primary">
+                    <span class="preventivo-metric-label">Totale vendita</span>
+                    <strong class="preventivo-metric-value">@Model.Riga.TotaleVendita.ToString("C2")</strong>
+                </div>
+                <div class="preventivo-metric">
+                    <span class="preventivo-metric-label">Margine valore</span>
+                    <strong class="preventivo-metric-value">@Model.Riga.MargineValore.ToString("C2")</strong>
+                </div>
+                <div class="preventivo-metric">
+                    <span class="preventivo-metric-label">Margine percentuale</span>
+                    <strong class="preventivo-metric-value">@Model.Riga.MarginePerc.ToString("N2") %</strong>
+                </div>
+                <div class="preventivo-metric">
+                    <span class="preventivo-metric-label">Prezzo manuale</span>
+                    <strong class="preventivo-metric-value">@(Model.Riga.PrezzoManuale ? "Sì" : "No")</strong>
+                </div>
+            </div>
         </div>
 
     </section>
@@ -202,14 +139,14 @@
         <div class="workspace-tab-content">
 
             <div id="componenti-riga"
-                 class="workspace-righe-toolbar">
+                 class="preventivo-section-toolbar">
                 <div>
-                    <strong>Componenti</strong>
-                    <span class="workspace-righe-count">
+                    <span class="preventivo-section-title">Componenti</span>
+                    <span class="preventivo-section-count">
                         @Model.Componenti.Count righe
                     </span>
                 </div>
-                <a class="btn btn-sm btn-primary"
+                <a class="pfw-btn pfw-btn-primary"
                    asp-page="/Preventivi/Riga/Componenti"
                    asp-route-modo="nuovo"
                    asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
@@ -228,17 +165,17 @@
             }
             else
             {
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover align-middle mb-0">
+                <div class="preventivi-table-wrap">
+                    <table class="table pfw-table preventivi-table align-middle">
                         <thead>
                             <tr>
                                 <th>Ordine</th>
-                                <th>IdNodo</th>
-                                <th>IdPadre</th>
-                                <th>DescrizioneNodo</th>
+                                <th>Nodo distinta</th>
+                                <th>Nodo padre</th>
+                                <th>Descrizione</th>
                                 <th class="text-end">Livello</th>
-                                <th class="text-end">QuantitaBase</th>
-                                <th class="text-end">QuantitaCalcolata</th>
+                                <th class="text-end">Quantità base</th>
+                                <th class="text-end">Quantità calcolata</th>
                                 <th class="text-end">Azioni</th>
                             </tr>
                         </thead>
@@ -249,12 +186,13 @@
                                     <td>@componente.OrdineVisualizzazione</td>
                                     <td>@componente.IdNodoDistinta</td>
                                     <td>@componente.IdNodoPadre</td>
-                                    <td>@componente.DescrizioneNodo</td>
+                                    <td class="fw-semibold">@componente.DescrizioneNodo</td>
                                     <td class="text-end">@componente.Livello</td>
                                     <td class="text-end">@componente.QuantitaBase.ToString("N2")</td>
                                     <td class="text-end">@componente.QuantitaCalcolata.ToString("N2")</td>
                                     <td class="text-end">
-                                        <a class="btn btn-sm btn-outline-secondary"
+                                        <div class="preventivi-actions">
+                                        <a class="pfw-btn pfw-btn-secondary pfw-btn-compact"
                                            asp-page="/Preventivi/Riga/Componenti"
                                            asp-route-modo="dettaglio"
                                            asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
@@ -262,7 +200,7 @@
                                            asp-route-id="@componente.IdRigaCompPrev">
                                             Apri
                                         </a>
-                                        <a class="btn btn-sm btn-outline-danger"
+                                        <a class="pfw-btn pfw-btn-danger pfw-btn-compact"
                                            asp-page="/Preventivi/Riga/Componenti"
                                            asp-route-modo="elimina"
                                            asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
@@ -270,6 +208,7 @@
                                            asp-route-id="@componente.IdRigaCompPrev">
                                             Elimina
                                         </a>
+                                        </div>
                                     </td>
                                 </tr>
                             }

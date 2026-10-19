@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Preventivi.Core.Allegati;
@@ -74,13 +75,31 @@ public sealed class SicurezzaApplicazioneTests
     {
         var options = new CookieAuthenticationOptions();
 
-        AutorizzazioneApplicazione.ConfiguraCookie(options, isDevelopment: true);
+        AutorizzazioneApplicazione.ConfiguraCookie(
+            options,
+            richiediHttpsCookie: false);
 
         Assert.Equal(TimeSpan.FromHours(12), options.ExpireTimeSpan);
         Assert.True(options.SlidingExpiration);
         Assert.True(options.Cookie.HttpOnly);
         Assert.Null(options.Cookie.MaxAge);
         Assert.Equal("/Account/Login", options.LoginPath);
+    }
+
+    [Theory]
+    [InlineData(true, CookieSecurePolicy.Always)]
+    [InlineData(false, CookieSecurePolicy.SameAsRequest)]
+    public void ConfiguraCookie_RispettaObbligoHttps(
+        bool richiediHttpsCookie,
+        CookieSecurePolicy attesa)
+    {
+        var options = new CookieAuthenticationOptions();
+
+        AutorizzazioneApplicazione.ConfiguraCookie(
+            options,
+            richiediHttpsCookie);
+
+        Assert.Equal(attesa, options.Cookie.SecurePolicy);
     }
 
     [Fact]

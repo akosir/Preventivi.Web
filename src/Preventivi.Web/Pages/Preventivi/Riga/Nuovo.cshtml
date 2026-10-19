@@ -5,6 +5,7 @@
     ViewData["Title"] = "Nuova riga preventivo";
 }
 
+<div class="preventivi-page">
 <section class="pfw-panel">
 
     <div class="pfw-panel-header">
@@ -25,12 +26,12 @@
         <div class="row g-3">
 
             <div class="col-12 col-md-2">
-                <label class="form-label" asp-for="Riga.RigaNr">RigaNr</label>
+                <label class="form-label" asp-for="Riga.RigaNr">Numero riga</label>
                 <input class="form-control text-end" asp-for="Riga.RigaNr" />
             </div>
 
-            <div class="col-12 col-md-4">
-                <label class="form-label" asp-for="Riga.IdTipoRiga">TipoRiga</label>
+            <div class="col-12 col-md-4 pfw-field-required">
+                <label class="form-label" asp-for="Riga.IdTipoRiga">Tipo riga</label>
                 <select class="form-select" asp-for="Riga.IdTipoRiga">
                     @foreach (var tipo in Model.TipiRiga)
                     {
@@ -43,22 +44,22 @@
             </div>
 
             <div class="col-12 col-md-3">
-                <label class="form-label" asp-for="Riga.IdArticolo">IdArticolo</label>
+                <label class="form-label" asp-for="Riga.IdArticolo">Articolo</label>
                 <input class="form-control text-end" asp-for="Riga.IdArticolo" />
             </div>
 
             <div class="col-12 col-md-3">
-                <label class="form-label" asp-for="Riga.IdModelloCiclo">IdModelloCiclo</label>
+                <label class="form-label" asp-for="Riga.IdModelloCiclo">Modello ciclo</label>
                 <input class="form-control text-end" asp-for="Riga.IdModelloCiclo" />
             </div>
 
-            <div class="col-12">
-                <label class="form-label" asp-for="Riga.DescrizioneVoce">DescrizioneVoce</label>
+            <div class="col-12 pfw-field-required">
+                <label class="form-label" asp-for="Riga.DescrizioneVoce">Descrizione</label>
                 <textarea class="form-control" asp-for="Riga.DescrizioneVoce" rows="3"></textarea>
                 <span class="text-danger" asp-validation-for="Riga.DescrizioneVoce"></span>
             </div>
 
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-3 pfw-field-required">
                 <label class="form-label" asp-for="Riga.Quantita">Quantità</label>
                 <input class="form-control text-end" asp-for="Riga.Quantita" />
                 <span class="text-danger" asp-validation-for="Riga.Quantita"></span>
@@ -70,12 +71,12 @@
             </div>
 
             <div class="col-12 col-md-3">
-                <label class="form-label" asp-for="Riga.MarkupPerc">MarkupPerc</label>
+                <label class="form-label" asp-for="Riga.MarkupPerc">Markup %</label>
                 <input class="form-control text-end" asp-for="Riga.MarkupPerc" />
             </div>
 
             <div class="col-12 col-md-3">
-                <label class="form-label" asp-for="Riga.CostoUnitarioLibero">CostoUnitarioLibero</label>
+                <label class="form-label" asp-for="Riga.CostoUnitarioLibero">Costo unitario libero</label>
                 <input class="form-control text-end" asp-for="Riga.CostoUnitarioLibero" />
             </div>
 
@@ -83,7 +84,7 @@
                 <div class="form-check">
                     <input class="form-check-input" asp-for="Riga.PrezzoManuale" />
                     <label class="form-check-label" asp-for="Riga.PrezzoManuale">
-                        PrezzoManuale
+                        Prezzo manuale
                     </label>
                 </div>
             </div>
@@ -110,6 +111,7 @@
     </form>
 
 </section>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

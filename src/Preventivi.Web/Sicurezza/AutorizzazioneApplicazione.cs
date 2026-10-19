@@ -22,14 +22,14 @@ public static class AutorizzazioneApplicazione
 
     public static void ConfiguraCookie(
         CookieAuthenticationOptions options,
-        bool isDevelopment)
+        bool richiediHttpsCookie)
     {
         options.Cookie.Name = ".Preventivi.Web.Sessione";
         options.Cookie.HttpOnly = true;
         options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy = isDevelopment
-            ? CookieSecurePolicy.SameAsRequest
-            : CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = richiediHttpsCookie
+            ? CookieSecurePolicy.Always
+            : CookieSecurePolicy.SameAsRequest;
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessoNegato";
         options.ExpireTimeSpan = TimeSpan.FromHours(12);

@@ -1,0 +1,122 @@
+.preventivi-page {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.preventivi-page .pfw-panel {
+    min-width: 0;
+}
+
+.preventivi-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.preventivi-page-title {
+    margin: 0;
+    color: var(--app-text);
+    font-size: 26px;
+    font-weight: 650;
+    line-height: 1.2;
+}
+
+.preventivi-page-subtitle {
+    margin-top: 5px;
+    color: var(--app-text-muted);
+    font-size: 13px;
+}
+
+.preventivi-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.preventivi-table {
+    min-width: 860px;
+    margin: 0;
+}
+
+.preventivi-table .preventivi-cell-primary {
+    color: var(--app-text);
+    font-weight: 650;
+}
+
+.preventivi-table .preventivi-cell-secondary {
+    color: var(--app-text-muted);
+    font-size: 12px;
+}
+
+.preventivi-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.preventivi-page .pfw-btn-compact {
+    min-height: 30px;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.preventivi-page .pfw-btn-danger {
+    border-color: #d34f45;
+    background: #fff;
+    color: #b7332a;
+}
+
+.preventivi-page .pfw-btn-danger:hover {
+    background: #fff4f3;
+    color: #8f251e;
+}
+
+.preventivi-page .pfw-empty-row {
+    padding: 42px 20px;
+    color: var(--app-text-muted);
+    text-align: center;
+}
+
+.preventivi-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+}
+
+.preventivi-origin-selector {
+    padding: 16px;
+    border: 1px solid var(--app-border);
+    border-radius: 7px;
+    background: #f8fafc;
+}
+
+.preventivi-page .form-control[readonly],
+.preventivi-page textarea[readonly] {
+    background: #f8fafc;
+    border-color: #dfe4ea;
+    color: var(--app-text);
+}
+
+@media (max-width: 767px) {
+    .preventivi-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .preventivi-page-title {
+        font-size: 23px;
+    }
+
+    .preventivi-form-actions {
+        justify-content: stretch;
+    }
+
+    .preventivi-form-actions .pfw-btn {
+        flex: 1;
+    }
+}
