@@ -15,6 +15,59 @@
         </div>
     </header>
 
+    <section class="pfw-panel preventivi-search-panel" aria-labelledby="ricerca-preventivi-title">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 id="ricerca-preventivi-title" class="pfw-panel-title">Ricerca preventivi</h2>
+                <div class="pfw-panel-subtitle">Filtra per numero, cliente, oggetto, stato e data.</div>
+            </div>
+        </div>
+
+        <form method="get" class="preventivi-search-form">
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-lg-4">
+                    <label asp-for="Ricerca" class="form-label">Numero, cliente o oggetto</label>
+                    <input asp-for="Ricerca" class="form-control" autocomplete="off" />
+                </div>
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <label asp-for="Stato" class="form-label">Stato</label>
+                    <select asp-for="Stato" class="form-select">
+                        <option value="">Tutti</option>
+                        @foreach (var stato in Model.Stati)
+                        {
+                            <option value="@stato">@stato</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <label asp-for="Anno" class="form-label">Anno</label>
+                    <select asp-for="Anno" class="form-select">
+                        <option value="">Tutti</option>
+                        @foreach (var anno in Model.Anni)
+                        {
+                            <option value="@anno">@anno</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <label asp-for="DataDa" class="form-label">Data da</label>
+                    <input asp-for="DataDa" type="date" class="form-control" />
+                </div>
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <label asp-for="DataA" class="form-label">Data a</label>
+                    <input asp-for="DataA" type="date" class="form-control" />
+                </div>
+            </div>
+            <div class="preventivi-search-actions">
+                @if (Model.HaFiltri)
+                {
+                    <a asp-page="/Preventivi/Index" class="pfw-btn pfw-btn-secondary">Azzera</a>
+                }
+                <button type="submit" class="pfw-btn pfw-btn-primary">Cerca</button>
+            </div>
+        </form>
+    </section>
+
     <section class="pfw-panel" aria-labelledby="elenco-preventivi-title">
         <div class="pfw-panel-header">
             <div>
@@ -29,7 +82,11 @@
 
         @if (Model.Preventivi.Count == 0)
         {
-            <div class="pfw-empty-row">Nessun preventivo disponibile.</div>
+            <div class="pfw-empty-row">
+                @(Model.HaFiltri
+                    ? "Nessun preventivo corrisponde ai filtri impostati."
+                    : "Nessun preventivo disponibile.")
+            </div>
         }
         else
         {

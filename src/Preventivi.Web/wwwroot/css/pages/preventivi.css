@@ -34,6 +34,17 @@
     overflow-x: auto;
 }
 
+.preventivi-search-form {
+    padding: 16px;
+}
+
+.preventivi-search-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
 .preventivi-table {
     min-width: 860px;
     margin: 0;
@@ -118,5 +129,230 @@
 
     .preventivi-form-actions .pfw-btn {
         flex: 1;
+    }
+
+    .preventivi-search-actions .pfw-btn {
+        flex: 1;
+    }
+}
+
+.preventivo-preview {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 24px;
+    border: 1px solid var(--app-border);
+    background: #fff;
+    color: var(--app-text);
+}
+
+.preventivo-preview-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.preventivo-preview-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 34%);
+    gap: 32px;
+    padding-bottom: 22px;
+    border-bottom: 2px solid var(--app-primary);
+}
+
+.preventivo-preview-kicker {
+    color: var(--app-primary);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.preventivo-preview-header h1 {
+    margin: 5px 0 8px;
+    font-size: 30px;
+}
+
+.preventivo-preview-object {
+    font-size: 16px;
+}
+
+.preventivo-preview-meta {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+}
+
+.preventivo-preview-meta div {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 10px;
+}
+
+.preventivo-preview-meta dt,
+.preventivo-preview-meta dd {
+    margin: 0;
+}
+
+.preventivo-preview-meta dt,
+.preventivo-preview-secondary,
+.preventivo-preview-component-meta {
+    color: var(--app-text-muted);
+}
+
+.preventivo-preview-notes,
+.preventivo-preview-section {
+    margin-top: 24px;
+}
+
+.preventivo-preview h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+}
+
+.preventivo-preview h3 {
+    margin: 18px 0 8px;
+    font-size: 15px;
+}
+
+.preventivo-preview h3 span {
+    color: var(--app-text-muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.preventivo-preview h4 {
+    margin: 14px 0 6px;
+    font-size: 13px;
+}
+
+.preventivo-preview-notes p {
+    margin: 0;
+    white-space: pre-line;
+}
+
+.preventivo-preview-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.preventivo-preview-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.preventivo-preview-table th,
+.preventivo-preview-table td {
+    padding: 9px 8px;
+    border-bottom: 1px solid var(--app-border);
+    vertical-align: top;
+}
+
+.preventivo-preview-table th {
+    background: #f5f7fa;
+    color: var(--app-text-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.preventivo-preview-table tfoot th {
+    background: #fff;
+    color: var(--app-text);
+    font-size: 14px;
+}
+
+.preventivo-preview-table-compact {
+    font-size: 12px;
+}
+
+.preventivo-preview-table-compact th,
+.preventivo-preview-table-compact td {
+    padding: 6px 7px;
+}
+
+.preventivo-preview-economics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.preventivo-preview-economics div {
+    padding: 12px;
+    border: 1px solid var(--app-border);
+}
+
+.preventivo-preview-economics span,
+.preventivo-preview-economics strong {
+    display: block;
+}
+
+.preventivo-preview-economics span {
+    color: var(--app-text-muted);
+    font-size: 12px;
+}
+
+.preventivo-preview-economics strong {
+    margin-top: 4px;
+    font-size: 16px;
+}
+
+.preventivo-preview-component {
+    margin-top: 16px;
+    padding: 0 0 14px 14px;
+    border-left: 3px solid #aeb9c6;
+}
+
+.preventivo-preview-empty {
+    padding: 14px;
+    color: var(--app-text-muted);
+    background: #f7f8fa;
+}
+
+@media (max-width: 767px) {
+    .preventivo-preview {
+        padding: 16px;
+    }
+
+    .preventivo-preview-header,
+    .preventivo-preview-economics {
+        grid-template-columns: 1fr;
+    }
+
+    .preventivo-preview-actions .pfw-btn {
+        flex: 1;
+    }
+}
+
+@media print {
+    .app-sidebar,
+    .app-header,
+    .app-footer,
+    .preventivo-preview-actions {
+        display: none !important;
+    }
+
+    .app-shell,
+    .app-main,
+    .app-content {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .preventivo-preview {
+        max-width: none;
+        padding: 0;
+        border: 0;
+    }
+
+    .preventivo-preview-header {
+        break-inside: avoid;
+    }
+
+    .preventivo-preview-breakable,
+    .preventivo-preview-component,
+    .preventivo-preview-table tr {
+        break-inside: avoid;
     }
 }

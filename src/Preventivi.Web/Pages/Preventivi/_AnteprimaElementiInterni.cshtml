@@ -1,0 +1,61 @@
+@model global::Preventivi.Web.Pages.Preventivi.AnteprimaElementiInterniModel
+
+@if (Model.Materiali.Count > 0)
+{
+    <div class="preventivo-preview-subsection">
+        <h4>Materiali</h4>
+        <table class="preventivo-preview-table preventivo-preview-table-compact">
+            <thead>
+                <tr>
+                    <th>Descrizione</th>
+                    <th>UM</th>
+                    <th class="text-end">Quantita</th>
+                    <th class="text-end">Costo unitario</th>
+                    <th class="text-end">Costo totale</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var materiale in Model.Materiali)
+                {
+                    <tr>
+                        <td>@materiale.DescrizioneMateriale</td>
+                        <td>@materiale.UM</td>
+                        <td class="text-end">@materiale.Quantita.ToString("N4")</td>
+                        <td class="text-end">@materiale.CostoUnitario.ToString("C4")</td>
+                        <td class="text-end">@materiale.CostoTotale.ToString("C2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (Model.Lavorazioni.Count > 0)
+{
+    <div class="preventivo-preview-subsection">
+        <h4>Lavorazioni</h4>
+        <table class="preventivo-preview-table preventivo-preview-table-compact">
+            <thead>
+                <tr>
+                    <th>Sequenza</th>
+                    <th>Descrizione</th>
+                    <th class="text-end">Quantita</th>
+                    <th class="text-end">Tempo totale</th>
+                    <th class="text-end">Costo totale</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var lavorazione in Model.Lavorazioni)
+                {
+                    <tr>
+                        <td>@lavorazione.Sequenza</td>
+                        <td>@lavorazione.DescrizioneLavorazione</td>
+                        <td class="text-end">@lavorazione.Quantita.ToString("N4")</td>
+                        <td class="text-end">@lavorazione.TempoTotaleMin.ToString("N2") min</td>
+                        <td class="text-end">@lavorazione.CostoTotale.ToString("C2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

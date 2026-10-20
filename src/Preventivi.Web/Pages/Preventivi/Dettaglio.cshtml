@@ -38,6 +38,18 @@
             </div>
 
             <div class="preventivi-actions">
+                <a asp-page="/Preventivi/Anteprima"
+                   asp-route-id="@Model.Preventivo.IdPreventivo"
+                   asp-route-tipo="cliente"
+                   class="pfw-btn pfw-btn-secondary">
+                    Anteprima cliente
+                </a>
+                <a asp-page="/Preventivi/Anteprima"
+                   asp-route-id="@Model.Preventivo.IdPreventivo"
+                   asp-route-tipo="interna"
+                   class="pfw-btn pfw-btn-secondary">
+                    Anteprima interna
+                </a>
                 <a asp-page="/Preventivi/Modifica"
                    asp-route-id="@Model.Preventivo.IdPreventivo"
                    class="pfw-btn pfw-btn-primary">

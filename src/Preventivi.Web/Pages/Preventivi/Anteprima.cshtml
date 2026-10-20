@@ -1,0 +1,165 @@
+@page
+@model Preventivi.AnteprimaModel
+
+@{
+    ViewData["Title"] = $"Anteprima {Model.TipoAnteprima} - Preventivo {Model.Preventivo!.NumeroCompleto}";
+}
+
+<div class="preventivo-preview @(Model.UsoInterno ? "preventivo-preview-interna" : "preventivo-preview-cliente")">
+    <div class="preventivo-preview-actions">
+        <a asp-page="/Preventivi/Dettaglio"
+           asp-route-id="@Model.Preventivo.IdPreventivo"
+           class="pfw-btn pfw-btn-secondary">
+            Torna al preventivo
+        </a>
+        <button type="button" class="pfw-btn pfw-btn-primary" onclick="window.print()">
+            Stampa
+        </button>
+    </div>
+
+    <header class="preventivo-preview-header">
+        <div>
+            <div class="preventivo-preview-kicker">
+                Preventivo @(Model.UsoInterno ? "- uso interno" : "")
+            </div>
+            <h1>@Model.Preventivo.NumeroCompleto</h1>
+            <div class="preventivo-preview-object">@Model.Preventivo.Oggetto</div>
+        </div>
+        <dl class="preventivo-preview-meta">
+            <div>
+                <dt>Data</dt>
+                <dd>@Model.Preventivo.DataPreventivo.ToString("dd/MM/yyyy")</dd>
+            </div>
+            <div>
+                <dt>Cliente</dt>
+                <dd>@Model.Preventivo.Cliente</dd>
+            </div>
+            <div>
+                <dt>Stato</dt>
+                <dd>@Model.Preventivo.Stato</dd>
+            </div>
+        </dl>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Preventivo.Note))
+    {
+        <section class="preventivo-preview-notes">
+            <h2>Note</h2>
+            <p>@Model.Preventivo.Note</p>
+        </section>
+    }
+
+    <section class="preventivo-preview-section">
+        <h2>Righe preventivo</h2>
+        <div class="preventivo-preview-table-wrap">
+            <table class="preventivo-preview-table">
+                <thead>
+                    <tr>
+                        <th>Riga</th>
+                        <th>Descrizione</th>
+                        <th class="text-end">Quantita</th>
+                        @if (Model.UsoInterno)
+                        {
+                            <th class="text-end">Costi</th>
+                        }
+                        <th class="text-end">Prezzo unitario</th>
+                        <th class="text-end">Totale vendita</th>
+                        @if (Model.UsoInterno)
+                        {
+                            <th class="text-end">Margine</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var voce in Model.Righe)
+                    {
+                        <tr>
+                            <td>@voce.Riga.RigaNr</td>
+                            <td>
+                                <strong>@voce.Riga.DescrizioneVoce</strong>
+                                @if (Model.UsoInterno)
+                                {
+                                    <div class="preventivo-preview-secondary">@voce.Riga.TipoRiga</div>
+                                }
+                            </td>
+                            <td class="text-end">@voce.Riga.Quantita.ToString("N2")</td>
+                            @if (Model.UsoInterno)
+                            {
+                                <td class="text-end">@voce.Riga.TotaleCosti.ToString("C2")</td>
+                            }
+                            <td class="text-end">@voce.Riga.PrezzoUnitarioVendita.ToString("C2")</td>
+                            <td class="text-end">@voce.Riga.TotaleVendita.ToString("C2")</td>
+                            @if (Model.UsoInterno)
+                            {
+                                <td class="text-end">@voce.Riga.MargineValore.ToString("C2")</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="@(Model.UsoInterno ? 5 : 4)" class="text-end">Totale preventivo</th>
+                        <th class="text-end">@Model.Preventivo.TotaleVendita.ToString("C2")</th>
+                        @if (Model.UsoInterno)
+                        {
+                            <th></th>
+                        }
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+
+    @if (Model.UsoInterno)
+    {
+        <section class="preventivo-preview-economics">
+            <div><span>Totale costi</span><strong>@Model.Preventivo.TotaleCosti.ToString("C2")</strong></div>
+            <div><span>Totale vendita</span><strong>@Model.Preventivo.TotaleVendita.ToString("C2")</strong></div>
+            <div><span>Margine</span><strong>@Model.Preventivo.MargineValore.ToString("C2")</strong></div>
+            <div><span>Margine %</span><strong>@Model.Preventivo.MarginePerc.ToString("N2") %</strong></div>
+        </section>
+
+        @foreach (var voce in Model.Righe)
+        {
+            <section class="preventivo-preview-section preventivo-preview-breakable">
+                <h2>Riga @voce.Riga.RigaNr - @voce.Riga.DescrizioneVoce</h2>
+
+                @if (voce.MaterialiComuni.Count > 0 || voce.LavorazioniComuni.Count > 0)
+                {
+                    <h3>Elementi comuni alla riga</h3>
+                    @await Html.PartialAsync("_AnteprimaElementiInterni", new global::Preventivi.Web.Pages.Preventivi.AnteprimaElementiInterniModel
+                    {
+                        Materiali = voce.MaterialiComuni,
+                        Lavorazioni = voce.LavorazioniComuni
+                    })
+                }
+
+                @foreach (var componente in voce.Componenti)
+                {
+                    <div class="preventivo-preview-component">
+                        <h3>
+                            @componente.Componente.DescrizioneNodo
+                            <span>Livello @componente.Componente.Livello</span>
+                        </h3>
+                        <div class="preventivo-preview-component-meta">
+                            Quantita base @componente.Componente.QuantitaBase.ToString("N4")
+                            · Quantita calcolata @componente.Componente.QuantitaCalcolata.ToString("N4")
+                        </div>
+                        @await Html.PartialAsync("_AnteprimaElementiInterni", new global::Preventivi.Web.Pages.Preventivi.AnteprimaElementiInterniModel
+                        {
+                            Materiali = componente.Materiali,
+                            Lavorazioni = componente.Lavorazioni
+                        })
+                    </div>
+                }
+
+                @if (voce.Componenti.Count == 0 &&
+                    voce.MaterialiComuni.Count == 0 &&
+                    voce.LavorazioniComuni.Count == 0)
+                {
+                    <div class="preventivo-preview-empty">Nessun dettaglio operativo per questa riga.</div>
+                }
+            </section>
+        }
+    }
+</div>
