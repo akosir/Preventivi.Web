@@ -32,6 +32,31 @@ public sealed class PreventivoRepository : IPreventivoRepository
             cancellationToken);
     }
 
+    public async Task AggiornaPreventivoAsync(
+        PreventivoUpdateModel preventivo,
+        CancellationToken cancellationToken = default)
+    {
+        var parameters = new[]
+        {
+            new SqlParameter("@IdPreventivo", preventivo.IdPreventivo),
+            new SqlParameter("@DataPreventivo", SqlDbType.Date)
+            {
+                Value = preventivo.DataPreventivo.ToDateTime(TimeOnly.MinValue)
+            },
+            NullableInt("@IdCliente", preventivo.IdCliente),
+            Text("@Oggetto", preventivo.Oggetto, 250),
+            NullableText("@Note", preventivo.Note),
+            Text("@Stato", preventivo.Stato, 30),
+            Decimal("@MarkupPercDefault", preventivo.MarkupPercDefault, 9, 2),
+            NullableInt("@IdRichiestaCliente", preventivo.IdRichiestaCliente)
+        };
+
+        await _db.ExecuteAsync(
+            "dbo.Preventivi_Aggiorna",
+            parameters,
+            cancellationToken);
+    }
+
     public async Task<IReadOnlyList<PreventivoRigaListItem>> GetRigheAsync(
         int idPreventivo,
         CancellationToken cancellationToken = default)
@@ -79,6 +104,29 @@ public sealed class PreventivoRepository : IPreventivoRepository
             cancellationToken);
     }
 
+    public async Task AggiornaRigaAsync(
+        PreventivoRigaUpdateModel riga,
+        CancellationToken cancellationToken = default)
+    {
+        var parameters = new[]
+        {
+            new SqlParameter("@IdRigaPreventivo", riga.IdRigaPreventivo),
+            new SqlParameter("@RigaNr", riga.RigaNr),
+            Text("@DescrizioneVoce", riga.DescrizioneVoce, 250),
+            Decimal("@Quantita", riga.Quantita, 18, 4),
+            Decimal("@PrezzoUnitarioVendita", riga.PrezzoUnitarioVendita, 18, 4),
+            NullableText("@Note", riga.Note),
+            Decimal("@MarkupPerc", riga.MarkupPerc, 9, 2),
+            new SqlParameter("@PrezzoManuale", SqlDbType.Bit) { Value = riga.PrezzoManuale },
+            NullableDecimal("@CostoUnitarioLibero", riga.CostoUnitarioLibero, 18, 4)
+        };
+
+        await _db.ExecuteAsync(
+            "dbo.Preventivi_Righe_Aggiorna",
+            parameters,
+            cancellationToken);
+    }
+
     public async Task EliminaRigaAsync(
         int idRigaPreventivo,
         CancellationToken cancellationToken = default)
@@ -115,6 +163,22 @@ public sealed class PreventivoRepository : IPreventivoRepository
             "dbo.Articoli_Dettaglio_Lookup",
             [new SqlParameter("@IdArticolo", idArticolo)],
             cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<ModelloCicloLookupItem>> GetModelliCicloAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<ModelloCicloLookupItem>(
+            "dbo.ModelliCiclo_Lookup",
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<FornitoreLookupItem>> GetFornitoriAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<FornitoreLookupItem>(
+            "dbo.Fornitori_Lookup",
+            cancellationToken: cancellationToken);
     }
 
     public async Task<IReadOnlyList<DistintaNodoLookupItem>> GetNodiDistintaAsync(
@@ -320,6 +384,24 @@ public sealed class PreventivoRepository : IPreventivoRepository
             cancellationToken);
     }
 
+    public async Task AggiornaComponenteAsync(
+        PreventivoRigaComponenteUpdateModel componente,
+        CancellationToken cancellationToken = default)
+    {
+        var parameters = new[]
+        {
+            new SqlParameter("@IdRigaCompPrev", componente.IdRigaCompPrev),
+            Text("@DescrizioneNodo", componente.DescrizioneNodo, 200),
+            Decimal("@QuantitaBase", componente.QuantitaBase, 18, 4),
+            new SqlParameter("@OrdineVisualizzazione", componente.OrdineVisualizzazione)
+        };
+
+        await _db.ExecuteAsync(
+            "dbo.Preventivi_Righe_Componenti_Aggiorna",
+            parameters,
+            cancellationToken);
+    }
+
     public async Task EliminaComponenteAsync(
         int idRigaCompPrev,
         CancellationToken cancellationToken = default)
@@ -375,6 +457,28 @@ public sealed class PreventivoRepository : IPreventivoRepository
 
         return await _db.ExecuteScalarAsync<int>(
             "dbo.Preventivi_Righe_Materiali_Crea",
+            parameters,
+            cancellationToken);
+    }
+
+    public async Task AggiornaMaterialeAsync(
+        PreventivoRigaMaterialeUpdateModel materiale,
+        CancellationToken cancellationToken = default)
+    {
+        var parameters = new[]
+        {
+            new SqlParameter("@IdRigaMatPrev", materiale.IdRigaMatPrev),
+            Text("@DescrizioneMateriale", materiale.DescrizioneMateriale, 200),
+            NullableShortText("@TipoMateriale", materiale.TipoMateriale, 30),
+            NullableShortText("@UM", materiale.UM, 10),
+            Decimal("@Quantita", materiale.Quantita, 18, 4),
+            Decimal("@CostoUnitario", materiale.CostoUnitario, 18, 4),
+            new SqlParameter("@DaAcquistare", SqlDbType.Bit) { Value = materiale.DaAcquistare },
+            NullableInt("@IdFornitoreSuggerito", materiale.IdFornitoreSuggerito)
+        };
+
+        await _db.ExecuteAsync(
+            "dbo.Preventivi_Righe_Materiali_Aggiorna",
             parameters,
             cancellationToken);
     }
@@ -436,6 +540,30 @@ public sealed class PreventivoRepository : IPreventivoRepository
 
         return await _db.ExecuteScalarAsync<int>(
             "dbo.Preventivi_Righe_Lavorazioni_Crea",
+            parameters,
+            cancellationToken);
+    }
+
+    public async Task AggiornaLavorazioneAsync(
+        PreventivoRigaLavorazioneUpdateModel lavorazione,
+        CancellationToken cancellationToken = default)
+    {
+        var parameters = new[]
+        {
+            new SqlParameter("@IdRigaLavPrev", lavorazione.IdRigaLavPrev),
+            Text("@DescrizioneLavorazione", lavorazione.DescrizioneLavorazione, 150),
+            new SqlParameter("@Sequenza", lavorazione.Sequenza),
+            Decimal("@TempoSetupMin", lavorazione.TempoSetupMin, 18, 2),
+            Decimal("@TempoPezzoMin", lavorazione.TempoPezzoMin, 18, 4),
+            Decimal("@Quantita", lavorazione.Quantita, 18, 4),
+            Decimal("@CostoOrario", lavorazione.CostoOrario, 18, 4),
+            Decimal("@CostoFisso", lavorazione.CostoFisso, 18, 4),
+            new SqlParameter("@DaAcquistareEsterno", SqlDbType.Bit) { Value = lavorazione.DaAcquistareEsterno },
+            NullableInt("@IdFornitoreSuggerito", lavorazione.IdFornitoreSuggerito)
+        };
+
+        await _db.ExecuteAsync(
+            "dbo.Preventivi_Righe_Lavorazioni_Aggiorna",
             parameters,
             cancellationToken);
     }

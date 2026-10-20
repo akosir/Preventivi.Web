@@ -22,6 +22,12 @@ public class NuovoModel : PageModel
     public IReadOnlyList<TipoRigaPreventivoItem> TipiRiga { get; private set; }
         = Array.Empty<TipoRigaPreventivoItem>();
 
+    public IReadOnlyList<ArticoloLookupItem> Articoli { get; private set; }
+        = Array.Empty<ArticoloLookupItem>();
+
+    public IReadOnlyList<ModelloCicloLookupItem> ModelliCiclo { get; private set; }
+        = Array.Empty<ModelloCicloLookupItem>();
+
     public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         if (IdPreventivo <= 0)
@@ -40,6 +46,7 @@ public class NuovoModel : PageModel
         }
 
         await CaricaTipiAsync(cancellationToken);
+        await CaricaLookupAsync(cancellationToken);
 
         Riga = new PreventivoRigaCreateModel
         {
@@ -62,6 +69,7 @@ public class NuovoModel : PageModel
         Riga.IdPreventivo = IdPreventivo;
 
         await CaricaTipiAsync(cancellationToken);
+        await CaricaLookupAsync(cancellationToken);
 
         var tipoRiga =
             TipiRiga.FirstOrDefault(
@@ -129,5 +137,14 @@ public class NuovoModel : PageModel
     {
         TipiRiga =
             await _preventivoRepository.GetTipiRigaAsync(cancellationToken);
+    }
+
+    private async Task CaricaLookupAsync(CancellationToken cancellationToken)
+    {
+        Articoli = await _preventivoRepository.CercaArticoliAsync(
+            null,
+            cancellationToken);
+        ModelliCiclo = await _preventivoRepository.GetModelliCicloAsync(
+            cancellationToken);
     }
 }

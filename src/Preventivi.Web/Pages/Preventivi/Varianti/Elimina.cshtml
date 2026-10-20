@@ -19,6 +19,8 @@
         <input type="hidden" asp-for="IdPreventivo" />
         <input type="hidden" asp-for="IdVariantePreventivo" />
 
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
         <p>
             Vuoi eliminare la variante
             <strong>@Model.Variante!.CodiceVariante - @Model.Variante.DescrizioneVariante</strong>?

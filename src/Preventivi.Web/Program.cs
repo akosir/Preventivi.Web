@@ -1,9 +1,12 @@
 
+using System.Globalization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Preventivi.Core.Allegati.Storage;
 using Preventivi.Core.ParametriSistema;
 using Preventivi.Core.Preventivi;
+using Preventivi.Core.Preventivi.Eliminazione;
 using Preventivi.Core.Sicurezza;
 using Preventivi.Data.Allegati;
 using Preventivi.Data.Comune;
@@ -11,12 +14,30 @@ using Preventivi.Data.ParametriSistema;
 using Preventivi.Data.Preventivi;
 using Preventivi.Data.Sicurezza;
 using Preventivi.Web.Sicurezza;
+using Preventivi.Web.UI.ModelBinding;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages(options =>
-    AutorizzazioneApplicazione.ConfiguraPagine(options));
+builder.Services
+    .AddRazorPages(options =>
+        AutorizzazioneApplicazione.ConfiguraPagine(options))
+    .AddMvcOptions(options =>
+    {
+        options.ModelBinderProviders.Insert(
+            0,
+            new FlexibleDecimalModelBinderProvider());
+        options.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(
+            _ => "Inserire un numero valido.");
+    });
+
+var culturaItaliana = CultureInfo.GetCultureInfo("it-IT");
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture(culturaItaliana);
+    options.SupportedCultures = [culturaItaliana];
+    options.SupportedUICultures = [culturaItaliana];
+});
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -45,6 +66,14 @@ builder.Services.AddScoped<DatabaseExecutor>();
 builder.Services.AddScoped<
     IPreventivoRepository,
     PreventivoRepository>();
+
+builder.Services.AddScoped<
+    IPreventivoEliminazioneRepository,
+    PreventivoEliminazioneRepository>();
+
+builder.Services.AddScoped<
+    IPreventivoEliminazioneService,
+    PreventivoEliminazioneService>();
 
 builder.Services.AddScoped<
     global::Preventivi.Core.Clienti.IClienteRepository,
@@ -92,6 +121,8 @@ if (args.Contains(
 }
 
 // Configure the HTTP request pipeline.
+app.UseRequestLocalization();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");

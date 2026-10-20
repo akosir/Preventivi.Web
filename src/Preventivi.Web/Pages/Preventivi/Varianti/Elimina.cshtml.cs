@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Data.SqlClient;
 using Preventivi.Core.Preventivi;
 
 namespace Preventivi.Web.Pages.Preventivi.Varianti;
@@ -40,9 +41,28 @@ public class EliminaModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await _preventivoRepository.EliminaVarianteAsync(
+        Variante = await _preventivoRepository.GetVarianteAsync(
             IdVariantePreventivo,
             cancellationToken);
+
+        if (Variante is null || Variante.IdPreventivo != IdPreventivo)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            await _preventivoRepository.EliminaVarianteAsync(
+                IdVariantePreventivo,
+                cancellationToken);
+        }
+        catch (SqlException exception) when (exception.Number == 1934)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "La configurazione database delle varianti non è aggiornata. Applicare lo script di correzione TEC-009.");
+            return Page();
+        }
 
         return RedirectToPage(
             "/Preventivi/Dettaglio",

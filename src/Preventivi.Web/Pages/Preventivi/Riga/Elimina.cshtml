@@ -22,6 +22,8 @@
         <input type="hidden" asp-for="IdPreventivo" />
         <input type="hidden" asp-for="IdRigaPreventivo" />
 
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
         <p>
             Vuoi eliminare la riga
             <strong>@Model.Riga!.RigaNr - @Model.Riga.DescrizioneVoce</strong>?

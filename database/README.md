@@ -51,6 +51,18 @@ la baseline TEC-002, che incorpora gia lo stato risultante al 16 ottobre
 La baseline non contiene `USE` e non crea il database: la destinazione resta
 una scelta esplicita dell'operatore.
 
+## Gestione modifiche Preventivi MB-02
+
+Per abilitare le pagine di modifica di preventivo, riga, componente,
+materiale e lavorazione su un database esistente, eseguire:
+
+1. `06_Aggiornamenti/MB-02_01_Procedure_Aggiornamento_Preventivi.sql`.
+
+Lo script aggiunge i lookup di modelli ciclo e fornitori, le procedure di
+aggiornamento e il ricalcolo delle quantita gerarchiche dei componenti. Non
+contiene `USE` e deve essere eseguito scegliendo esplicitamente il database
+di destinazione.
+
 ## Sicurezza applicativa TEC-005
 
 Per attivare l'autenticazione su un database esistente eseguire, dopo la
@@ -68,3 +80,25 @@ non deve essere eseguito senza una variabile `PreventiviWebPassword` fornita
 dall'operatore. La rotazione della precedente credenziale SQL resta
 un'operazione amministrativa separata e coordinata con gli altri eventuali
 utilizzatori dell'account.
+
+## Eliminazioni coordinate TEC-007
+
+Per attivare le eliminazioni coordinate di righe, componenti, materiali,
+lavorazioni e relativi allegati su un database esistente, dopo TEC-001 e
+TEC-009 eseguire:
+
+1. `06_Aggiornamenti/TEC-007_01_Eliminazioni_Gerarchia_Allegati.sql`.
+
+Lo script crea il tipo tabellare usato per il controllo concorrente e le
+procedure di preparazione e conferma dell'eliminazione. Non contiene `USE` e
+deve essere eseguito scegliendo esplicitamente il database di destinazione.
+
+## Correzione procedure varianti TEC-009
+
+Sui database che hanno gia ricevuto TEC-009, applicare:
+
+1. `06_Aggiornamenti/TEC-009_08_Correzione_QuotedIdentifier_Varianti.sql`.
+
+Lo script ricrea le procedure di creazione, selezione ed eliminazione delle
+varianti con `QUOTED_IDENTIFIER ON`, richiesto dall'indice filtrato che
+garantisce una sola variante attiva selezionata per preventivo.

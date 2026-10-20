@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Allegati;
-using Preventivi.Web.UI.Modules.Allegati;
+using Preventivi.Core.Allegati.Application;
 using Preventivi.Core.Allegati.Storage;
-using Preventivi.Data.Allegati;
 using Preventivi.Web.Sicurezza;
+using Preventivi.Web.UI.Modules.Allegati;
 
 
 namespace Preventivi.Web.Pages.Allegati;
@@ -12,16 +12,16 @@ namespace Preventivi.Web.Pages.Allegati;
 public class NuovoModel : PageModel
 {
     private readonly IAllegatoRepository _allegatoRepository;
-    private readonly IAllegatoStorageService _storageService;
+    private readonly IAllegatoApplicationService _applicationService;
     private readonly ILogger<NuovoModel> _logger;
 
     public NuovoModel(
         IAllegatoRepository allegatoRepository,
-        IAllegatoStorageService storageService,
+        IAllegatoApplicationService applicationService,
         ILogger<NuovoModel> logger)
     {
         _allegatoRepository = allegatoRepository;
-        _storageService = storageService;
+        _applicationService = applicationService;
         _logger = logger;
     }
 
@@ -115,53 +115,34 @@ public class NuovoModel : PageModel
                 Path.GetTempPath(),
                 $"{Guid.NewGuid():D}{Path.GetExtension(nomeFileOriginale)}");
 
-        await using (var stream =
-            new FileStream(
+        try
+        {
+            await using (var stream = new FileStream(
                 fileTemporaneo,
                 FileMode.Create,
                 FileAccess.Write,
                 FileShare.None,
                 81920,
                 useAsync: true))
-        {
-            await Form.File.CopyToAsync(
-                stream,
-                cancellationToken);
-        }
-
-        StorageSaveResult storageResult;
-
-        try
-        {
-            storageResult =
-                await _storageService.SalvaAsync(
-                    new StorageSaveRequest
-                    {
-                        Entita = Entita,
-                        IdEntita = IdEntita,
-                        FileOrigine = fileTemporaneo,
-                        NomeFileOriginale = nomeFileOriginale
-                    },
-                    cancellationToken);
-
-            var nuovoAllegato = new AllegatoCreateModel
             {
-                Entita = Entita,
-                IdEntita = IdEntita,
-                TipoAllegato = Form.TipoAllegato,
-                Descrizione = Form.Descrizione,
-                NomeFileOriginale = storageResult.NomeFileOriginale,
-                PercorsoFile = storageResult.PercorsoRelativo,
-                Estensione = storageResult.Estensione,
-                DataAllegato = DateOnly.FromDateTime(DateTime.Today),
-                UtenteInserimento = User.Identity?.Name ?? "Sistema",
-                Note = Form.Note,
-                NomeFileArchiviato = storageResult.NomeFileArchiviato,
-                DimensioneFile = storageResult.DimensioneFile
-            };
+                await Form.File.CopyToAsync(
+                    stream,
+                    cancellationToken);
+            }
 
-            await _allegatoRepository.CreaAsync(
-                nuovoAllegato,
+            await _applicationService.CreaAsync(
+                new AllegatoUploadRequest
+                {
+                    Entita = Entita,
+                    IdEntita = IdEntita,
+                    TipoAllegato = Form.TipoAllegato,
+                    Descrizione = Form.Descrizione,
+                    FileTemporaneo = fileTemporaneo,
+                    NomeFileOriginale = nomeFileOriginale,
+                    DataAllegato = DateOnly.FromDateTime(DateTime.Today),
+                    UtenteInserimento = User.Identity?.Name ?? "Sistema",
+                    Note = Form.Note
+                },
                 cancellationToken);
 
             TempData["MessaggioSuccesso"] =
@@ -194,7 +175,11 @@ public class NuovoModel : PageModel
 
             return RedirectToPage();
         }
-        catch (AllegatoStorageException exception)
+        catch (Exception exception) when (
+            exception is AllegatoStorageException or
+                AllegatoApplicationException or
+                IOException or
+                UnauthorizedAccessException)
         {
             _logger.LogError(
                 exception,
@@ -213,9 +198,17 @@ public class NuovoModel : PageModel
         }
         finally
         {
-            if (System.IO.File.Exists(fileTemporaneo))
+            try
             {
                 System.IO.File.Delete(fileTemporaneo);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(
+                    exception,
+                    "Pulizia del file temporaneo fallita durante l'upload di un allegato per {Entita} {IdEntita}.",
+                    Entita,
+                    IdEntita);
             }
         }
 

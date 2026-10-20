@@ -170,7 +170,13 @@
                         </div>
                         <div class="col-12 col-md-3">
                             <label asp-for="NuovaLavorazione.IdFornitoreSuggerito" class="form-label"></label>
-                            <input asp-for="NuovaLavorazione.IdFornitoreSuggerito" class="form-control text-end" />
+                            <select asp-for="NuovaLavorazione.IdFornitoreSuggerito" class="form-select">
+                                <option value="">Nessun fornitore</option>
+                                @foreach (var fornitore in Model.Fornitori)
+                                {
+                                    <option value="@fornitore.IdFornitore">@fornitore.Display</option>
+                                }
+                            </select>
                         </div>
                         <div class="col-12 col-md-4 d-flex align-items-end">
                             <div class="form-check">
@@ -235,6 +241,15 @@
                         int.Parse(idRigaPreventivo),
                         int.Parse(idComponente),
                         Model.Lavorazione.IdRigaLavPrev);
+
+                    <div class="preventivi-form-actions">
+                        <a class="pfw-btn pfw-btn-primary" asp-page="/Preventivi/Riga/LavorazioneModifica"
+                           asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+                           asp-route-idComponente="@idComponente" asp-route-id="@Model.Lavorazione.IdRigaLavPrev">Modifica</a>
+                        <a class="pfw-btn pfw-btn-danger" asp-page="/Preventivi/Riga/Lavorazioni" asp-route-modo="elimina"
+                           asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+                           asp-route-idComponente="@idComponente" asp-route-id="@Model.Lavorazione.IdRigaLavPrev">Elimina</a>
+                    </div>
 
                     <section class="pfw-panel mt-4">
                         <div class="pfw-panel-header">

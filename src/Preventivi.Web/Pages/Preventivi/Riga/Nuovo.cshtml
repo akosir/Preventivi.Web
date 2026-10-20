@@ -45,12 +45,24 @@
 
             <div class="col-12 col-md-3">
                 <label class="form-label" asp-for="Riga.IdArticolo">Articolo</label>
-                <input class="form-control text-end" asp-for="Riga.IdArticolo" />
+                <select class="form-select" asp-for="Riga.IdArticolo">
+                    <option value="">Nessun articolo</option>
+                    @foreach (var articolo in Model.Articoli)
+                    {
+                        <option value="@articolo.IdArticolo">@articolo.Display</option>
+                    }
+                </select>
             </div>
 
             <div class="col-12 col-md-3">
                 <label class="form-label" asp-for="Riga.IdModelloCiclo">Modello ciclo</label>
-                <input class="form-control text-end" asp-for="Riga.IdModelloCiclo" />
+                <select class="form-select" asp-for="Riga.IdModelloCiclo">
+                    <option value="">Nessun modello ciclo</option>
+                    @foreach (var modello in Model.ModelliCiclo)
+                    {
+                        <option value="@modello.IdModelloCiclo">@modello.Display</option>
+                    }
+                </select>
             </div>
 
             <div class="col-12 pfw-field-required">

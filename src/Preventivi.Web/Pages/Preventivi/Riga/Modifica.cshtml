@@ -1,0 +1,98 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.ModificaModel
+
+@{
+    var preventivo = Model.Preventivo!;
+    var rigaCorrente = Model.RigaCorrente!;
+    ViewData["Title"] = $"Modifica riga {rigaCorrente.RigaNr}";
+}
+
+<div class="workspace-page preventivi-page preventivo-workspace">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Preventivi/Dettaglio" asp-route-id="@preventivo.IdPreventivo">
+                @preventivo.NumeroCompleto
+            </a>
+            <span>/</span>
+            <a asp-page="/Preventivi/Riga/Workspace"
+               asp-route-idPreventivo="@preventivo.IdPreventivo"
+               asp-route-idRigaPreventivo="@rigaCorrente.IdRigaPreventivo">
+                Riga @rigaCorrente.RigaNr
+            </a>
+            <span>/</span>
+            <span>Modifica</span>
+        </div>
+        <h1 class="workspace-title">Modifica riga preventivo</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati riga</h2>
+                <div class="pfw-panel-subtitle">Tipo e origine restano invariati</div>
+            </div>
+        </div>
+
+        <form method="post" class="p-3">
+            <input type="hidden" asp-for="Riga.IdRigaPreventivo" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="row g-3">
+                <div class="col-12 col-md-2 pfw-field-required">
+                    <label asp-for="Riga.RigaNr" class="form-label">Numero riga</label>
+                    <input asp-for="Riga.RigaNr" class="form-control text-end" />
+                    <span asp-validation-for="Riga.RigaNr" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Tipo riga</label>
+                    <input class="form-control" value="@rigaCorrente.TipoRiga" readonly />
+                </div>
+                <div class="col-12 pfw-field-required">
+                    <label asp-for="Riga.DescrizioneVoce" class="form-label">Descrizione</label>
+                    <textarea asp-for="Riga.DescrizioneVoce" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Riga.DescrizioneVoce" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-3 pfw-field-required">
+                    <label asp-for="Riga.Quantita" class="form-label">Quantita</label>
+                    <input asp-for="Riga.Quantita" class="form-control text-end" />
+                    <span asp-validation-for="Riga.Quantita" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label asp-for="Riga.PrezzoUnitarioVendita" class="form-label">Prezzo unitario vendita</label>
+                    <input asp-for="Riga.PrezzoUnitarioVendita" class="form-control text-end" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label asp-for="Riga.MarkupPerc" class="form-label">Markup %</label>
+                    <input asp-for="Riga.MarkupPerc" class="form-control text-end" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label asp-for="Riga.CostoUnitarioLibero" class="form-label">Costo unitario libero</label>
+                    <input asp-for="Riga.CostoUnitarioLibero" class="form-control text-end"
+                           readonly="@(!rigaCorrente.CostoUnitarioLibero.HasValue)" />
+                    <span asp-validation-for="Riga.CostoUnitarioLibero" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="Riga.PrezzoManuale" class="form-check-input" />
+                        <label asp-for="Riga.PrezzoManuale" class="form-check-label">Prezzo manuale</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Riga.Note" class="form-label">Note</label>
+                    <textarea asp-for="Riga.Note" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="preventivi-form-actions">
+                <a asp-page="/Preventivi/Riga/Workspace"
+                   asp-route-idPreventivo="@preventivo.IdPreventivo"
+                   asp-route-idRigaPreventivo="@rigaCorrente.IdRigaPreventivo"
+                   class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

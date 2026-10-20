@@ -36,6 +36,32 @@ public sealed class AllegatoStorageServiceTests
         Assert.True(File.Exists(percorsoSalvato));
     }
 
+    [Fact]
+    public async Task SalvaAsync_Annullata_NonLasciaFileParziali()
+    {
+        using var ambiente = new AmbienteStorage();
+        var origine = ambiente.CreaFileOrigine(new string('x', 200000));
+        var servizio = ambiente.CreaServizio(ambiente.Root);
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            servizio.SalvaAsync(
+                new StorageSaveRequest
+                {
+                    Entita = AllegatoEntita.Preventivi,
+                    IdEntita = 42,
+                    FileOrigine = origine,
+                    NomeFileOriginale = "prova.txt"
+                },
+                cancellation.Token));
+
+        Assert.Empty(Directory.EnumerateFiles(
+            ambiente.Root,
+            "*",
+            SearchOption.AllDirectories));
+    }
+
     [Theory]
     [InlineData("preventivi")]
     [InlineData("Preventivi/../Altro")]
@@ -109,6 +135,50 @@ public sealed class AllegatoStorageServiceTests
             servizio.EliminaAsync("..", "esterno.txt"));
 
         Assert.True(File.Exists(fileEsterno));
+    }
+
+    [Fact]
+    public async Task Quarantena_SpostaERipristinaIlFile()
+    {
+        using var ambiente = new AmbienteStorage();
+        var servizio = ambiente.CreaServizio(ambiente.Root);
+        var percorsoRelativo = Path.Combine("Preventivi", "2026", "1");
+        var cartella = Path.Combine(ambiente.Root, percorsoRelativo);
+        Directory.CreateDirectory(cartella);
+        var percorsoOriginale = Path.Combine(cartella, "archivio.txt");
+        await File.WriteAllTextAsync(percorsoOriginale, "contenuto");
+
+        var quarantena = await servizio.SpostaInQuarantenaAsync(
+            percorsoRelativo,
+            "archivio.txt");
+
+        Assert.NotNull(quarantena);
+        Assert.False(File.Exists(percorsoOriginale));
+
+        await servizio.RipristinaDaQuarantenaAsync(quarantena!);
+
+        Assert.True(File.Exists(percorsoOriginale));
+    }
+
+    [Fact]
+    public async Task Quarantena_DopoConfermaEliminaDefinitivamenteIlFile()
+    {
+        using var ambiente = new AmbienteStorage();
+        var servizio = ambiente.CreaServizio(ambiente.Root);
+        var percorsoRelativo = Path.Combine("Preventivi", "2026", "1");
+        var cartella = Path.Combine(ambiente.Root, percorsoRelativo);
+        Directory.CreateDirectory(cartella);
+        await File.WriteAllTextAsync(
+            Path.Combine(cartella, "archivio.txt"),
+            "contenuto");
+
+        var quarantena = await servizio.SpostaInQuarantenaAsync(
+            percorsoRelativo,
+            "archivio.txt");
+        await servizio.EliminaDaQuarantenaAsync(quarantena!);
+
+        Assert.Empty(Directory.EnumerateFiles(
+            Path.Combine(ambiente.Root, ".quarantena")));
     }
 
     [Theory]

@@ -660,6 +660,106 @@ soltanto preparati nel repository: non sono stati applicati al database. La
 password amministrativa non e stata inizializzata, l'account SQL dedicato non
 e stato creato e la precedente credenziale SQL non e stata ruotata.
 
+### 5.12 Decisioni TEC-006 — Compensazione fra storage e database
+
+**Classificazione:** [D].
+
+**Stato:** approvate.
+
+**Data di approvazione:** 19 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work dedicata
+a TEC-006.
+
+Le decisioni approvate sono:
+
+- **193:** creazione e cancellazione degli allegati sono coordinate
+  dall'Application Service;
+- **194:** la creazione del file temporaneo e compresa nel blocco di pulizia;
+- **195:** se l'inserimento SQL fallisce, il file gia archiviato viene
+  eliminato come compensazione;
+- **196:** durante l'eliminazione il file viene prima spostato in una cartella
+  di quarantena interna alla root, quindi il record SQL viene eliminato e il
+  file viene cancellato definitivamente;
+- **197:** se l'eliminazione SQL fallisce, il file viene ripristinato dalla
+  quarantena;
+- **198:** i fallimenti delle compensazioni sono registrati come critici senza
+  esporre percorsi fisici nell'interfaccia;
+- **199:** i passaggi intermedi e i relativi errori sono verificati mediante
+  test automatici con fallimenti simulati.
+
+**Riscontri [C] al 19 ottobre 2026**
+
+L'Application Service coordina upload, repository e quarantena. Lo storage
+rimuove i file parziali in caso di copia non completata; dopo la prima modifica
+al filesystem, completamento e compensazioni non dipendono piu
+dall'annullamento della richiesta HTTP. La UI mantiene messaggi funzionali e
+non espone i percorsi dello storage.
+
+La suite completa ha superato 23 test Data e 18 test Web. Non sono state
+necessarie modifiche al database. TEC-007 resta distinta e disciplina le
+future cancellazioni degli allegati collegate alla gerarchia del preventivo.
+
+### 5.13 Decisioni TEC-007 — Cancellazioni della gerarchia e allegati
+
+**Classificazione:** [D].
+
+**Stato:** approvate.
+
+**Data di approvazione:** 20 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work dedicata
+a TEC-007.
+
+Le decisioni approvate sono:
+
+- **200:** eliminare fisicamente gli allegati quando viene eliminata
+  fisicamente l'entita proprietaria;
+- **201:** eliminando un materiale o una lavorazione vengono eliminati i
+  rispettivi allegati;
+- **202:** eliminando un componente foglia vengono eliminati i suoi allegati
+  e quelli dei suoi materiali e lavorazioni;
+- **203:** un componente con figli non viene eliminato; l'utente deve prima
+  rimuovere i figli, mantenendo la protezione attuale;
+- **204:** eliminando una riga vengono eliminati gli allegati di tutti i
+  componenti, materiali e lavorazioni contenuti;
+- **205:** la disattivazione di una variante conserva righe e allegati;
+- **206:** i file interessati vengono spostati insieme in quarantena; una
+  sola transazione SQL elimina record `Allegati`, entita e ricalcola i
+  totali;
+- **207:** se la transazione SQL fallisce, tutti i file vengono ripristinati;
+  se anche un solo file non puo essere messo in quarantena, l'operazione
+  viene annullata prima di modificare il database;
+- **208:** un file gia mancante non blocca la pulizia del relativo record SQL
+  e l'anomalia viene registrata; un fallimento della pulizia finale della
+  quarantena viene registrato come critico;
+- **209:** la transazione verifica che l'elenco degli allegati non sia
+  cambiato nel frattempo e, in caso di modifica concorrente, annulla la
+  cancellazione;
+- **210:** il comportamento viene coperto da test automatici per successo,
+  rollback, file mancante, errore storage e modifica concorrente.
+
+**Riscontri [C] al 20 ottobre 2026**
+
+TEC-006 fornisce la quarantena e la compensazione per il singolo allegato.
+Nel repository sono stati predisposti il coordinamento applicativo dei gruppi
+di file, le eliminazioni di riga, componente, materiale e lavorazione, il
+controllo concorrente dell'elenco allegati e lo script SQL transazionale
+`TEC-007_01_Eliminazioni_Gerarchia_Allegati.sql`.
+
+La compilazione della soluzione e completata con zero errori; risultano
+superati 28 test Data e 26 test Web, inclusi i casi TEC-007 di successo,
+rollback SQL, file mancante, errore storage e modifica concorrente.
+
+Il 20 ottobre 2026 l'utente ha confermato l'applicazione senza errori dello
+script al database di test e l'esito positivo delle prove runtime relative a:
+eliminazione di materiale con allegato, lavorazione con allegato, componente
+foglia con contenuti e allegati, rifiuto dell'eliminazione di un componente
+con figli ed eliminazione completa di una riga strutturata con aggiornamento
+dei totali. Le prove runtime attestano il percorso funzionale ordinario; i
+casi di errore e concorrenza restano coperti dai test automatici e non da
+simulazioni manuali sul database.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]
@@ -690,7 +790,6 @@ Restano proposte, fra le altre:
 - associazione univoca dei materiali e delle lavorazioni al componente;
 - regole complete di ricalcolo e propagazione dei totali;
 - comportamento delle varianti;
-- coordinamento delle cancellazioni e degli allegati;
 - gestione dei fallimenti fra filesystem e SQL Server;
 - conversione tipizzata dei parametri;
 - strategia di test e verifica;

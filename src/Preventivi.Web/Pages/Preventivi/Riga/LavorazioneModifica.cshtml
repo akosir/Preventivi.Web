@@ -1,0 +1,63 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.LavorazioneModificaModel
+@{
+    ViewData["Title"] = "Modifica lavorazione";
+    var idPreventivo = Request.Query["idPreventivo"].ToString();
+    var idRigaPreventivo = Request.Query["idRigaPreventivo"].ToString();
+    var idComponente = Request.Query["idComponente"].ToString();
+}
+
+<div class="workspace-page preventivi-page preventivo-workspace">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Preventivi/Riga/Lavorazioni" asp-route-modo="dettaglio"
+               asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+               asp-route-idComponente="@idComponente" asp-route-id="@Model.Lavorazione!.IdRigaLavPrev">Lavorazione</a>
+            <span>/</span><span>Modifica</span>
+        </div>
+        <h1 class="workspace-title">Modifica lavorazione</h1>
+    </div>
+    <section class="pfw-panel">
+        <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati lavorazione</h2>
+            <div class="pfw-panel-subtitle">Origine e associazione al componente restano invariate</div></div></div>
+        <form method="post" class="p-3">
+            <input type="hidden" asp-for="Dati.IdRigaLavPrev" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="row g-3">
+                <div class="col-12 pfw-field-required"><label asp-for="Dati.DescrizioneLavorazione" class="form-label">Descrizione</label>
+                    <input asp-for="Dati.DescrizioneLavorazione" class="form-control" />
+                    <span asp-validation-for="Dati.DescrizioneLavorazione" class="text-danger"></span></div>
+                <div class="col-12 col-md-2"><label asp-for="Dati.Sequenza" class="form-label">Sequenza</label>
+                    <input asp-for="Dati.Sequenza" class="form-control text-end" /></div>
+                <div class="col-12 col-md-2"><label asp-for="Dati.TempoSetupMin" class="form-label">Tempo setup</label>
+                    <input asp-for="Dati.TempoSetupMin" class="form-control text-end" /></div>
+                <div class="col-12 col-md-2"><label asp-for="Dati.TempoPezzoMin" class="form-label">Tempo pezzo</label>
+                    <input asp-for="Dati.TempoPezzoMin" class="form-control text-end" /></div>
+                <div class="col-12 col-md-2"><label asp-for="Dati.Quantita" class="form-label">Quantita</label>
+                    <input asp-for="Dati.Quantita" class="form-control text-end" /></div>
+                <div class="col-12 col-md-2"><label asp-for="Dati.CostoOrario" class="form-label">Costo orario</label>
+                    <input asp-for="Dati.CostoOrario" class="form-control text-end" /></div>
+                <div class="col-12 col-md-2"><label asp-for="Dati.CostoFisso" class="form-label">Costo fisso</label>
+                    <input asp-for="Dati.CostoFisso" class="form-control text-end" /></div>
+                <div class="col-12 col-md-6"><label asp-for="Dati.IdFornitoreSuggerito" class="form-label">Fornitore suggerito</label>
+                    <select asp-for="Dati.IdFornitoreSuggerito" class="form-select">
+                        <option value="">Nessun fornitore</option>
+                        @foreach (var fornitore in Model.Fornitori)
+                        { <option value="@fornitore.IdFornitore">@fornitore.Display</option> }
+                    </select></div>
+                <div class="col-12 col-md-4 d-flex align-items-end"><div class="form-check">
+                    <input asp-for="Dati.DaAcquistareEsterno" class="form-check-input" />
+                    <label asp-for="Dati.DaAcquistareEsterno" class="form-check-label">Lavorazione esterna</label>
+                </div></div>
+            </div>
+            <div class="preventivi-form-actions">
+                <a asp-page="/Preventivi/Riga/Lavorazioni" asp-route-modo="dettaglio"
+                   asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+                   asp-route-idComponente="@idComponente" asp-route-id="@Model.Lavorazione.IdRigaLavPrev"
+                   class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

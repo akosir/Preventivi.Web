@@ -1,0 +1,61 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.MaterialeModificaModel
+@{
+    ViewData["Title"] = "Modifica materiale";
+    var idPreventivo = Request.Query["idPreventivo"].ToString();
+    var idRigaPreventivo = Request.Query["idRigaPreventivo"].ToString();
+    var idComponente = Request.Query["idComponente"].ToString();
+}
+
+<div class="workspace-page preventivi-page preventivo-workspace">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Preventivi/Riga/Materiali" asp-route-modo="dettaglio"
+               asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+               asp-route-idComponente="@idComponente" asp-route-id="@Model.Materiale!.IdRigaMatPrev">Materiale</a>
+            <span>/</span><span>Modifica</span>
+        </div>
+        <h1 class="workspace-title">Modifica materiale</h1>
+    </div>
+    <section class="pfw-panel">
+        <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati materiale</h2>
+            <div class="pfw-panel-subtitle">Origine e associazione al componente restano invariate</div></div></div>
+        <form method="post" class="p-3">
+            <input type="hidden" asp-for="Dati.IdRigaMatPrev" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="row g-3">
+                <div class="col-12 pfw-field-required"><label asp-for="Dati.DescrizioneMateriale" class="form-label">Descrizione</label>
+                    <input asp-for="Dati.DescrizioneMateriale" class="form-control" />
+                    <span asp-validation-for="Dati.DescrizioneMateriale" class="text-danger"></span></div>
+                <div class="col-12 col-md-4"><label asp-for="Dati.TipoMateriale" class="form-label">Tipo materiale</label>
+                    <input asp-for="Dati.TipoMateriale" class="form-control" /></div>
+                <div class="col-12 col-md-2"><label asp-for="Dati.UM" class="form-label">Unita di misura</label>
+                    <input asp-for="Dati.UM" class="form-control" /></div>
+                <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Dati.Quantita" class="form-label">Quantita</label>
+                    <input asp-for="Dati.Quantita" class="form-control text-end" />
+                    <span asp-validation-for="Dati.Quantita" class="text-danger"></span></div>
+                <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Dati.CostoUnitario" class="form-label">Costo unitario</label>
+                    <input asp-for="Dati.CostoUnitario" class="form-control text-end" />
+                    <span asp-validation-for="Dati.CostoUnitario" class="text-danger"></span></div>
+                <div class="col-12 col-md-6"><label asp-for="Dati.IdFornitoreSuggerito" class="form-label">Fornitore suggerito</label>
+                    <select asp-for="Dati.IdFornitoreSuggerito" class="form-select">
+                        <option value="">Nessun fornitore</option>
+                        @foreach (var fornitore in Model.Fornitori)
+                        { <option value="@fornitore.IdFornitore">@fornitore.Display</option> }
+                    </select></div>
+                <div class="col-12 col-md-4 d-flex align-items-end"><div class="form-check">
+                    <input asp-for="Dati.DaAcquistare" class="form-check-input" />
+                    <label asp-for="Dati.DaAcquistare" class="form-check-label">Da acquistare</label>
+                </div></div>
+            </div>
+            <div class="preventivi-form-actions">
+                <a asp-page="/Preventivi/Riga/Materiali" asp-route-modo="dettaglio"
+                   asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+                   asp-route-idComponente="@idComponente" asp-route-id="@Model.Materiale.IdRigaMatPrev"
+                   class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

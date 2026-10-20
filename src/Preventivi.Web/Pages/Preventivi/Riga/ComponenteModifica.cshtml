@@ -1,0 +1,55 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.ComponenteModificaModel
+
+@{
+    ViewData["Title"] = "Modifica componente";
+    var idPreventivo = Request.Query["idPreventivo"].ToString();
+    var idRigaPreventivo = Request.Query["idRigaPreventivo"].ToString();
+}
+
+<div class="workspace-page preventivi-page preventivo-workspace">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Preventivi/Riga/Componenti" asp-route-modo="dettaglio"
+               asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+               asp-route-id="@Model.Componente!.IdRigaCompPrev">Componente</a>
+            <span>/</span><span>Modifica</span>
+        </div>
+        <h1 class="workspace-title">Modifica componente</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div><h2 class="pfw-panel-title">Dati componente</h2>
+                <div class="pfw-panel-subtitle">Origine e gerarchia restano invariate</div></div>
+        </div>
+        <form method="post" class="p-3">
+            <input type="hidden" asp-for="Dati.IdRigaCompPrev" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="row g-3">
+                <div class="col-12 col-md-4"><label class="form-label">Origine</label>
+                    <input class="form-control" value="@Model.Componente!.TipoOrigineComponente" readonly /></div>
+                <div class="col-12 col-md-4"><label class="form-label">Componente padre</label>
+                    <input class="form-control" value="@(Model.Componente.IdRigaCompPrevPadre?.ToString() ?? "Componente radice")" readonly /></div>
+                <div class="col-12 col-md-4"><label class="form-label">Livello</label>
+                    <input class="form-control" value="@Model.Componente.Livello" readonly /></div>
+                <div class="col-12 pfw-field-required"><label asp-for="Dati.DescrizioneNodo" class="form-label">Descrizione</label>
+                    <input asp-for="Dati.DescrizioneNodo" class="form-control" />
+                    <span asp-validation-for="Dati.DescrizioneNodo" class="text-danger"></span></div>
+                <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Dati.QuantitaBase" class="form-label">Quantita base</label>
+                    <input asp-for="Dati.QuantitaBase" class="form-control text-end" />
+                    <span asp-validation-for="Dati.QuantitaBase" class="text-danger"></span></div>
+                <div class="col-12 col-md-3"><label asp-for="Dati.OrdineVisualizzazione" class="form-label">Ordine</label>
+                    <input asp-for="Dati.OrdineVisualizzazione" class="form-control text-end" /></div>
+            </div>
+            <div class="preventivi-form-actions">
+                <a asp-page="/Preventivi/Riga/Componenti" asp-route-modo="dettaglio"
+                   asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+                   asp-route-id="@Model.Componente.IdRigaCompPrev" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

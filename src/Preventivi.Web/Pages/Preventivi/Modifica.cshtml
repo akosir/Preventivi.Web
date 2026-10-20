@@ -1,0 +1,88 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.ModificaModel
+
+@{
+    ViewData["Title"] = $"Modifica preventivo {Model.Preventivo!.NumeroCompleto}";
+}
+
+<div class="workspace-page preventivi-page preventivo-workspace">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Preventivi/Index">Preventivi</a>
+            <span>/</span>
+            <a asp-page="/Preventivi/Dettaglio" asp-route-id="@Model.Preventivo.IdPreventivo">
+                @Model.Preventivo.NumeroCompleto
+            </a>
+            <span>/</span>
+            <span>Modifica</span>
+        </div>
+        <h1 class="workspace-title">Modifica preventivo @Model.Preventivo.NumeroCompleto</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati preventivo</h2>
+                <div class="pfw-panel-subtitle">Numero e anno restano invariati</div>
+            </div>
+        </div>
+
+        <form method="post" class="p-3">
+            <input type="hidden" asp-for="Dati.IdPreventivo" />
+            <input type="hidden" asp-for="Dati.IdRichiestaCliente" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-3 pfw-field-required">
+                    <label asp-for="Dati.DataPreventivo" class="form-label">Data preventivo</label>
+                    <input asp-for="Dati.DataPreventivo" type="date" class="form-control" />
+                    <span asp-validation-for="Dati.DataPreventivo" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-5">
+                    <label asp-for="Dati.IdCliente" class="form-label">Cliente</label>
+                    <select asp-for="Dati.IdCliente" class="form-select">
+                        <option value="">Nessun cliente</option>
+                        @foreach (var cliente in Model.Clienti)
+                        {
+                            <option value="@cliente.IdCliente">@cliente.CodiceCliente - @cliente.RagioneSociale</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 pfw-field-required">
+                    <label asp-for="Dati.Stato" class="form-label">Stato</label>
+                    <select asp-for="Dati.Stato" class="form-select">
+                        @foreach (var stato in Model.Stati)
+                        {
+                            <option value="@stato">@stato</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dati.Stato" class="text-danger"></span>
+                </div>
+                <div class="col-12 pfw-field-required">
+                    <label asp-for="Dati.Oggetto" class="form-label">Oggetto</label>
+                    <input asp-for="Dati.Oggetto" class="form-control" />
+                    <span asp-validation-for="Dati.Oggetto" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-3 pfw-field-required">
+                    <label asp-for="Dati.MarkupPercDefault" class="form-label">Markup predefinito %</label>
+                    <input asp-for="Dati.MarkupPercDefault" class="form-control text-end" />
+                    <span asp-validation-for="Dati.MarkupPercDefault" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Dati.Note" class="form-label">Note</label>
+                    <textarea asp-for="Dati.Note" class="form-control" rows="4"></textarea>
+                </div>
+            </div>
+
+            <div class="preventivi-form-actions">
+                <a asp-page="/Preventivi/Dettaglio" asp-route-id="@Model.Preventivo.IdPreventivo"
+                   class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -9,6 +9,10 @@ public interface IPreventivoRepository
     int idPreventivo,
     CancellationToken cancellationToken = default);
 
+    Task AggiornaPreventivoAsync(
+        PreventivoUpdateModel preventivo,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<PreventivoRigaListItem>> GetRigheAsync(
     int idPreventivo,
     CancellationToken cancellationToken = default);
@@ -19,6 +23,10 @@ public interface IPreventivoRepository
 
     Task<int> CreaRigaAsync(
         PreventivoRigaCreateModel riga,
+        CancellationToken cancellationToken = default);
+
+    Task AggiornaRigaAsync(
+        PreventivoRigaUpdateModel riga,
         CancellationToken cancellationToken = default);
 
     Task EliminaRigaAsync(
@@ -34,6 +42,12 @@ public interface IPreventivoRepository
 
     Task<ArticoloLookupItem?> GetArticoloAsync(
         int idArticolo,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ModelloCicloLookupItem>> GetModelliCicloAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<FornitoreLookupItem>> GetFornitoriAsync(
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<DistintaNodoLookupItem>> GetNodiDistintaAsync(
@@ -108,6 +122,10 @@ public interface IPreventivoRepository
         PreventivoRigaComponenteCreateModel componente,
         CancellationToken cancellationToken = default);
 
+    Task AggiornaComponenteAsync(
+        PreventivoRigaComponenteUpdateModel componente,
+        CancellationToken cancellationToken = default);
+
     Task EliminaComponenteAsync(
         int idRigaCompPrev,
         CancellationToken cancellationToken = default);
@@ -125,6 +143,10 @@ public interface IPreventivoRepository
         PreventivoRigaMaterialeCreateModel materiale,
         CancellationToken cancellationToken = default);
 
+    Task AggiornaMaterialeAsync(
+        PreventivoRigaMaterialeUpdateModel materiale,
+        CancellationToken cancellationToken = default);
+
     Task EliminaMaterialeAsync(
         int idRigaMatPrev,
         CancellationToken cancellationToken = default);
@@ -140,6 +162,10 @@ public interface IPreventivoRepository
 
     Task<int> CreaLavorazioneAsync(
         PreventivoRigaLavorazioneCreateModel lavorazione,
+        CancellationToken cancellationToken = default);
+
+    Task AggiornaLavorazioneAsync(
+        PreventivoRigaLavorazioneUpdateModel lavorazione,
         CancellationToken cancellationToken = default);
 
     Task EliminaLavorazioneAsync(

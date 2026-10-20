@@ -90,7 +90,8 @@ public class EliminaModel : PageModel
                 IdAllegato,
                 cancellationToken);
         }
-        catch (AllegatoStorageException exception)
+        catch (Exception exception) when (
+            exception is AllegatoStorageException or AllegatoApplicationException)
         {
             _logger.LogError(
                 exception,

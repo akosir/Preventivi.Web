@@ -161,7 +161,13 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <label asp-for="NuovoMateriale.IdFornitoreSuggerito" class="form-label"></label>
-                            <input asp-for="NuovoMateriale.IdFornitoreSuggerito" class="form-control text-end" />
+                            <select asp-for="NuovoMateriale.IdFornitoreSuggerito" class="form-select">
+                                <option value="">Nessun fornitore</option>
+                                @foreach (var fornitore in Model.Fornitori)
+                                {
+                                    <option value="@fornitore.IdFornitore">@fornitore.Display</option>
+                                }
+                            </select>
                         </div>
                         <div class="col-12 col-md-4 d-flex align-items-end">
                             <div class="form-check">
@@ -223,6 +229,15 @@
                         int.Parse(idRigaPreventivo),
                         int.Parse(idComponente),
                         Model.Materiale.IdRigaMatPrev);
+
+                    <div class="preventivi-form-actions">
+                        <a class="pfw-btn pfw-btn-primary" asp-page="/Preventivi/Riga/MaterialeModifica"
+                           asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+                           asp-route-idComponente="@idComponente" asp-route-id="@Model.Materiale.IdRigaMatPrev">Modifica</a>
+                        <a class="pfw-btn pfw-btn-danger" asp-page="/Preventivi/Riga/Materiali" asp-route-modo="elimina"
+                           asp-route-idPreventivo="@idPreventivo" asp-route-idRigaPreventivo="@idRigaPreventivo"
+                           asp-route-idComponente="@idComponente" asp-route-id="@Model.Materiale.IdRigaMatPrev">Elimina</a>
+                    </div>
 
                     <section class="pfw-panel mt-4">
                         <div class="pfw-panel-header">

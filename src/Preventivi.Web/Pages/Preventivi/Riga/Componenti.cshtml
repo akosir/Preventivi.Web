@@ -244,6 +244,20 @@
                 }
                 else
                 {
+                    <div class="preventivi-form-actions">
+                        <a class="pfw-btn pfw-btn-primary"
+                           asp-page="/Preventivi/Riga/ComponenteModifica"
+                           asp-route-idPreventivo="@idPreventivo"
+                           asp-route-idRigaPreventivo="@idRigaPreventivo"
+                           asp-route-id="@Model.Componente.IdRigaCompPrev">Modifica</a>
+                        <a class="pfw-btn pfw-btn-danger"
+                           asp-page="/Preventivi/Riga/Componenti"
+                           asp-route-modo="elimina"
+                           asp-route-idPreventivo="@idPreventivo"
+                           asp-route-idRigaPreventivo="@idRigaPreventivo"
+                           asp-route-id="@Model.Componente.IdRigaCompPrev">Elimina</a>
+                    </div>
+
                     <section class="pfw-panel mt-4">
                         <div class="workspace-tabs">
                             <a href="#materiali-componente" class="workspace-tab active text-decoration-none">
@@ -319,6 +333,12 @@
                                                            asp-route-id="@materiale.IdRigaMatPrev">
                                                             Apri
                                                         </a>
+                                                        <a class="pfw-btn pfw-btn-secondary pfw-btn-compact"
+                                                           asp-page="/Preventivi/Riga/MaterialeModifica"
+                                                           asp-route-idPreventivo="@idPreventivo"
+                                                           asp-route-idRigaPreventivo="@idRigaPreventivo"
+                                                           asp-route-idComponente="@Model.Componente.IdRigaCompPrev"
+                                                           asp-route-id="@materiale.IdRigaMatPrev">Modifica</a>
                                                         <a class="pfw-btn pfw-btn-danger pfw-btn-compact"
                                                            asp-page="/Preventivi/Riga/Materiali"
                                                            asp-route-modo="elimina"
@@ -396,6 +416,12 @@
                                                            asp-route-id="@lavorazione.IdRigaLavPrev">
                                                             Apri
                                                         </a>
+                                                        <a class="pfw-btn pfw-btn-secondary pfw-btn-compact"
+                                                           asp-page="/Preventivi/Riga/LavorazioneModifica"
+                                                           asp-route-idPreventivo="@idPreventivo"
+                                                           asp-route-idRigaPreventivo="@idRigaPreventivo"
+                                                           asp-route-idComponente="@Model.Componente.IdRigaCompPrev"
+                                                           asp-route-id="@lavorazione.IdRigaLavPrev">Modifica</a>
                                                         <a class="pfw-btn pfw-btn-danger pfw-btn-compact"
                                                            asp-page="/Preventivi/Riga/Lavorazioni"
                                                            asp-route-modo="elimina"

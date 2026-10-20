@@ -15,6 +15,8 @@ public class WorkspaceModel : PageModel
     public IReadOnlyList<PreventivoRigaComponenteItem> Componenti { get; private set; }
         = Array.Empty<PreventivoRigaComponenteItem>();
 
+    public bool RigaLibera { get; private set; }
+
     public WorkspaceModel(
         IPreventivoRepository preventivoRepository)
     {
@@ -52,6 +54,10 @@ public class WorkspaceModel : PageModel
         {
             return NotFound();
         }
+
+        var tipiRiga = await _preventivoRepository.GetTipiRigaAsync(cancellationToken);
+        RigaLibera = tipiRiga.Any(tipo =>
+            tipo.IdTipoRiga == Riga.IdTipoRiga && tipo.RigaLibera);
 
         Componenti =
             await _preventivoRepository.GetComponentiAsync(

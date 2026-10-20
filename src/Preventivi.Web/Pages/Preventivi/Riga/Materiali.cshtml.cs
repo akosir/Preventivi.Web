@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Allegati;
 using Preventivi.Core.Preventivi;
+using Preventivi.Core.Preventivi.Eliminazione;
 using Preventivi.Web.UI.Modules.Allegati;
 
 namespace Preventivi.Web.Pages.Preventivi.Riga;
@@ -14,6 +15,7 @@ public class MaterialiModel : PageModel
 
     private readonly IPreventivoRepository _preventivoRepository;
     private readonly IAllegatoRepository _allegatoRepository;
+    private readonly IPreventivoEliminazioneService _eliminazioneService;
 
     public PreventivoRigaMaterialeItem? Materiale { get; private set; }
 
@@ -26,6 +28,9 @@ public class MaterialiModel : PageModel
 
     public IReadOnlyList<MaterialeLookupItem> MaterialiAnagrafica { get; private set; }
         = Array.Empty<MaterialeLookupItem>();
+
+    public IReadOnlyList<FornitoreLookupItem> Fornitori { get; private set; }
+        = Array.Empty<FornitoreLookupItem>();
 
     public DistintaMaterialeLookupItem? MaterialeDistintaSelezionato { get; private set; }
 
@@ -48,10 +53,12 @@ public class MaterialiModel : PageModel
 
     public MaterialiModel(
         IPreventivoRepository preventivoRepository,
-        IAllegatoRepository allegatoRepository)
+        IAllegatoRepository allegatoRepository,
+        IPreventivoEliminazioneService eliminazioneService)
     {
         _preventivoRepository = preventivoRepository;
         _allegatoRepository = allegatoRepository;
+        _eliminazioneService = eliminazioneService;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -173,9 +180,24 @@ public class MaterialiModel : PageModel
                 return NotFound();
             }
 
-            await _preventivoRepository.EliminaMaterialeAsync(
-                id.Value,
-                cancellationToken);
+            try
+            {
+                await _eliminazioneService.EliminaAsync(
+                    TipoEliminazionePreventivo.Materiale,
+                    id.Value,
+                    cancellationToken);
+            }
+            catch (PreventivoEliminazioneException exception)
+            {
+                if (exception.EliminazioneCompletata)
+                {
+                    return RedirectToComponente(idPreventivo, idRigaPreventivo, idComponente);
+                }
+
+                ModelState.AddModelError(string.Empty, exception.Message);
+                Materiale = materiale;
+                return Page();
+            }
 
             return RedirectToComponente(idPreventivo, idRigaPreventivo, idComponente);
         }
@@ -296,6 +318,9 @@ public class MaterialiModel : PageModel
             await _preventivoRepository.CercaMaterialiAsync(
                 RicercaMateriale,
                 cancellationToken);
+
+        Fornitori =
+            await _preventivoRepository.GetFornitoriAsync(cancellationToken);
 
         if (IdDistintaMaterialeSelezionato is > 0)
         {

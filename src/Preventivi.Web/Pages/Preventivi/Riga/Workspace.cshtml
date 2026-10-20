@@ -40,6 +40,20 @@
                     @Model.Preventivo.Cliente
                 </div>
             </div>
+            <div class="preventivi-actions">
+                <a class="pfw-btn pfw-btn-primary"
+                   asp-page="/Preventivi/Riga/Modifica"
+                   asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                   asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo">
+                    Modifica
+                </a>
+                <a class="pfw-btn pfw-btn-danger"
+                   asp-page="/Preventivi/Riga/Elimina"
+                   asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                   asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo">
+                    Elimina
+                </a>
+            </div>
         </div>
 
     </div>
@@ -146,14 +160,24 @@
                         @Model.Componenti.Count righe
                     </span>
                 </div>
-                <a class="pfw-btn pfw-btn-primary"
-                   asp-page="/Preventivi/Riga/Componenti"
-                   asp-route-modo="nuovo"
-                   asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
-                   asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo">
-                    Nuovo componente
-                </a>
+                @if (!Model.RigaLibera)
+                {
+                    <a class="pfw-btn pfw-btn-primary"
+                       asp-page="/Preventivi/Riga/Componenti"
+                       asp-route-modo="nuovo"
+                       asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                       asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo">
+                        Nuovo componente
+                    </a>
+                }
             </div>
+
+            @if (Model.RigaLibera)
+            {
+                <div class="alert alert-info mb-3" role="status">
+                    Le righe libere non prevedono componenti, materiali o lavorazioni.
+                </div>
+            }
 
             @if (Model.Componenti.Count == 0)
             {
@@ -199,6 +223,13 @@
                                            asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo"
                                            asp-route-id="@componente.IdRigaCompPrev">
                                             Apri
+                                        </a>
+                                        <a class="pfw-btn pfw-btn-secondary pfw-btn-compact"
+                                           asp-page="/Preventivi/Riga/ComponenteModifica"
+                                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                                           asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo"
+                                           asp-route-id="@componente.IdRigaCompPrev">
+                                            Modifica
                                         </a>
                                         <a class="pfw-btn pfw-btn-danger pfw-btn-compact"
                                            asp-page="/Preventivi/Riga/Componenti"

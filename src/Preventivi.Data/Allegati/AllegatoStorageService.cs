@@ -7,6 +7,7 @@ namespace Preventivi.Data.Allegati;
 public sealed class AllegatoStorageService : IAllegatoStorageService
 {
     private const string ChiavePercorsoRoot = "PercorsoRootAllegati";
+    private const string CartellaQuarantena = ".quarantena";
 
     private readonly IParametriSistemaRepository _parametriRepository;
 
@@ -61,16 +62,17 @@ public sealed class AllegatoStorageService : IAllegatoStorageService
             percorsoRelativo,
             nomeFileArchiviato);
 
-        Directory.CreateDirectory(cartellaCompleta);
-
-        await using (var sorgente = new FileStream(
-            request.FileOrigine,
-            FileMode.Open,
-            FileAccess.Read,
-            FileShare.Read,
-            81920,
-            useAsync: true))
+        try
         {
+            Directory.CreateDirectory(cartellaCompleta);
+
+            await using var sorgente = new FileStream(
+                request.FileOrigine,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                81920,
+                useAsync: true);
             await using var destinazione = new FileStream(
                 percorsoDestinazione,
                 FileMode.CreateNew,
@@ -80,6 +82,28 @@ public sealed class AllegatoStorageService : IAllegatoStorageService
                 useAsync: true);
 
             await sorgente.CopyToAsync(destinazione, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            try
+            {
+                File.Delete(percorsoDestinazione);
+            }
+            catch (Exception compensazioneException)
+            {
+                throw new AllegatoStorageOperationException(
+                    "La copia dell'allegato non è riuscita e il file parziale non è stato rimosso.",
+                    new AggregateException(exception, compensazioneException));
+            }
+
+            if (exception is OperationCanceledException)
+            {
+                throw;
+            }
+
+            throw new AllegatoStorageOperationException(
+                "Non è stato possibile archiviare il file allegato.",
+                exception);
         }
 
         var infoFile = new FileInfo(percorsoDestinazione);
@@ -145,6 +169,89 @@ public sealed class AllegatoStorageService : IAllegatoStorageService
         {
             File.Delete(percorsoCompleto);
         }
+    }
+
+    public async Task<StorageQuarantineResult?> SpostaInQuarantenaAsync(
+        string percorsoRelativo,
+        string nomeFileArchiviato,
+        CancellationToken cancellationToken = default)
+    {
+        var percorsoRoot = await GetPercorsoRootAsync(cancellationToken);
+        var percorsoOriginale = CostruisciPercorsoContenuto(
+            percorsoRoot,
+            percorsoRelativo,
+            nomeFileArchiviato);
+
+        if (!File.Exists(percorsoOriginale))
+        {
+            return null;
+        }
+
+        var nomeFileQuarantena = $"{Guid.NewGuid():D}{Path.GetExtension(nomeFileArchiviato)}";
+        var cartellaQuarantena = CostruisciPercorsoContenuto(
+            percorsoRoot,
+            CartellaQuarantena);
+        var percorsoQuarantena = CostruisciPercorsoContenuto(
+            percorsoRoot,
+            CartellaQuarantena,
+            nomeFileQuarantena);
+
+        try
+        {
+            Directory.CreateDirectory(cartellaQuarantena);
+            File.Move(percorsoOriginale, percorsoQuarantena);
+        }
+        catch (Exception exception)
+        {
+            throw new AllegatoStorageOperationException(
+                "Non è stato possibile preparare il file per l'eliminazione.",
+                exception);
+        }
+
+        return new StorageQuarantineResult
+        {
+            PercorsoRelativoOriginale = percorsoRelativo,
+            NomeFileArchiviatoOriginale = nomeFileArchiviato,
+            PercorsoRelativoQuarantena = CartellaQuarantena,
+            NomeFileQuarantena = nomeFileQuarantena
+        };
+    }
+
+    public async Task RipristinaDaQuarantenaAsync(
+        StorageQuarantineResult fileInQuarantena,
+        CancellationToken cancellationToken = default)
+    {
+        var percorsoRoot = await GetPercorsoRootAsync(cancellationToken);
+        var percorsoQuarantena = CostruisciPercorsoContenuto(
+            percorsoRoot,
+            fileInQuarantena.PercorsoRelativoQuarantena,
+            fileInQuarantena.NomeFileQuarantena);
+        var percorsoOriginale = CostruisciPercorsoContenuto(
+            percorsoRoot,
+            fileInQuarantena.PercorsoRelativoOriginale,
+            fileInQuarantena.NomeFileArchiviatoOriginale);
+
+        if (!File.Exists(percorsoQuarantena))
+        {
+            throw new FileNotFoundException(
+                "Il file in quarantena non è disponibile per il ripristino.");
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(percorsoOriginale)!);
+        File.Move(percorsoQuarantena, percorsoOriginale);
+    }
+
+    public async Task EliminaDaQuarantenaAsync(
+        StorageQuarantineResult fileInQuarantena,
+        CancellationToken cancellationToken = default)
+    {
+        var percorsoRoot = await GetPercorsoRootAsync(cancellationToken);
+        var percorsoQuarantena = CostruisciPercorsoContenuto(
+            percorsoRoot,
+            fileInQuarantena.PercorsoRelativoQuarantena,
+            fileInQuarantena.NomeFileQuarantena);
+
+        File.Delete(percorsoQuarantena);
     }
 
     private async Task<string> GetPercorsoRootAsync(

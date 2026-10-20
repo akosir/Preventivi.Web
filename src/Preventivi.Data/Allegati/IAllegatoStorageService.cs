@@ -16,4 +16,17 @@ public interface IAllegatoStorageService
         string percorsoRelativo,
         string nomeFileArchiviato,
         CancellationToken cancellationToken = default);
+
+    Task<StorageQuarantineResult?> SpostaInQuarantenaAsync(
+        string percorsoRelativo,
+        string nomeFileArchiviato,
+        CancellationToken cancellationToken = default);
+
+    Task RipristinaDaQuarantenaAsync(
+        StorageQuarantineResult fileInQuarantena,
+        CancellationToken cancellationToken = default);
+
+    Task EliminaDaQuarantenaAsync(
+        StorageQuarantineResult fileInQuarantena,
+        CancellationToken cancellationToken = default);
 }

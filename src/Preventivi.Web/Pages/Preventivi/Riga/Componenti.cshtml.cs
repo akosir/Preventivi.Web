@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Data.SqlClient;
 using Preventivi.Core.Allegati;
 using Preventivi.Core.Preventivi;
+using Preventivi.Core.Preventivi.Eliminazione;
 using Preventivi.Web.UI.Modules.Allegati;
 
 namespace Preventivi.Web.Pages.Preventivi.Riga;
@@ -14,6 +16,7 @@ public class ComponentiModel : PageModel
 
     private readonly IPreventivoRepository _preventivoRepository;
     private readonly IAllegatoRepository _allegatoRepository;
+    private readonly IPreventivoEliminazioneService _eliminazioneService;
 
     public PreventivoRigaComponenteItem? Componente { get; private set; }
 
@@ -59,10 +62,12 @@ public class ComponentiModel : PageModel
 
     public ComponentiModel(
         IPreventivoRepository preventivoRepository,
-        IAllegatoRepository allegatoRepository)
+        IAllegatoRepository allegatoRepository,
+        IPreventivoEliminazioneService eliminazioneService)
     {
         _preventivoRepository = preventivoRepository;
         _allegatoRepository = allegatoRepository;
+        _eliminazioneService = eliminazioneService;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -89,6 +94,12 @@ public class ComponentiModel : PageModel
                 cancellationToken))
         {
             return NotFound();
+        }
+
+        if (IsNuovo(modo) &&
+            await RigaLiberaAsync(idRigaPreventivo, cancellationToken))
+        {
+            return RedirectToWorkspace(idPreventivo, idRigaPreventivo);
         }
 
         if (IsNuovo(modo))
@@ -156,9 +167,23 @@ public class ComponentiModel : PageModel
                 return Page();
             }
 
-            await _preventivoRepository.EliminaComponenteAsync(
-                Componente!.IdRigaCompPrev,
-                cancellationToken);
+            try
+            {
+                await _eliminazioneService.EliminaAsync(
+                    TipoEliminazionePreventivo.Componente,
+                    Componente!.IdRigaCompPrev,
+                    cancellationToken);
+            }
+            catch (PreventivoEliminazioneException exception)
+            {
+                if (exception.EliminazioneCompletata)
+                {
+                    return RedirectToWorkspace(idPreventivo, idRigaPreventivo);
+                }
+
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return Page();
+            }
 
             return RedirectToWorkspace(idPreventivo, idRigaPreventivo);
         }
@@ -179,6 +204,12 @@ public class ComponentiModel : PageModel
                 cancellationToken))
         {
             return NotFound();
+        }
+
+        if (IsNuovo(modo) &&
+            await RigaLiberaAsync(idRigaPreventivo, cancellationToken))
+        {
+            return RedirectToWorkspace(idPreventivo, idRigaPreventivo);
         }
 
         NormalizeOrigine();
@@ -277,10 +308,20 @@ public class ComponentiModel : PageModel
             return Page();
         }
 
-        var idComponente =
-            await _preventivoRepository.CreaComponenteAsync(
+        int idComponente;
+        try
+        {
+            idComponente = await _preventivoRepository.CreaComponenteAsync(
                 NuovoComponente,
                 cancellationToken);
+        }
+        catch (SqlException exception) when (exception.Number == 51932)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Una riga libera non può contenere componenti.");
+            return Page();
+        }
 
         return RedirectToPage(
             "/Preventivi/Riga/Componenti",
@@ -455,6 +496,23 @@ public class ComponentiModel : PageModel
                 cancellationToken);
 
         return riga?.IdPreventivo == idPreventivo;
+    }
+
+    private async Task<bool> RigaLiberaAsync(
+        int idRigaPreventivo,
+        CancellationToken cancellationToken)
+    {
+        var riga = await _preventivoRepository.GetRigaAsync(
+            idRigaPreventivo,
+            cancellationToken);
+        if (riga is null)
+        {
+            return false;
+        }
+
+        var tipiRiga = await _preventivoRepository.GetTipiRigaAsync(cancellationToken);
+        return tipiRiga.Any(tipo =>
+            tipo.IdTipoRiga == riga.IdTipoRiga && tipo.RigaLibera);
     }
 
     private void NormalizeOrigine()

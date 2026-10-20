@@ -6,4 +6,9 @@ public abstract class AllegatoStorageException : InvalidOperationException
         : base(message)
     {
     }
+
+    protected AllegatoStorageException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

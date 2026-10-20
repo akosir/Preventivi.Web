@@ -12,6 +12,10 @@
     Lo script non seleziona il database.
 */
 
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+GO
+
 SET NOCOUNT ON;
 
 IF OBJECT_ID(N'dbo.sp_RicalcolaTotaliVariante', N'P') IS NULL
