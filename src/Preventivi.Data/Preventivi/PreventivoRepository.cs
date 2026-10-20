@@ -22,6 +22,47 @@ public sealed class PreventivoRepository : IPreventivoRepository
             cancellationToken: cancellationToken);
     }
 
+    public async Task<IReadOnlyList<PreventivoRichiestaLookupItem>> GetRichiesteCreazioneAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<PreventivoRichiestaLookupItem>(
+            "dbo.Preventivi_Creazione_Richieste_Elenco",
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<PreventivoModelloLookupItem>> GetModelliPreventivoAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.QueryAsync<PreventivoModelloLookupItem>(
+            "dbo.Preventivi_Creazione_Modelli_Elenco",
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<int> CreaPreventivoAsync(
+        PreventivoCreateModel preventivo,
+        CancellationToken cancellationToken = default)
+    {
+        var parameters = new[]
+        {
+            Text("@Origine", preventivo.Origine, 20),
+            new SqlParameter("@DataPreventivo", SqlDbType.Date)
+            {
+                Value = preventivo.DataPreventivo.ToDateTime(TimeOnly.MinValue)
+            },
+            NullableInt("@IdCliente", preventivo.IdCliente),
+            NullableInt("@IdRichiestaCliente", preventivo.IdRichiestaCliente),
+            NullableInt("@IdModelloPreventivo", preventivo.IdModelloPreventivo),
+            Text("@Oggetto", preventivo.Oggetto, 250),
+            NullableText("@Note", preventivo.Note),
+            Decimal("@MarkupPercDefault", preventivo.MarkupPercDefault, 9, 2)
+        };
+
+        return await _db.ExecuteScalarAsync<int>(
+            "dbo.Preventivi_Crea",
+            parameters,
+            cancellationToken);
+    }
+
     public async Task<PreventivoDettaglio?> GetDettaglioAsync(
         int idPreventivo,
         CancellationToken cancellationToken = default)

@@ -5,6 +5,16 @@ public interface IPreventivoRepository
     Task<IReadOnlyList<PreventivoListItem>> GetElencoAsync(
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<PreventivoRichiestaLookupItem>> GetRichiesteCreazioneAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<PreventivoModelloLookupItem>> GetModelliPreventivoAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<int> CreaPreventivoAsync(
+        PreventivoCreateModel preventivo,
+        CancellationToken cancellationToken = default);
+
     Task<PreventivoDettaglio?> GetDettaglioAsync(
     int idPreventivo,
     CancellationToken cancellationToken = default);

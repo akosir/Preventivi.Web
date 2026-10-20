@@ -760,6 +760,52 @@ dei totali. Le prove runtime attestano il percorso funzionale ordinario; i
 casi di errore e concorrenza restano coperti dai test automatici e non da
 simulazioni manuali sul database.
 
+### 5.14 Decisioni TEC-008 — Creazione del preventivo
+
+**Classificazione:** [D].
+
+**Stato:** approvate.
+
+**Data di approvazione:** 20 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work dedicata
+alla prosecuzione della gestione Preventivi.
+
+Le decisioni approvate sono:
+
+- **211:** la creazione del preventivo supporta le origini Libero, Richiesta
+  cliente e Modello preventivo;
+- **212:** il numero e progressivo per anno ed e assegnato automaticamente in
+  modo concorrente e transazionale;
+- **213:** la data viene proposta con il giorno corrente ed e modificabile;
+- **214:** lo stato iniziale e sempre `Bozza`;
+- **215:** il cliente e obbligatorio per l'origine Libero; per Richiesta e
+  Modello viene proposto dai dati di origine;
+- **216:** la maschera iniziale comprende cliente, oggetto, note e markup
+  predefinito, oltre a data e origine;
+- **217:** dopo il salvataggio viene aperto il dettaglio del nuovo preventivo;
+- **218:** le modifiche al database sono distribuite mediante script SQL
+  versionato e applicate prima della prova runtime;
+- **219:** l'eliminazione dell'intero preventivo resta un intervento separato,
+  da definire rispetto a richieste, varianti, righe e allegati.
+
+**Riscontri [C] al 20 ottobre 2026**
+
+Nel repository sono stati predisposti la pagina di creazione, i lookup di
+clienti, richieste e modelli, il collegamento dall'elenco e lo script
+transazionale `TEC-008_01_Creazione_Preventivo.sql`. La compilazione della
+soluzione e completata con zero errori e le suite di regressione hanno
+superato 28 test Data e 26 test Web.
+
+Il 20 ottobre 2026 l'utente ha confermato l'applicazione dello script al
+database di test senza errori. La prova runtime ha verificato l'apertura della
+pagina, le origini Libero, Richiesta cliente e Modello preventivo, i relativi
+lookup e la creazione libera del preventivo `2026-00002`: stato iniziale
+Bozza, data corrente, cliente TECNOCED, markup predefinito 60%, totali iniziali
+a zero e reindirizzamento al dettaglio. La creazione da richiesta cliente e da
+modello preventivo non risulta ancora collaudata con salvataggio effettivo; nel
+database di test non erano disponibili modelli selezionabili.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

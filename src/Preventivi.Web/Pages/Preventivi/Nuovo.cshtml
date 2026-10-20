@@ -1,0 +1,154 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.NuovoModel
+
+@{
+    ViewData["Title"] = "Nuovo preventivo";
+}
+
+<div class="workspace-page preventivi-page preventivo-workspace">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="/Preventivi/Index">Preventivi</a>
+            <span>/</span>
+            <span>Nuovo</span>
+        </div>
+        <h1 class="workspace-title">Nuovo preventivo</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati preventivo</h2>
+                <div class="pfw-panel-subtitle">Il numero progressivo verra assegnato al salvataggio</div>
+            </div>
+        </div>
+
+        <form method="post" class="p-3" id="preventivo-create-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-4 pfw-field-required">
+                    <label asp-for="Dati.Origine" class="form-label">Origine</label>
+                    <select asp-for="Dati.Origine" class="form-select" id="preventivo-origine">
+                        <option value="Libero">Libero</option>
+                        <option value="Richiesta">Richiesta cliente</option>
+                        <option value="Modello">Modello preventivo</option>
+                    </select>
+                    <span asp-validation-for="Dati.Origine" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 col-md-4 pfw-field-required">
+                    <label asp-for="Dati.DataPreventivo" class="form-label">Data preventivo</label>
+                    <input asp-for="Dati.DataPreventivo" type="date" class="form-control" />
+                    <span asp-validation-for="Dati.DataPreventivo" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 col-md-4 pfw-field-required">
+                    <label asp-for="Dati.MarkupPercDefault" class="form-label">Markup predefinito %</label>
+                    <input asp-for="Dati.MarkupPercDefault" class="form-control text-end" />
+                    <span asp-validation-for="Dati.MarkupPercDefault" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 preventivo-origin-field" data-origin="Richiesta">
+                    <label asp-for="Dati.IdRichiestaCliente" class="form-label">Richiesta cliente</label>
+                    <select asp-for="Dati.IdRichiestaCliente" class="form-select" id="preventivo-richiesta">
+                        <option value="">Seleziona una richiesta</option>
+                        @foreach (var richiesta in Model.Richieste)
+                        {
+                            <option value="@richiesta.IdRichiestaCliente"
+                                    data-cliente="@richiesta.IdCliente"
+                                    data-oggetto="@richiesta.Oggetto">
+                                @richiesta.NumeroCompleto - @richiesta.Cliente - @richiesta.Oggetto (@richiesta.Stato)
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dati.IdRichiestaCliente" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 preventivo-origin-field" data-origin="Modello">
+                    <label asp-for="Dati.IdModelloPreventivo" class="form-label">Modello preventivo</label>
+                    <select asp-for="Dati.IdModelloPreventivo" class="form-select" id="preventivo-modello">
+                        <option value="">Seleziona un modello</option>
+                        @foreach (var modello in Model.Modelli)
+                        {
+                            <option value="@modello.IdModelloPreventivo"
+                                    data-cliente="@modello.IdCliente"
+                                    data-oggetto="@modello.Oggetto">
+                                @modello.CodiceModelloPreventivo - @modello.Descrizione
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dati.IdModelloPreventivo" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 col-md-6 pfw-field-required">
+                    <label asp-for="Dati.IdCliente" class="form-label">Cliente</label>
+                    <select asp-for="Dati.IdCliente" class="form-select" id="preventivo-cliente">
+                        <option value="">Seleziona un cliente</option>
+                        @foreach (var cliente in Model.Clienti)
+                        {
+                            <option value="@cliente.IdCliente">@cliente.CodiceCliente - @cliente.RagioneSociale</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dati.IdCliente" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 pfw-field-required">
+                    <label asp-for="Dati.Oggetto" class="form-label">Oggetto</label>
+                    <input asp-for="Dati.Oggetto" class="form-control" id="preventivo-oggetto" />
+                    <span asp-validation-for="Dati.Oggetto" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Dati.Note" class="form-label">Note</label>
+                    <textarea asp-for="Dati.Note" class="form-control" rows="4"></textarea>
+                </div>
+            </div>
+
+            <div class="preventivi-form-actions">
+                <a asp-page="/Preventivi/Index" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const origine = document.getElementById("preventivo-origine");
+            const cliente = document.getElementById("preventivo-cliente");
+            const oggetto = document.getElementById("preventivo-oggetto");
+            const richiesta = document.getElementById("preventivo-richiesta");
+            const modello = document.getElementById("preventivo-modello");
+            const sezioniOrigine = document.querySelectorAll(".preventivo-origin-field");
+
+            const aggiornaOrigine = () => {
+                sezioniOrigine.forEach(sezione => {
+                    sezione.hidden = sezione.dataset.origin !== origine.value;
+                });
+            };
+
+            const applicaOrigine = select => {
+                const option = select.options[select.selectedIndex];
+                if (!option || !option.value) {
+                    return;
+                }
+
+                if (option.dataset.cliente) {
+                    cliente.value = option.dataset.cliente;
+                }
+
+                if (option.dataset.oggetto) {
+                    oggetto.value = option.dataset.oggetto;
+                }
+            };
+
+            origine.addEventListener("change", aggiornaOrigine);
+            richiesta.addEventListener("change", () => applicaOrigine(richiesta));
+            modello.addEventListener("change", () => applicaOrigine(modello));
+            aggiornaOrigine();
+        })();
+    </script>
+}

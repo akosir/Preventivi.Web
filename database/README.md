@@ -93,6 +93,18 @@ Lo script crea il tipo tabellare usato per il controllo concorrente e le
 procedure di preparazione e conferma dell'eliminazione. Non contiene `USE` e
 deve essere eseguito scegliendo esplicitamente il database di destinazione.
 
+## Creazione preventivo TEC-008
+
+Per attivare il flusso Web di creazione libera, da richiesta cliente o da
+modello preventivo, dopo TEC-001 e TEC-009 eseguire:
+
+1. `06_Aggiornamenti/TEC-008_01_Creazione_Preventivo.sql`.
+
+Lo script aggiunge i lookup di richieste e modelli e la procedura
+transazionale che assegna il numero progressivo annuale. Non contiene `USE`,
+non modifica i preventivi esistenti e deve essere eseguito scegliendo
+esplicitamente il database di destinazione.
+
 ## Correzione procedure varianti TEC-009
 
 Sui database che hanno gia ricevuto TEC-009, applicare:
