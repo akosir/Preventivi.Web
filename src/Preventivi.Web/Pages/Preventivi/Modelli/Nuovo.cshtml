@@ -1,0 +1,38 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Modelli.NuovoModel
+
+@{
+    ViewData["Title"] = "Nuovo modello preventivo";
+}
+
+<div class="workspace-page preventivi-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="./Index">Modelli preventivo</a>
+            <span>/</span>
+            <span>Nuovo</span>
+        </div>
+        <h1 class="workspace-title">Nuovo modello preventivo</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati modello</h2>
+                <div class="pfw-panel-subtitle">Valori proposti alla creazione del preventivo</div>
+            </div>
+        </div>
+        <form method="post" class="pfw-panel-body">
+            @await Html.PartialAsync("~/Pages/Shared/Preventivi/_ModelloPreventivoForm.cshtml", Model.Form)
+
+            <div class="preventivi-form-actions">
+                <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

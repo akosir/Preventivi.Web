@@ -42,6 +42,7 @@ BEGIN
         richiesta.Anno,
         richiesta.IdCliente,
         ISNULL(cliente.RagioneSociale, N'') AS Cliente,
+        CONVERT(BIT, ISNULL(cliente.Attivo, 0)) AS ClienteAttivo,
         richiesta.Oggetto,
         richiesta.Stato
     FROM dbo.RichiesteClienti AS richiesta
@@ -120,10 +121,20 @@ BEGIN
     IF @Origine = N'Richiesta'
     BEGIN
         SELECT
-            @IdCliente = COALESCE(@IdCliente, richiesta.IdCliente),
+            @IdCliente = richiesta.IdCliente,
             @Oggetto = COALESCE(@Oggetto, richiesta.Oggetto)
         FROM dbo.RichiesteClienti AS richiesta
         WHERE richiesta.IdRichiestaCliente = @IdRichiestaCliente;
+
+        IF @IdCliente IS NULL
+           OR NOT EXISTS
+           (
+               SELECT 1
+               FROM dbo.Clienti
+               WHERE IdCliente = @IdCliente
+                 AND Attivo = 1
+           )
+            THROW 51810, 'Il cliente collegato alla richiesta non e attivo.', 1;
     END;
 
     IF @Origine = N'Modello'

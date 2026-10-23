@@ -1,0 +1,42 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Modelli.Righe.NuovaModel
+
+@{
+    var modello = Model.Modello!;
+    ViewData["Title"] = "Nuova riga modello";
+}
+
+<div class="workspace-page preventivi-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="../Index">Modelli preventivo</a>
+            <span>/</span>
+            <a asp-page="../Dettaglio" asp-route-id="@modello.IdModelloPreventivo">@modello.CodiceModelloPreventivo</a>
+            <span>/</span>
+            <span>Nuova riga</span>
+        </div>
+        <h1 class="workspace-title">Nuova riga modello</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati riga</h2>
+                <div class="pfw-panel-subtitle">Valori copiati nel nuovo preventivo</div>
+            </div>
+        </div>
+        <form method="post" class="pfw-panel-body">
+            <input asp-for="IdModello" type="hidden" />
+            @await Html.PartialAsync("~/Pages/Shared/Preventivi/_ModelloPreventivoRigaForm.cshtml", Model.Form)
+
+            <div class="preventivi-form-actions">
+                <a asp-page="../Dettaglio" asp-route-id="@modello.IdModelloPreventivo" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

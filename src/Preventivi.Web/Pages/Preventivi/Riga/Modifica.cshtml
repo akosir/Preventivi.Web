@@ -29,7 +29,7 @@
         <div class="pfw-panel-header">
             <div>
                 <h2 class="pfw-panel-title">Dati riga</h2>
-                <div class="pfw-panel-subtitle">Tipo e origine restano invariati</div>
+                <div class="pfw-panel-subtitle">Dati identificativi ed economici</div>
             </div>
         </div>
 
@@ -42,13 +42,54 @@
                     <input asp-for="Riga.RigaNr" class="form-control text-end" />
                     <span asp-validation-for="Riga.RigaNr" class="text-danger"></span>
                 </div>
-                <div class="col-12 col-md-4">
-                    <label class="form-label">Tipo riga</label>
-                    <input class="form-control" value="@rigaCorrente.TipoRiga" readonly />
+                <div class="col-12 col-md-4 pfw-field-required">
+                    <label asp-for="Riga.IdTipoRiga" class="form-label">Tipo riga</label>
+                    <select asp-for="Riga.IdTipoRiga" class="form-select" id="riga-tipo">
+                        @foreach (var tipo in Model.TipiRiga)
+                        {
+                            <option value="@tipo.IdTipoRiga"
+                                    data-riga-articolo="@tipo.RigaArticolo.ToString().ToLowerInvariant()"
+                                    data-riga-libera="@tipo.RigaLibera.ToString().ToLowerInvariant()"
+                                    data-obbliga-articolo="@tipo.ObbligaArticolo.ToString().ToLowerInvariant()">
+                                @tipo.Descrizione
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="Riga.IdTipoRiga" class="text-danger"></span>
+                </div>
+                <div class="col-12" id="riga-articolo-fields">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6" id="riga-articolo-field">
+                            <label asp-for="Riga.IdArticolo" class="form-label">Articolo</label>
+                            <select asp-for="Riga.IdArticolo" class="form-select" id="riga-articolo">
+                                <option value="">Seleziona un articolo</option>
+                                @foreach (var articolo in Model.Articoli)
+                                {
+                                    <option value="@articolo.IdArticolo"
+                                            data-descrizione="@articolo.Descrizione">@articolo.Display</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Riga.IdArticolo" class="text-danger"></span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="Riga.IdModelloCiclo" class="form-label">Modello ciclo</label>
+                            <select asp-for="Riga.IdModelloCiclo" class="form-select" id="riga-modello-ciclo">
+                                <option value="">Nessun modello ciclo</option>
+                                @foreach (var modello in Model.ModelliCiclo)
+                                {
+                                    <option value="@modello.IdModelloCiclo">@modello.Display</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Riga.IdModelloCiclo" class="text-danger"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-12 pfw-field-required">
                     <label asp-for="Riga.DescrizioneVoce" class="form-label">Descrizione</label>
-                    <textarea asp-for="Riga.DescrizioneVoce" class="form-control" rows="3"></textarea>
+                    <textarea asp-for="Riga.DescrizioneVoce"
+                              class="form-control"
+                              id="riga-descrizione"
+                              rows="3"></textarea>
                     <span asp-validation-for="Riga.DescrizioneVoce" class="text-danger"></span>
                 </div>
                 <div class="col-12 col-md-3 pfw-field-required">
@@ -64,10 +105,11 @@
                     <label asp-for="Riga.MarkupPerc" class="form-label">Markup %</label>
                     <input asp-for="Riga.MarkupPerc" class="form-control text-end" />
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-3" id="riga-costo-field">
                     <label asp-for="Riga.CostoUnitarioLibero" class="form-label">Costo unitario libero</label>
-                    <input asp-for="Riga.CostoUnitarioLibero" class="form-control text-end"
-                           readonly="@(!rigaCorrente.CostoUnitarioLibero.HasValue)" />
+                    <input asp-for="Riga.CostoUnitarioLibero"
+                           class="form-control text-end"
+                           id="riga-costo-unitario" />
                     <span asp-validation-for="Riga.CostoUnitarioLibero" class="text-danger"></span>
                 </div>
                 <div class="col-12 col-md-4 d-flex align-items-end">
@@ -95,4 +137,71 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const tipo = document.getElementById("riga-tipo");
+            const costo = document.getElementById("riga-costo-unitario");
+            const campoCosto = document.getElementById("riga-costo-field");
+            const campiArticolo = document.getElementById("riga-articolo-fields");
+            const campoArticolo = document.getElementById("riga-articolo-field");
+            const articolo = document.getElementById("riga-articolo");
+            const modelloCiclo = document.getElementById("riga-modello-ciclo");
+            const descrizione = document.getElementById("riga-descrizione");
+
+            const tipoSelezionato = () => tipo.options[tipo.selectedIndex];
+
+            const aggiornaDescrizioneArticolo = () => {
+                const option = articolo.options[articolo.selectedIndex];
+                descrizione.value = option?.dataset.descrizione ?? "";
+            };
+
+            const aggiornaCosto = () => {
+                const option = tipoSelezionato();
+                const rigaArticolo = option?.dataset.rigaArticolo === "true";
+                const rigaLibera = option?.dataset.rigaLibera === "true";
+                const richiedeCostoLibero = rigaLibera && !rigaArticolo;
+
+                costo.disabled = !richiedeCostoLibero;
+                costo.required = richiedeCostoLibero;
+                campoCosto.classList.toggle("pfw-field-required", richiedeCostoLibero);
+
+                if (!richiedeCostoLibero) {
+                    costo.value = "";
+                }
+            };
+
+            const aggiornaArticolo = (tipoCambiato) => {
+                const option = tipoSelezionato();
+                const mostraArticolo = option?.dataset.rigaArticolo === "true";
+                const obbligaArticolo = option?.dataset.obbligaArticolo === "true";
+
+                campiArticolo.hidden = !mostraArticolo;
+                articolo.disabled = !mostraArticolo;
+                modelloCiclo.disabled = !mostraArticolo;
+                articolo.required = mostraArticolo && obbligaArticolo;
+                campoArticolo.classList.toggle(
+                    "pfw-field-required",
+                    mostraArticolo && obbligaArticolo);
+
+                if (!mostraArticolo) {
+                    articolo.value = "";
+                    modelloCiclo.value = "";
+
+                    if (tipoCambiato) {
+                        descrizione.value = "";
+                    }
+                } else if (tipoCambiato) {
+                    aggiornaDescrizioneArticolo();
+                }
+            };
+
+            tipo.addEventListener("change", () => {
+                aggiornaCosto();
+                aggiornaArticolo(true);
+            });
+            articolo.addEventListener("change", aggiornaDescrizioneArticolo);
+            aggiornaCosto();
+            aggiornaArticolo(false);
+        })();
+    </script>
 }

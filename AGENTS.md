@@ -171,6 +171,10 @@ di testo obbligatori o richiesti devono essere evidenziati; i campi
 identificativi, dove necessario, devono disporre del lookup verso la
 rispettiva tabella.
 
+[D] Le label dei campi devono essere definite esplicitamente con testo
+leggibile e coerente con il linguaggio funzionale. Non devono essere
+ricavate automaticamente dai nomi delle proprieta C# o delle colonne SQL.
+
 [D] Salvo diverso accordo, le pagine devono esporre le azioni
 `Nuovo`, `Modifica` ed `Elimina` tramite i componenti UI del progetto.
 
@@ -407,6 +411,15 @@ Non inserire credenziali o valori riservati negli script.
 
 [D] Nessuna modifica deve rimanere soltanto sul server SQL.
 Gli script devono essere conservati nel repository e versionati.
+
+[D] Il database installato deve esporre una versione esplicita dello schema.
+Ogni aggiornamento strutturale o funzionale del database deve essere
+riconducibile a una versione ordinata e verificabile.
+
+[P] Definire con un intervento dedicato il meccanismo tecnico di versionamento,
+la versione iniziale, la numerazione degli aggiornamenti e i controlli da
+eseguire in installazione o avvio. Non introdurre convenzioni implicite prima
+della relativa approvazione.
 
 [D] Gli script devono essere idempotenti quando possibile.
 

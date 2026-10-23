@@ -1,0 +1,120 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Modelli.DettaglioModel
+
+@{
+    var modello = Model.Modello!;
+    ViewData["Title"] = $"Modello {modello.CodiceModelloPreventivo}";
+}
+
+<div class="workspace-page preventivi-page">
+    <div class="workspace-header d-flex justify-content-between align-items-start gap-3">
+        <div>
+            <div class="workspace-breadcrumb">
+                <a asp-page="./Index">Modelli preventivo</a>
+                <span>/</span>
+                <span>@modello.CodiceModelloPreventivo</span>
+            </div>
+            <h1 class="workspace-title">Dettaglio modello preventivo</h1>
+            <div class="workspace-subtitle">
+                <span class="pfw-badge @(modello.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">
+                    @(modello.Attivo ? "Attivo" : "Non attivo")
+                </span>
+            </div>
+        </div>
+        <a asp-page="./Stato"
+           asp-route-id="@modello.IdModelloPreventivo"
+           asp-route-attivo="@(!modello.Attivo)"
+           class="pfw-btn @(modello.Attivo ? "pfw-btn-danger" : "pfw-btn-primary")">
+            @(modello.Attivo ? "Elimina" : "Riattiva")
+        </a>
+    </div>
+
+    @if (TempData["MessaggioSuccesso"] is string messaggio)
+    {
+        <div class="alert alert-success">@messaggio</div>
+    }
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati modello</h2>
+                <div class="pfw-panel-subtitle">Modifica i valori proposti ai nuovi preventivi</div>
+            </div>
+        </div>
+        <form method="post" class="pfw-panel-body">
+            <input asp-for="Id" type="hidden" />
+            @await Html.PartialAsync("~/Pages/Shared/Preventivi/_ModelloPreventivoForm.cshtml", Model.Form)
+
+            <div class="preventivi-form-actions">
+                <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva modifiche</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Righe modello</h2>
+                <div class="pfw-panel-subtitle">Righe copiate nei nuovi preventivi</div>
+            </div>
+            <a asp-page="./Righe/Nuova"
+               asp-route-idModello="@modello.IdModelloPreventivo"
+               class="pfw-btn pfw-btn-primary">Nuova riga</a>
+        </div>
+
+        @if (Model.Righe.Count == 0)
+        {
+            <div class="pfw-panel-body">
+                <div class="workspace-placeholder">
+                    <div class="workspace-placeholder-title">Nessuna riga presente</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table pfw-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-end">Riga</th>
+                            <th>Tipo</th>
+                            <th>Articolo</th>
+                            <th>Descrizione</th>
+                            <th class="text-end">Quantita</th>
+                            <th class="text-end">Prezzo unitario</th>
+                            <th class="text-end">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var riga in Model.Righe)
+                        {
+                            <tr>
+                                <td class="text-end">@riga.RigaNr</td>
+                                <td>@riga.TipoRiga</td>
+                                <td>@(string.IsNullOrWhiteSpace(riga.Articolo) ? "-" : riga.Articolo)</td>
+                                <td>@riga.DescrizioneVoce</td>
+                                <td class="text-end">@riga.Quantita.ToString("N4")</td>
+                                <td class="text-end">@riga.PrezzoUnitarioVendita.ToString("N4")</td>
+                                <td class="text-end">
+                                    <a asp-page="./Righe/Modifica"
+                                       asp-route-idModello="@modello.IdModelloPreventivo"
+                                       asp-route-idRiga="@riga.IdRigaModelloPreventivo"
+                                       class="pfw-btn pfw-btn-secondary">Modifica</a>
+                                    <a asp-page="./Righe/Elimina"
+                                       asp-route-idModello="@modello.IdModelloPreventivo"
+                                       asp-route-idRiga="@riga.IdRigaModelloPreventivo"
+                                       class="pfw-btn pfw-btn-danger">Elimina</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

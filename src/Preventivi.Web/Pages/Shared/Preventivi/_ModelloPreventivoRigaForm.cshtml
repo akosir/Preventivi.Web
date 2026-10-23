@@ -1,0 +1,127 @@
+@model global::Preventivi.Web.Pages.Preventivi.Modelli.Righe.ModelloPreventivoRigaFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<div class="row g-3">
+    <div class="col-12 col-md-2 pfw-field-required">
+        <label asp-for="Dati.RigaNr" class="form-label">Numero riga</label>
+        <input asp-for="Dati.RigaNr" class="form-control text-end" />
+        <span asp-validation-for="Dati.RigaNr" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-4 pfw-field-required">
+        <label asp-for="Dati.IdTipoRiga" class="form-label">Tipo riga</label>
+        <select asp-for="Dati.IdTipoRiga" class="form-select" id="modello-riga-tipo">
+            <option value="">Seleziona il tipo riga</option>
+            @foreach (var tipo in Model.TipiRiga)
+            {
+                <option value="@tipo.IdTipoRiga"
+                        data-riga-articolo="@tipo.RigaArticolo.ToString().ToLowerInvariant()"
+                        data-obbliga-articolo="@tipo.ObbligaArticolo.ToString().ToLowerInvariant()">
+                    @tipo.Descrizione
+                </option>
+            }
+        </select>
+        <span asp-validation-for="Dati.IdTipoRiga" class="text-danger"></span>
+    </div>
+
+    <div class="col-12" id="modello-riga-articolo-fields">
+        <div class="row g-3">
+            <div class="col-12 col-md-6" id="modello-riga-articolo-field">
+                <label asp-for="Dati.IdArticolo" class="form-label">Articolo</label>
+                <select asp-for="Dati.IdArticolo" class="form-select" id="modello-riga-articolo">
+                    <option value="">Seleziona un articolo</option>
+                    @foreach (var articolo in Model.Articoli)
+                    {
+                        <option value="@articolo.IdArticolo" data-descrizione="@articolo.Descrizione">
+                            @articolo.Display
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Dati.IdArticolo" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label asp-for="Dati.IdModelloCiclo" class="form-label">Modello ciclo</label>
+                <select asp-for="Dati.IdModelloCiclo" class="form-select" id="modello-riga-ciclo">
+                    <option value="">Nessun modello ciclo</option>
+                    @foreach (var ciclo in Model.ModelliCiclo)
+                    {
+                        <option value="@ciclo.IdModelloCiclo">@ciclo.Display</option>
+                    }
+                </select>
+                <span asp-validation-for="Dati.IdModelloCiclo" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 pfw-field-required">
+        <label asp-for="Dati.DescrizioneVoce" class="form-label">Descrizione</label>
+        <textarea asp-for="Dati.DescrizioneVoce" class="form-control" id="modello-riga-descrizione" rows="3"></textarea>
+        <span asp-validation-for="Dati.DescrizioneVoce" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-4 pfw-field-required">
+        <label asp-for="Dati.Quantita" class="form-label">Quantita</label>
+        <input asp-for="Dati.Quantita" class="form-control text-end" />
+        <span asp-validation-for="Dati.Quantita" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-4 pfw-field-required">
+        <label asp-for="Dati.PrezzoUnitarioVendita" class="form-label">Prezzo unitario vendita</label>
+        <input asp-for="Dati.PrezzoUnitarioVendita" class="form-control text-end" />
+        <span asp-validation-for="Dati.PrezzoUnitarioVendita" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Dati.Note" class="form-label">Note</label>
+        <textarea asp-for="Dati.Note" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Dati.Note" class="text-danger"></span>
+    </div>
+</div>
+
+<script>
+    (() => {
+        const tipo = document.getElementById("modello-riga-tipo");
+        const campiArticolo = document.getElementById("modello-riga-articolo-fields");
+        const campoArticolo = document.getElementById("modello-riga-articolo-field");
+        const articolo = document.getElementById("modello-riga-articolo");
+        const ciclo = document.getElementById("modello-riga-ciclo");
+        const descrizione = document.getElementById("modello-riga-descrizione");
+
+        if (!tipo || !campiArticolo || !articolo || !ciclo || !descrizione) {
+            return;
+        }
+
+        const aggiornaDescrizione = () => {
+            const option = articolo.options[articolo.selectedIndex];
+            descrizione.value = option?.dataset.descrizione ?? "";
+        };
+
+        const aggiornaTipo = (tipoCambiato) => {
+            const option = tipo.options[tipo.selectedIndex];
+            const rigaArticolo = option?.dataset.rigaArticolo === "true";
+            const obbligaArticolo = option?.dataset.obbligaArticolo === "true";
+
+            campiArticolo.hidden = !rigaArticolo;
+            articolo.disabled = !rigaArticolo;
+            ciclo.disabled = !rigaArticolo;
+            articolo.required = rigaArticolo && obbligaArticolo;
+            campoArticolo?.classList.toggle("pfw-field-required", rigaArticolo && obbligaArticolo);
+
+            if (!rigaArticolo) {
+                articolo.value = "";
+                ciclo.value = "";
+                if (tipoCambiato) {
+                    descrizione.value = "";
+                }
+            } else if (tipoCambiato) {
+                aggiornaDescrizione();
+            }
+        };
+
+        tipo.addEventListener("change", () => aggiornaTipo(true));
+        articolo.addEventListener("change", aggiornaDescrizione);
+        aggiornaTipo(false);
+    })();
+</script>

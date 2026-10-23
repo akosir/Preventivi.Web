@@ -68,6 +68,10 @@ builder.Services.AddScoped<
     PreventivoRepository>();
 
 builder.Services.AddScoped<
+    IModelloPreventivoRepository,
+    ModelloPreventivoRepository>();
+
+builder.Services.AddScoped<
     IPreventivoEliminazioneRepository,
     PreventivoEliminazioneRepository>();
 

@@ -93,6 +93,17 @@ public class NuovoModel : PageModel
             cancellationToken: cancellationToken);
         Richieste = await _preventivoRepository.GetRichiesteCreazioneAsync(cancellationToken);
         Modelli = await _preventivoRepository.GetModelliPreventivoAsync(cancellationToken);
+
+        var idClientiAttivi = Clienti
+            .Select(cliente => cliente.IdCliente)
+            .ToHashSet();
+
+        foreach (var richiesta in Richieste)
+        {
+            richiesta.ClienteAttivo =
+                richiesta.IdCliente.HasValue &&
+                idClientiAttivi.Contains(richiesta.IdCliente.Value);
+        }
     }
 
     private void ValidaDati()
@@ -121,29 +132,50 @@ public class NuovoModel : PageModel
             ModelState.AddModelError("Dati.MarkupPercDefault", "Il markup non puo essere negativo.");
         }
 
-        if (Dati.IdCliente.HasValue &&
-            Clienti.All(cliente => cliente.IdCliente != Dati.IdCliente.Value))
-        {
-            ModelState.AddModelError("Dati.IdCliente", "Il cliente selezionato non e disponibile.");
-        }
-
-        if (string.Equals(Dati.Origine, OrigineLibero, StringComparison.OrdinalIgnoreCase) &&
-            !Dati.IdCliente.HasValue)
-        {
-            ModelState.AddModelError("Dati.IdCliente", "Selezionare il cliente.");
-        }
-
         if (string.Equals(Dati.Origine, OrigineRichiesta, StringComparison.OrdinalIgnoreCase))
         {
-            if (!Dati.IdRichiestaCliente.HasValue ||
-                Richieste.All(richiesta => richiesta.IdRichiestaCliente != Dati.IdRichiestaCliente.Value))
+            var richiesta = Dati.IdRichiestaCliente.HasValue
+                ? Richieste.FirstOrDefault(
+                    elemento => elemento.IdRichiestaCliente == Dati.IdRichiestaCliente.Value)
+                : null;
+
+            if (richiesta is null)
             {
                 ModelState.AddModelError("Dati.IdRichiestaCliente", "Selezionare una richiesta cliente valida.");
+            }
+            else
+            {
+                Dati.IdCliente = richiesta.IdCliente;
+
+                if (!richiesta.IdCliente.HasValue)
+                {
+                    ModelState.AddModelError(
+                        "Dati.IdCliente",
+                        "La richiesta non ha un cliente associato.");
+                }
+                else if (!richiesta.ClienteAttivo)
+                {
+                    ModelState.AddModelError(
+                        "Dati.IdCliente",
+                        "Il cliente collegato alla richiesta non e attivo. Riattivarlo prima di creare il preventivo.");
+                }
             }
         }
         else
         {
             Dati.IdRichiestaCliente = null;
+
+            if (Dati.IdCliente.HasValue &&
+                Clienti.All(cliente => cliente.IdCliente != Dati.IdCliente.Value))
+            {
+                ModelState.AddModelError("Dati.IdCliente", "Il cliente selezionato non e disponibile.");
+            }
+
+            if (string.Equals(Dati.Origine, OrigineLibero, StringComparison.OrdinalIgnoreCase) &&
+                !Dati.IdCliente.HasValue)
+            {
+                ModelState.AddModelError("Dati.IdCliente", "Selezionare il cliente.");
+            }
         }
 
         if (string.Equals(Dati.Origine, OrigineModello, StringComparison.OrdinalIgnoreCase))
@@ -161,7 +193,7 @@ public class NuovoModel : PageModel
     }
 
     private static bool IsErroreCreazionePrevisto(int numero) =>
-        numero is >= 51801 and <= 51809 or 2601 or 2627;
+        numero is >= 51801 and <= 51810 or 2601 or 2627;
 
     private static string GetMessaggioCreazione(int numero) => numero switch
     {
@@ -169,6 +201,8 @@ public class NuovoModel : PageModel
         51805 => "Il modello preventivo selezionato non e piu disponibile.",
         51806 => "Il cliente selezionato non e disponibile.",
         51808 => "Non e stato possibile assegnare il numero progressivo. Riprovare.",
+        51809 => "Il modello contiene una o piu righe con tipo non valido o non attivo.",
+        51810 => "Il cliente collegato alla richiesta non e attivo. Riattivarlo prima di creare il preventivo.",
         2601 or 2627 => "Il numero del preventivo e stato utilizzato da un'altra operazione. Riprovare.",
         _ => "I dati del preventivo non sono validi. Controllare i campi e riprovare."
     };

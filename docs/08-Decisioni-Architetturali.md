@@ -57,6 +57,9 @@ Tutte le voci della tabella raccolgono contenuti già approvati o già classific
 | DA-020 | Registrazione delle nuove decisioni | Approvazione esplicita riportata in AGENTS |
 | DA-021 | Baseline completa dello schema SQL | Approvazione esplicita TEC-002 |
 | DA-022 | Regole obbligatorie dell'interfaccia Preventivi | Approvazione esplicita nella sessione Work |
+| DA-023 | Versionamento esplicito dello schema database | Approvazione esplicita nella sessione Work |
+| DA-024 | Label funzionali leggibili | Approvazione esplicita nella sessione Work |
+| DA-025 | Applicazione Android Preventivi Mobile | Approvazione esplicita nella sessione Work |
 
 ## 3. Decisioni storiche conservate
 
@@ -431,7 +434,10 @@ Tutte le maschere e le pagine devono:
 5. fornire, per i campi identificativi dove necessario, un menu a tendina di
    lookup collegato alla rispettiva tabella;
 6. esporre, salvo diverso accordo, le azioni `Nuovo`, `Modifica` ed `Elimina`
-   tramite i componenti UI del progetto.
+   tramite i componenti UI del progetto;
+7. utilizzare label definite esplicitamente, leggibili e coerenti con il
+   linguaggio funzionale, senza ricavarle automaticamente dai nomi delle
+   proprieta C# o delle colonne SQL.
 
 Ogni modulo esistente o nuovo deve disporre nella dashboard di un
 collegamento alla propria gestione. Il collegamento deve puntare a una
@@ -459,6 +465,149 @@ esistenti siano gia conformi, ne che la ricerca dinamica e i report siano gia
 implementati. La conformita deve essere verificata negli interventi grafici
 successivi; ricerca e reportistica restano funzionalita approvate da
 realizzare e collaudare.
+
+### DA-023 — Versionamento esplicito dello schema database
+
+**Stato:** [D] Approvata esplicitamente.
+
+**Data di approvazione:** 21 ottobre 2026.
+
+**Fonte dell'approvazione:** richiesta esplicita nella sessione Work.
+
+**Contesto**
+
+Gli script SQL sono conservati e versionati nel repository, ma questo non
+identifica automaticamente la versione effettivamente installata su ciascun
+database.
+
+**Decisione**
+
+Il database installato deve esporre una versione esplicita dello schema. Ogni
+aggiornamento strutturale o funzionale deve essere riconducibile a una versione
+ordinata e verificabile, in modo da determinare quali aggiornamenti risultano
+applicati e quali restano da eseguire.
+
+**Relazioni**
+
+La decisione integra DA-014 e DA-021. Non sostituisce l'obbligo di conservare
+gli script SQL nel repository.
+
+**Riscontri [C] al 21 ottobre 2026**
+
+La ricognizione del repository non ha individuato un meccanismo generale che
+registri nel database la versione installata dello schema. I nomi progressivi
+degli script e le verifiche dei singoli interventi non costituiscono da soli
+un registro di versione del database.
+
+**Punti aperti [P]**
+
+Restano da definire il meccanismo tecnico, la versione iniziale, la numerazione
+degli aggiornamenti e i controlli da eseguire durante installazione,
+aggiornamento o avvio dell'applicazione.
+
+### DA-024 — Label funzionali leggibili
+
+**Stato:** [D] Approvata esplicitamente.
+
+**Data di approvazione:** 21 ottobre 2026.
+
+**Fonte dell'approvazione:** richiesta esplicita nella sessione Work.
+
+**Decisione**
+
+Le label dei campi nelle maschere e nelle pagine devono essere definite
+esplicitamente con testo leggibile e coerente con il linguaggio funzionale.
+Non devono essere esposte label ottenute automaticamente dai nomi tecnici
+delle proprieta C# o delle colonne SQL.
+
+**Relazioni**
+
+La decisione integra DA-022 ed e obbligatoria per ogni nuova pagina o modifica
+grafica. Non autorizza una revisione indiscriminata di pagine estranee
+all'intervento corrente.
+
+**Riscontri [C] al 21 ottobre 2026**
+
+La registrazione della decisione non attesta che tutte le pagine esistenti
+siano gia conformi. La conformita delle label deve essere verificata negli
+interventi grafici successivi.
+
+### DA-025 — Applicazione Android Preventivi Mobile
+
+**Stato:** [D] Approvata esplicitamente per obiettivi, ambito della prima fase
+e requisiti di utilizzo. Le scelte tecniche indicate nei punti aperti restano
+[P].
+
+**Data di approvazione:** 21 ottobre 2026.
+
+**Fonte dell'approvazione:** richiesta esplicita nella sessione Work.
+
+**Obiettivo**
+
+Realizzare un'applicazione Android, denominata `Preventivi Mobile`, che renda
+consultabili da qualsiasi luogo i dati gestiti dal sistema Preventivi.
+
+**Prima fase [D]**
+
+La prima fase e esclusivamente di consultazione e deve comprendere:
+
+1. ricerca dei preventivi mediante filtri avanzati;
+2. consultazione della testata e dei dettagli dei preventivi;
+3. ricerca e consultazione dei clienti;
+4. ricerca e consultazione delle tabelle anagrafiche piu importanti;
+5. interfaccia ordinata, leggibile e progettata per una navigazione semplice
+   su dispositivo mobile;
+6. predisposizione architetturale delle future operazioni di inserimento,
+   modifica ed eliminazione, senza renderle disponibili nella prima fase;
+7. possibilita di predisporre e inviare preventivi e richieste tramite le
+   applicazioni email disponibili sul dispositivo.
+
+La selezione del preventivo o della richiesta deve condurre ai relativi
+dettagli senza richiedere percorsi di navigazione complessi. Filtri, elenchi e
+dettagli devono essere progettati specificamente per schermi mobili e non come
+semplice riproduzione delle pagine desktop.
+
+**Evoluzione successiva [D]**
+
+Le operazioni di inserimento, modifica ed eliminazione sono previste come
+possibile evoluzione. La loro predisposizione non ne autorizza
+l'implementazione o l'attivazione finche non saranno approvati regole
+funzionali, autorizzazioni, validazioni e controlli di concorrenza.
+
+**Vincoli e punti aperti [P]**
+
+- definire un'API HTTPS autenticata tra l'applicazione mobile e il sistema
+  Preventivi, evitando l'esposizione diretta di SQL Server su Internet;
+- definire autenticazione, ruoli, autorizzazioni, audit, scadenza delle
+  sessioni e protezione dei dati memorizzati sul dispositivo;
+- scegliere la tecnologia di sviluppo Android e stabilire se prevedere anche
+  una futura versione iOS;
+- identificare con un elenco approvato le tabelle anagrafiche comprese nella
+  prima fase;
+- definire filtri, ordinamenti, paginazione e limiti dei risultati per ogni
+  area consultabile;
+- definire se sia richiesta consultazione offline e, in caso affermativo,
+  quali dati possano essere memorizzati localmente e per quanto tempo;
+- verificare la generazione o il recupero del documento da allegare all'email;
+- utilizzare preferibilmente il selettore di condivisione o composizione email
+  di Android, lasciando all'applicazione email scelta dall'utente la selezione
+  dell'account mittente. L'eventuale enumerazione diretta degli account del
+  dispositivo richiede una verifica tecnica e di riservatezza dedicata.
+
+**Relazioni**
+
+La prima fase non modifica il database e non sostituisce Preventivi.Web. Il
+database rimane la fonte dati del sistema; il canale tecnico di accesso remoto
+deve essere approvato prima dell'implementazione. Le regole di DA-017 si
+applicano alla gestione degli errori, mentre DA-022 e DA-024 costituiscono il
+riferimento di coerenza grafica e leggibilita, adattato all'esperienza mobile.
+
+**Riscontri [C] al 21 ottobre 2026**
+
+La registrazione della decisione non attesta l'esistenza dell'applicazione,
+di un'API mobile o di servizi esposti da remoto. Non e stata ancora eseguita
+una verifica dell'infrastruttura, della sicurezza di rete o dei requisiti di
+pubblicazione Android.
 
 ## 5. Riscontri e chiarimenti aperti
 
@@ -739,7 +888,7 @@ Le decisioni approvate sono:
 - **210:** il comportamento viene coperto da test automatici per successo,
   rollback, file mancante, errore storage e modifica concorrente.
 
-**Riscontri [C] al 20 ottobre 2026**
+**Riscontri [C] al 21 ottobre 2026**
 
 TEC-006 fornisce la quarantena e la compensazione per il singolo allegato.
 Nel repository sono stati predisposti il coordinamento applicativo dei gruppi
@@ -788,6 +937,35 @@ Le decisioni approvate sono:
   versionato e applicate prima della prova runtime;
 - **219:** l'eliminazione dell'intero preventivo resta un intervento separato,
   da definire rispetto a richieste, varianti, righe e allegati.
+- **220:** nella creazione da Richiesta cliente il cliente viene ereditato
+  dalla richiesta e non e sostituibile; se e assente o non attivo, la
+  creazione viene bloccata con un messaggio esplicito.
+- **221:** nella creazione da Modello preventivo, cliente, oggetto e note del
+  modello sono valori iniziali modificabili prima del salvataggio;
+- **222:** dal modello vengono copiate esclusivamente le righe presenti in
+  `ModelliPreventivoRighe`; componenti, materiali e lavorazioni non vengono
+  copiati dal modello attuale;
+- **223:** il preventivo creato conserva il collegamento al modello di origine,
+  ma le successive modifiche del modello non aggiornano il preventivo gia
+  creato;
+- **224:** nella creazione sono selezionabili soltanto modelli attivi e
+  l'eventuale cliente associato al preventivo deve risultare attivo al momento
+  del salvataggio;
+- **225:** la gestione completa dei modelli preventivo costituisce un
+  intervento separato. Il collaudo conclusivo di TEC-008 deve utilizzare un
+  modello reale proveniente dal flusso di gestione o importazione oppure uno
+  script di prova controllato.
+- **226:** ogni riga di un modello preventivo deve memorizzare esplicitamente
+  il proprio `IdTipoRiga`;
+- **227:** `ModelliPreventivoRighe.IdTipoRiga` deve essere protetto da una
+  chiave esterna verso `TipiRigaPreventivo.IdTipoRiga`;
+- **228:** la migrazione delle righe modello esistenti puo assegnare
+  automaticamente il tipo soltanto quando questo e determinabile senza
+  ambiguita. In presenza di piu tipi compatibili, lo script deve interrompersi
+  e segnalare le righe da classificare;
+- **229:** la creazione da modello deve copiare e validare il tipo registrato
+  nella riga modello, senza selezionare automaticamente il primo tipo riga
+  compatibile.
 
 **Riscontri [C] al 20 ottobre 2026**
 
@@ -802,9 +980,107 @@ database di test senza errori. La prova runtime ha verificato l'apertura della
 pagina, le origini Libero, Richiesta cliente e Modello preventivo, i relativi
 lookup e la creazione libera del preventivo `2026-00002`: stato iniziale
 Bozza, data corrente, cliente TECNOCED, markup predefinito 60%, totali iniziali
-a zero e reindirizzamento al dettaglio. La creazione da richiesta cliente e da
-modello preventivo non risulta ancora collaudata con salvataggio effettivo; nel
-database di test non erano disponibili modelli selezionabili.
+a zero e reindirizzamento al dettaglio. La creazione da modello preventivo non
+risulta ancora collaudata con salvataggio effettivo; nel database di test non
+erano disponibili modelli selezionabili.
+
+Nella stessa data l'utente ha approvato la decisione 220 e ha confermato
+l'applicazione senza errori dello script incrementale
+`TEC-008_02_Vincolo_Cliente_Richiesta.sql`. Il collaudo browser sulla richiesta
+`2026-00001` ha verificato il caso negativo: il cliente inattivo `TEST` viene
+mostrato in sola lettura, l'oggetto viene proposto, compare il messaggio
+esplicito e l'azione Salva risulta disabilitata.
+
+Il 21 ottobre 2026 il controllo applicativo e stato allineato all'elenco dei
+clienti attivi caricato dalla stessa connessione. Il collaudo positivo ha
+creato il preventivo `2026-00003` dalla richiesta `2026-00001`, con stato
+iniziale Bozza, cliente `Cliente Test S.r.l.`, oggetto e markup proposti,
+collegamento alla richiesta e reindirizzamento al dettaglio. La richiesta e
+stata aggiornata allo stato `Preventivata`. Il rifiuto runtime della stored
+procedure contro dati alterati non risulta collaudato mediante una chiamata
+diretta.
+
+Nella stessa data l'utente ha approvato le decisioni 221-225 relative alla
+creazione da Modello preventivo. La loro registrazione non costituisce prova
+del flusso runtime: il salvataggio da modello resta da collaudare con un
+modello attivo e con righe reali o predisposte mediante uno script controllato.
+
+La ricognizione successiva ha rilevato che `ModelliPreventivoRighe` non
+memorizza attualmente `IdTipoRiga` e che la procedura TEC-008 sceglie il primo
+tipo attivo compatibile in base alla sola presenza dell'articolo. Il 21 ottobre
+2026 l'utente ha quindi approvato le decisioni 226-229.
+
+Nel repository e stato predisposto lo script
+`TEC-008_03_Tipo_Riga_Modelli.sql`: aggiunge la colonna, migra solo le righe
+classificabili senza ambiguita, applica `NOT NULL` e chiave esterna e sostituisce
+il fallback `TOP (1)` con la copia del tipo registrato. Il 21 ottobre 2026
+l'utente ha confermato l'esecuzione dello script sul database senza errori. Il
+flusso da modello non e ancora collaudato a runtime.
+
+La successiva ricognizione dei tipi riga reali ha verificato che soltanto
+`ART` ha `RigaArticolo = 1`, mentre `MostraArticolo = 1` e presente anche sui
+tipi liberi. Sono stati quindi predisposti gli script incrementali
+`MB-02_05_Regole_Riga_Articolo.sql` e
+`TEC-008_04_Regole_Riga_Articolo_Modelli.sql`, che usano `RigaArticolo` come
+discriminante senza modificare la configurazione esistente. Per il collaudo,
+in assenza di modelli reali, e stato inoltre predisposto
+`TEC-008_05_Modello_Collaudo_Articolo.sql`, basato sul tipo `ART` e
+sull'articolo attivo `GAB.01.001` indicati dall'utente. Il 23 ottobre 2026
+l'utente ha confermato l'esecuzione senza errori di tutti e tre gli script; il
+successivo collaudo runtime e stato superato. Sono stati verificati il
+passaggio tra riga Articolo e Materiale libero, la compilazione o lo
+svuotamento della descrizione, l'obbligatorieta coerente del costo libero e la
+creazione del preventivo dal modello controllato `TEST-TEC008-ART` con tipo
+`ART` e articolo `GAB.01.001`.
+
+### 5.15 Decisioni TEC-010 — Gestione modelli preventivo
+
+**Classificazione:** [D].
+
+**Stato:** approvate.
+
+**Data di approvazione:** 23 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work dedicata
+alla prosecuzione successiva a TEC-008.
+
+Le decisioni approvate sono:
+
+- **230:** creare il modulo Web `Modelli preventivo`, protetto dal permesso
+  applicativo dei Preventivi;
+- **231:** l'elenco espone ricerca e filtri per codice, descrizione, cliente e
+  stato;
+- **232:** la testata gestisce codice univoco, descrizione obbligatoria,
+  cliente facoltativo, oggetto, note e stato;
+- **233:** le righe dispongono delle azioni `Nuovo`, `Modifica` ed `Elimina` e
+  applicano le regole dinamiche gia approvate per le righe preventivo;
+- **234:** l'eliminazione di un modello e logica mediante disattivazione, in
+  modo da conservare la tracciabilita dei preventivi che lo hanno utilizzato;
+- **235:** un modello disattivato puo essere riattivato;
+- **236:** una singola riga modello puo essere eliminata fisicamente previa
+  conferma, poiche i preventivi gia creati ne conservano una copia autonoma;
+- **237:** il modulo deve essere raggiungibile mediante collegamenti reali dal
+  menu e dalla dashboard;
+- **238:** componenti, materiali e lavorazioni non fanno parte di TEC-010: il
+  modello corrente contiene e trasferisce esclusivamente le righe definite in
+  `ModelliPreventivoRighe`.
+
+**Riscontri [C] al 23 ottobre 2026**
+
+Prima dell'implementazione risultano presenti le tabelle
+`ModelliPreventivo` e `ModelliPreventivoRighe`, i relativi vincoli nella
+baseline TEC-002, il tipo riga esplicito introdotto da TEC-008 e il solo lookup
+dei modelli attivi usato nella creazione del preventivo. Non risultano pagine
+Web o operazioni repository dedicate alla gestione completa dei modelli.
+
+Nel repository sono ora predisposti il contratto e il repository dedicati, le
+pagine di elenco, creazione, modifica, disattivazione e riattivazione, la
+gestione completa delle righe, i collegamenti da menu e dashboard e lo script
+`TEC-010_01_Gestione_Modelli_Preventivo.sql`. Lo script ha superato il
+controllo sintattico ScriptDom, ma non risulta ancora applicato al database.
+La soluzione compila con zero errori; hanno superato la verifica 28 test Data
+e 30 test Web, inclusi quattro nuovi test di validazione dei form TEC-010. Il
+flusso applicativo non e ancora collaudato a runtime contro il database.
 
 ## 6. Implementazioni e proposte non promosse a decisioni
 

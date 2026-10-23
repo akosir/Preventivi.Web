@@ -1,0 +1,123 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Modelli.IndexModel
+
+@{
+    ViewData["Title"] = "Modelli preventivo";
+}
+
+<div class="workspace-page preventivi-page">
+    <div class="workspace-header d-flex justify-content-between align-items-start gap-3">
+        <div>
+            <h1 class="workspace-title">Modelli preventivo</h1>
+            <div class="workspace-subtitle">Gestione delle testate e delle righe riutilizzabili</div>
+        </div>
+        <a asp-page="./Nuovo" class="pfw-btn pfw-btn-primary">Nuovo</a>
+    </div>
+
+    @if (TempData["MessaggioSuccesso"] is string messaggio)
+    {
+        <div class="alert alert-success">@messaggio</div>
+    }
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Ricerca</h2>
+                <div class="pfw-panel-subtitle">Filtra per contenuto, cliente e stato</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-lg-5">
+                    <label asp-for="Ricerca" class="form-label">Codice, descrizione, oggetto o cliente</label>
+                    <input asp-for="Ricerca" class="form-control" />
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label asp-for="IdCliente" class="form-label">Cliente</label>
+                    <select asp-for="IdCliente" class="form-select">
+                        <option value="">Tutti i clienti</option>
+                        @foreach (var cliente in Model.Clienti)
+                        {
+                            <option value="@cliente.IdCliente">@cliente.CodiceCliente - @cliente.RagioneSociale</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <label asp-for="Stato" class="form-label">Stato</label>
+                    <select asp-for="Stato" class="form-select">
+                        <option value="attivi">Attivi</option>
+                        <option value="nonattivi">Non attivi</option>
+                        <option value="tutti">Tutti</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <button type="submit" class="pfw-btn pfw-btn-primary">Cerca</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Risultati</h2>
+                <div class="pfw-panel-subtitle">@Model.Modelli.Count modelli trovati</div>
+            </div>
+        </div>
+
+        @if (Model.Modelli.Count == 0)
+        {
+            <div class="pfw-panel-body">
+                <div class="workspace-placeholder">
+                    <div class="workspace-placeholder-title">Nessun modello trovato</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table pfw-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Codice</th>
+                            <th>Descrizione</th>
+                            <th>Cliente</th>
+                            <th>Oggetto</th>
+                            <th class="text-end">Righe</th>
+                            <th>Stato</th>
+                            <th class="text-end">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var modello in Model.Modelli)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@modello.CodiceModelloPreventivo</td>
+                                <td>@modello.Descrizione</td>
+                                <td>@(string.IsNullOrWhiteSpace(modello.Cliente) ? "-" : modello.Cliente)</td>
+                                <td>@(string.IsNullOrWhiteSpace(modello.Oggetto) ? "-" : modello.Oggetto)</td>
+                                <td class="text-end">@modello.NumeroRighe</td>
+                                <td>
+                                    <span class="pfw-badge @(modello.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">
+                                        @(modello.Attivo ? "Attivo" : "Non attivo")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-page="./Dettaglio"
+                                       asp-route-id="@modello.IdModelloPreventivo"
+                                       class="pfw-btn pfw-btn-secondary">Apri</a>
+                                    <a asp-page="./Stato"
+                                       asp-route-id="@modello.IdModelloPreventivo"
+                                       asp-route-attivo="@(!modello.Attivo)"
+                                       class="pfw-btn @(modello.Attivo ? "pfw-btn-danger" : "pfw-btn-primary")">
+                                        @(modello.Attivo ? "Elimina" : "Riattiva")
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>

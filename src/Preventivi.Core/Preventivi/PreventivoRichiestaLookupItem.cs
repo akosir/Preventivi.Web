@@ -12,6 +12,8 @@ public sealed class PreventivoRichiestaLookupItem
 
     public string Cliente { get; set; } = string.Empty;
 
+    public bool ClienteAttivo { get; set; }
+
     public string Oggetto { get; set; } = string.Empty;
 
     public string Stato { get; set; } = string.Empty;

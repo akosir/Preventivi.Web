@@ -159,7 +159,10 @@ public sealed class PreventivoRepository : IPreventivoRepository
             NullableText("@Note", riga.Note),
             Decimal("@MarkupPerc", riga.MarkupPerc, 9, 2),
             new SqlParameter("@PrezzoManuale", SqlDbType.Bit) { Value = riga.PrezzoManuale },
-            NullableDecimal("@CostoUnitarioLibero", riga.CostoUnitarioLibero, 18, 4)
+            NullableDecimal("@CostoUnitarioLibero", riga.CostoUnitarioLibero, 18, 4),
+            new SqlParameter("@IdTipoRiga", riga.IdTipoRiga),
+            NullableInt("@IdArticolo", riga.IdArticolo),
+            NullableInt("@IdModelloCiclo", riga.IdModelloCiclo)
         };
 
         await _db.ExecuteAsync(

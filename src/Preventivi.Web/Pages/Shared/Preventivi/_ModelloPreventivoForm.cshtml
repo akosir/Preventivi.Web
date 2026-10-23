@@ -1,0 +1,43 @@
+@model global::Preventivi.Web.Pages.Preventivi.Modelli.ModelloPreventivoFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<div class="row g-3">
+    <div class="col-12 col-md-4 pfw-field-required">
+        <label asp-for="Dati.CodiceModelloPreventivo" class="form-label">Codice modello</label>
+        <input asp-for="Dati.CodiceModelloPreventivo" class="form-control" />
+        <span asp-validation-for="Dati.CodiceModelloPreventivo" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-8 pfw-field-required">
+        <label asp-for="Dati.Descrizione" class="form-label">Descrizione</label>
+        <input asp-for="Dati.Descrizione" class="form-control" />
+        <span asp-validation-for="Dati.Descrizione" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label asp-for="Dati.IdCliente" class="form-label">Cliente associato</label>
+        <select asp-for="Dati.IdCliente" class="form-select">
+            <option value="">Nessun cliente associato</option>
+            @foreach (var cliente in Model.Clienti)
+            {
+                <option value="@cliente.IdCliente">
+                    @cliente.CodiceCliente - @cliente.RagioneSociale@(!cliente.Attivo ? " (non attivo)" : "")
+                </option>
+            }
+        </select>
+        <span asp-validation-for="Dati.IdCliente" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label asp-for="Dati.Oggetto" class="form-label">Oggetto proposto</label>
+        <input asp-for="Dati.Oggetto" class="form-control" />
+        <span asp-validation-for="Dati.Oggetto" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Dati.Note" class="form-label">Note proposte</label>
+        <textarea asp-for="Dati.Note" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Dati.Note" class="text-danger"></span>
+    </div>
+</div>

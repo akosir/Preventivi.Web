@@ -1,0 +1,37 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Modelli.Righe.EliminaModel
+
+@{
+    var modello = Model.Modello!;
+    var riga = Model.Riga!;
+    ViewData["Title"] = "Elimina riga modello";
+}
+
+<div class="workspace-page preventivi-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="../Index">Modelli preventivo</a>
+            <span>/</span>
+            <a asp-page="../Dettaglio" asp-route-id="@modello.IdModelloPreventivo">@modello.CodiceModelloPreventivo</a>
+            <span>/</span>
+            <span>Elimina riga</span>
+        </div>
+        <h1 class="workspace-title">Elimina riga modello</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-body">
+            <p>
+                Confermi l'eliminazione della riga <strong>@riga.RigaNr - @riga.DescrizioneVoce</strong>?
+                L'operazione non modifica i preventivi gia creati dal modello.
+            </p>
+
+            <form method="post" class="preventivi-form-actions">
+                <input asp-for="IdModello" type="hidden" />
+                <input asp-for="IdRiga" type="hidden" />
+                <a asp-page="../Dettaglio" asp-route-id="@modello.IdModelloPreventivo" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-danger">Elimina</button>
+            </form>
+        </div>
+    </section>
+</div>

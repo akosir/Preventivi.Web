@@ -57,6 +57,8 @@
                         {
                             <option value="@richiesta.IdRichiestaCliente"
                                     data-cliente="@richiesta.IdCliente"
+                                    data-cliente-label="@richiesta.Cliente"
+                                    data-cliente-attivo="@richiesta.ClienteAttivo.ToString().ToLowerInvariant()"
                                     data-oggetto="@richiesta.Oggetto">
                                 @richiesta.NumeroCompleto - @richiesta.Cliente - @richiesta.Oggetto (@richiesta.Stato)
                             </option>
@@ -81,7 +83,7 @@
                     <span asp-validation-for="Dati.IdModelloPreventivo" class="text-danger"></span>
                 </div>
 
-                <div class="col-12 col-md-6 pfw-field-required">
+                <div class="col-12 col-md-6 pfw-field-required" id="preventivo-cliente-editabile">
                     <label asp-for="Dati.IdCliente" class="form-label">Cliente</label>
                     <select asp-for="Dati.IdCliente" class="form-select" id="preventivo-cliente">
                         <option value="">Seleziona un cliente</option>
@@ -90,6 +92,20 @@
                             <option value="@cliente.IdCliente">@cliente.CodiceCliente - @cliente.RagioneSociale</option>
                         }
                     </select>
+                </div>
+
+                <div class="col-12 col-md-6 pfw-field-required" id="preventivo-cliente-richiesta" hidden>
+                    <label for="preventivo-cliente-richiesta-testo" class="form-label">Cliente</label>
+                    <input type="text"
+                           class="form-control"
+                           id="preventivo-cliente-richiesta-testo"
+                           readonly />
+                    <div class="text-danger" id="preventivo-cliente-richiesta-errore" hidden>
+                        Il cliente collegato alla richiesta non e attivo. Riattivarlo prima di creare il preventivo.
+                    </div>
+                </div>
+
+                <div class="col-12">
                     <span asp-validation-for="Dati.IdCliente" class="text-danger"></span>
                 </div>
 
@@ -107,7 +123,7 @@
 
             <div class="preventivi-form-actions">
                 <a asp-page="/Preventivi/Index" class="pfw-btn pfw-btn-secondary">Annulla</a>
-                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+                <button type="submit" class="pfw-btn pfw-btn-primary" id="preventivo-salva">Salva</button>
             </div>
         </form>
     </section>
@@ -123,11 +139,40 @@
             const richiesta = document.getElementById("preventivo-richiesta");
             const modello = document.getElementById("preventivo-modello");
             const sezioniOrigine = document.querySelectorAll(".preventivo-origin-field");
+            const clienteEditabile = document.getElementById("preventivo-cliente-editabile");
+            const clienteRichiesta = document.getElementById("preventivo-cliente-richiesta");
+            const clienteRichiestaTesto = document.getElementById("preventivo-cliente-richiesta-testo");
+            const clienteRichiestaErrore = document.getElementById("preventivo-cliente-richiesta-errore");
+            const salva = document.getElementById("preventivo-salva");
+
+            const aggiornaClienteRichiesta = () => {
+                const option = richiesta.options[richiesta.selectedIndex];
+                const selezionata = Boolean(option?.value);
+                const clienteAttivo = option?.dataset.clienteAttivo === "true";
+
+                clienteRichiestaTesto.value = selezionata
+                    ? option.dataset.clienteLabel || "Cliente non associato"
+                    : "";
+                clienteRichiestaErrore.hidden = !selezionata || clienteAttivo;
+                salva.disabled = selezionata && !clienteAttivo;
+            };
 
             const aggiornaOrigine = () => {
                 sezioniOrigine.forEach(sezione => {
                     sezione.hidden = sezione.dataset.origin !== origine.value;
                 });
+
+                const daRichiesta = origine.value === "Richiesta";
+                clienteEditabile.hidden = daRichiesta;
+                clienteRichiesta.hidden = !daRichiesta;
+                cliente.disabled = daRichiesta;
+
+                if (daRichiesta) {
+                    aggiornaClienteRichiesta();
+                } else {
+                    clienteRichiestaErrore.hidden = true;
+                    salva.disabled = false;
+                }
             };
 
             const applicaOrigine = select => {
@@ -146,7 +191,10 @@
             };
 
             origine.addEventListener("change", aggiornaOrigine);
-            richiesta.addEventListener("change", () => applicaOrigine(richiesta));
+            richiesta.addEventListener("change", () => {
+                applicaOrigine(richiesta);
+                aggiornaClienteRichiesta();
+            });
             modello.addEventListener("change", () => applicaOrigine(modello));
             aggiornaOrigine();
         })();
