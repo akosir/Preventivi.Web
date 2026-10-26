@@ -499,11 +499,13 @@ registri nel database la versione installata dello schema. I nomi progressivi
 degli script e le verifiche dei singoli interventi non costituiscono da soli
 un registro di versione del database.
 
-**Punti aperti [P]**
+**Risoluzione dei punti aperti [D] al 26 ottobre 2026**
 
-Restano da definire il meccanismo tecnico, la versione iniziale, la numerazione
-degli aggiornamenti e i controlli da eseguire durante installazione,
-aggiornamento o avvio dell'applicazione.
+Le decisioni 239-245, registrate nella sezione 5.16, definiscono il meccanismo
+tecnico, la versione iniziale, la numerazione e il controllo applicativo. La
+decisione DA-023 non presenta quindi piu punti funzionali aperti; restano da
+completare e verificare l'applicazione dello script iniziale e il collaudo
+runtime.
 
 ### DA-024 — Label funzionali leggibili
 
@@ -1077,10 +1079,76 @@ Nel repository sono ora predisposti il contratto e il repository dedicati, le
 pagine di elenco, creazione, modifica, disattivazione e riattivazione, la
 gestione completa delle righe, i collegamenti da menu e dashboard e lo script
 `TEC-010_01_Gestione_Modelli_Preventivo.sql`. Lo script ha superato il
-controllo sintattico ScriptDom, ma non risulta ancora applicato al database.
+controllo sintattico ScriptDom.
+
+Il 23 ottobre 2026 lo script e stato applicato a `PreventiviProduzione` dopo
+una diagnostica senza riferimenti orfani. La verifica successiva ha confermato
+10 procedure TEC-010 installate e i 5 vincoli richiesti attivi e affidabili.
 La soluzione compila con zero errori; hanno superato la verifica 28 test Data
-e 30 test Web, inclusi quattro nuovi test di validazione dei form TEC-010. Il
-flusso applicativo non e ancora collaudato a runtime contro il database.
+e 30 test Web, inclusi quattro test di validazione dei form TEC-010.
+
+Il collaudo runtime ha verificato elenco e ricerca, creazione e modifica della
+testata, compilazione del cliente e dei valori proposti, inserimento di una
+riga Articolo con descrizione automatica e modello ciclo, inserimento e
+modifica di una riga Materiale libero e la relativa conferma di eliminazione.
+L'eliminazione della riga di prova e la disattivazione e riattivazione del
+modello sono state verificate direttamente mediante le procedure TEC-010.
+La creazione da modello e stata infine eseguita in una transazione di collaudo:
+testata, collegamento al modello, cliente, stato Bozza e riga Articolo sono
+risultati corretti; il rollback finale ha confermato l'assenza di preventivi
+residui. TEC-010 risulta quindi chiusa per l'ambito approvato dalle decisioni
+230-238.
+
+### 5.16 Decisioni TEC-012 — Versionamento database
+
+**Classificazione:** [D].
+
+**Stato:** approvate.
+
+**Data di approvazione:** 26 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work.
+
+Le decisioni approvate sono:
+
+- **239:** introdurre l'intervento TEC-012 per il versionamento esplicito dello
+  schema database;
+- **240:** usare il registro append-only `dbo.VersioniSchema`, nel quale ogni
+  aggiornamento applicato conserva versione, codice intervento, script,
+  descrizione, data, operatore e impronta SHA-256;
+- **241:** usare una versione numerica nel formato `AAAAMMGGNN`, con baseline
+  iniziale `2026102601`;
+- **242:** lo script iniziale registra la baseline soltanto dopo aver verificato
+  la presenza degli oggetti applicativi richiesti fino a TEC-010;
+- **243:** ogni futuro aggiornamento database deve essere transazionale,
+  incrementare la versione e registrare codice, script, descrizione, data,
+  operatore e impronta SHA-256;
+- **244:** l'applicazione verifica la versione in sola lettura e non esegue
+  automaticamente script o migrazioni;
+- **245:** database non disponibile, registro assente o versione diversa da
+  quella supportata bloccano le funzioni operative e mostrano una pagina di
+  manutenzione leggibile, conservando il dettaglio tecnico nei log.
+
+**Riscontri [C] al 26 ottobre 2026**
+
+Nel repository sono predisposti lo script incrementale
+`TEC-012_01_Versionamento_Database.sql`, il contratto e il verificatore della
+versione, il controllo di avvio, il middleware di blocco e la pagina di
+manutenzione. Lo script verifica gli oggetti rappresentativi richiesti fino a
+TEC-010, crea il registro append-only e la procedura di lettura della versione
+corrente, quindi registra la baseline `2026102601` con la relativa impronta.
+
+Lo script ha superato il controllo sintattico ScriptDom e la verifica
+dell'impronta SHA-256 dichiarata. La soluzione compila con zero errori; sono
+stati superati 28 test Data e 36 test Web. Prima dell'applicazione dello script,
+il collaudo runtime ha confermato il riconoscimento dello stato
+`NonInizializzato`, il redirect da `/Preventivi` a `/Sistema/Database` e la
+pagina di manutenzione HTTP 200 con versione richiesta `2026102601` e versione
+installata non rilevata.
+
+Lo script non risulta ancora applicato al database. La compatibilita operativa
+dopo l'installazione della baseline deve quindi essere verificata separatamente
+e non e attestata dai controlli precedenti.
 
 ## 6. Implementazioni e proposte non promosse a decisioni
 

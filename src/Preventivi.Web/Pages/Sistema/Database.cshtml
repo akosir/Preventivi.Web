@@ -1,0 +1,39 @@
+@page
+@model global::Preventivi.Web.Pages.Sistema.DatabaseModel
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Database non disponibile";
+}
+
+<main class="account-page">
+    <section class="account-maintenance" aria-labelledby="database-title">
+        <div class="account-brand" aria-hidden="true">P</div>
+        <h1 id="database-title">Database non pronto</h1>
+        <p class="account-subtitle">L'area di lavoro e temporaneamente sospesa</p>
+
+        <div class="pfw-panel">
+            <div class="pfw-panel-body">
+                <p class="mb-3">@Model.Stato.MessaggioUtente</p>
+
+                <dl class="database-status">
+                    <div>
+                        <dt>Versione richiesta</dt>
+                        <dd>@Model.Stato.VersioneSupportata</dd>
+                    </div>
+                    <div>
+                        <dt>Versione installata</dt>
+                        <dd>@(Model.Stato.VersioneInstallata?.ToString() ?? "Non rilevata")</dd>
+                    </div>
+                </dl>
+
+                <p class="account-help">
+                    Applicare gli aggiornamenti previsti e riavviare
+                    Preventivi.Web. Nessun aggiornamento viene eseguito
+                    automaticamente.
+                </p>
+            </div>
+        </div>
+    </section>
+</main>

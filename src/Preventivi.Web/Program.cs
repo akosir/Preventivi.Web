@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Preventivi.Core.Allegati.Storage;
+using Preventivi.Core.Database;
 using Preventivi.Core.ParametriSistema;
 using Preventivi.Core.Preventivi;
 using Preventivi.Core.Preventivi.Eliminazione;
@@ -13,6 +14,7 @@ using Preventivi.Data.Comune;
 using Preventivi.Data.ParametriSistema;
 using Preventivi.Data.Preventivi;
 using Preventivi.Data.Sicurezza;
+using Preventivi.Web.Database;
 using Preventivi.Web.Sicurezza;
 using Preventivi.Web.UI.ModelBinding;
 
@@ -60,6 +62,11 @@ var connectionString =
 
 builder.Services.AddSingleton(
     new SqlConnectionFactory(connectionString));
+
+builder.Services.AddSingleton<
+    IVerificatoreVersioneDatabase,
+    VerificatoreVersioneDatabase>();
+builder.Services.AddSingleton<StatoSchemaDatabaseApplicazione>();
 
 builder.Services.AddScoped<DatabaseExecutor>();
 
@@ -114,10 +121,46 @@ builder.Services.AddScoped<
 
 var app = builder.Build();
 
+var statoSchemaDatabase =
+    app.Services.GetRequiredService<StatoSchemaDatabaseApplicazione>();
+var schemaLogger = app.Services
+    .GetRequiredService<ILoggerFactory>()
+    .CreateLogger("SchemaDatabase");
+
+try
+{
+    var verificatore =
+        app.Services.GetRequiredService<IVerificatoreVersioneDatabase>();
+    var stato = await verificatore.VerificaAsync();
+    statoSchemaDatabase.Aggiorna(stato);
+
+    if (!stato.Operativo)
+    {
+        schemaLogger.LogCritical(
+            "Schema database non compatibile. Installata: {Installata}; supportata: {Supportata}; stato: {Stato}.",
+            stato.VersioneInstallata,
+            stato.VersioneSupportata,
+            stato.Compatibilita);
+    }
+}
+catch (Exception exception)
+{
+    statoSchemaDatabase.Aggiorna(StatoSchemaDatabase.NonDisponibile());
+    schemaLogger.LogError(
+        exception,
+        "Verifica della versione database non riuscita.");
+}
+
 if (args.Contains(
     "--inizializza-password-admin",
     StringComparer.OrdinalIgnoreCase))
 {
+    if (!statoSchemaDatabase.Stato.Operativo)
+    {
+        throw new InvalidOperationException(
+            statoSchemaDatabase.Stato.MessaggioUtente);
+    }
+
     await using var scope = app.Services.CreateAsyncScope();
     var initializer = scope.ServiceProvider.GetRequiredService<PasswordAdminInitializer>();
     await initializer.EseguiAsync();
@@ -135,6 +178,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ControlloSchemaDatabaseMiddleware>();
 
 app.UseRouting();
 

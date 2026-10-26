@@ -167,3 +167,26 @@ Lo script verifica preventivamente l'assenza di riferimenti orfani, completa
 gli eventuali vincoli mancanti e crea le procedure per ricerca, testata, stato
 e righe dei modelli. Non corregge automaticamente dati incoerenti, non elimina
 modelli e non contiene `USE`.
+
+## Versionamento database TEC-012
+
+Dopo avere applicato gli aggiornamenti richiesti fino a TEC-010, eseguire:
+
+1. `06_Aggiornamenti/TEC-012_01_Versionamento_Database.sql`.
+
+Lo script verifica gli oggetti applicativi richiesti, crea il registro
+append-only `dbo.VersioniSchema`, crea la procedura
+`dbo.Sistema_VersioneSchema_Corrente` e registra la baseline `2026102601`.
+Non contiene `USE` e non applica automaticamente gli aggiornamenti precedenti.
+
+Preventivi.Web accetta esclusivamente la versione database dichiarata nel
+codice applicativo. Se il database non e disponibile, il registro non e
+inizializzato o la versione e diversa, le funzioni operative restano bloccate
+e viene mostrata la pagina di manutenzione. Dopo ogni aggiornamento database e
+necessario riavviare l'applicazione; nessuna migrazione viene eseguita
+automaticamente.
+
+Ogni futuro script strutturale o funzionale deve essere transazionale,
+incrementare la versione numerica `AAAAMMGGNN` e registrare in
+`dbo.VersioniSchema` almeno codice intervento, nome script, descrizione,
+impronta SHA-256, data UTC e operatore.

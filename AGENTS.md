@@ -416,10 +416,17 @@ Gli script devono essere conservati nel repository e versionati.
 Ogni aggiornamento strutturale o funzionale del database deve essere
 riconducibile a una versione ordinata e verificabile.
 
-[P] Definire con un intervento dedicato il meccanismo tecnico di versionamento,
-la versione iniziale, la numerazione degli aggiornamenti e i controlli da
-eseguire in installazione o avvio. Non introdurre convenzioni implicite prima
-della relativa approvazione.
+[D] Il registro di versione e `dbo.VersioniSchema`, e append-only e usa una
+versione numerica `AAAAMMGGNN`. La baseline iniziale e `2026102601`.
+
+[D] Ogni futuro aggiornamento database deve essere transazionale, incrementare
+la versione e registrare codice intervento, nome script, descrizione, data,
+operatore e impronta SHA-256.
+
+[D] L'applicazione controlla la versione in sola lettura e non esegue
+automaticamente script o migrazioni. Database non disponibile, registro
+assente o versione non supportata bloccano le funzioni operative e mostrano
+una pagina di manutenzione leggibile; il dettaglio tecnico resta nei log.
 
 [D] Gli script devono essere idempotenti quando possibile.
 
