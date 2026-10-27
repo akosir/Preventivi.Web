@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Preventivi.Core.Campionature;
 using Preventivi.Core.Preventivi;
 using Preventivi.Core.RichiesteClienti;
 using Preventivi.Core.Sicurezza;
@@ -10,6 +11,7 @@ public class IndexModel : PageModel
 {
     private readonly IPreventivoRepository _preventivoRepository;
     private readonly IRichiestaClienteRepository _richiestaClienteRepository;
+    private readonly ICampionaturaRepository _campionaturaRepository;
 
     public IReadOnlyList<DashboardKpiItem> Indicatori { get; private set; }
         = Array.Empty<DashboardKpiItem>();
@@ -27,13 +29,16 @@ public class IndexModel : PageModel
 
     public bool PuoVisualizzarePreventivi { get; private set; }
     public bool PuoVisualizzareRichiesteClienti { get; private set; }
+    public bool PuoVisualizzareCampionature { get; private set; }
 
     public IndexModel(
         IPreventivoRepository preventivoRepository,
-        IRichiestaClienteRepository richiestaClienteRepository)
+        IRichiestaClienteRepository richiestaClienteRepository,
+        ICampionaturaRepository campionaturaRepository)
     {
         _preventivoRepository = preventivoRepository;
         _richiestaClienteRepository = richiestaClienteRepository;
+        _campionaturaRepository = campionaturaRepository;
     }
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
@@ -48,6 +53,11 @@ public class IndexModel : PageModel
                 User,
                 PermessiApplicazione.RichiesteClienti);
 
+        PuoVisualizzareCampionature =
+            AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                User,
+                PermessiApplicazione.Campionature);
+
         var preventivi = PuoVisualizzarePreventivi
             ? await _preventivoRepository.GetElencoAsync(cancellationToken)
             : Array.Empty<PreventivoListItem>();
@@ -58,11 +68,20 @@ public class IndexModel : PageModel
                 cancellationToken)
             : Array.Empty<RichiestaClienteListItem>();
 
+        var campionature = PuoVisualizzareCampionature
+            ? await _campionaturaRepository.GetElencoAsync(
+                new CampionaturaFiltro(),
+                cancellationToken)
+            : Array.Empty<CampionaturaListItem>();
+
         var preventiviDaInviare =
             preventivi.Count(IsDaInviare);
 
         var richiesteAperte = richieste.Count(richiesta =>
             !RichiestaClienteValori.StatoFinale(richiesta.Stato));
+
+        var campionatureAperte = campionature.Count(campionatura =>
+            !CampionaturaValori.StatoFinale(campionatura.Stato));
 
         Indicatori =
         [
@@ -82,8 +101,10 @@ public class IndexModel : PageModel
                 "P"),
             new DashboardKpiItem(
                 "Campionature",
-                "-",
-                "Modulo campionature non collegato",
+                PuoVisualizzareCampionature ? campionatureAperte.ToString() : "-",
+                PuoVisualizzareCampionature
+                    ? "Aperte"
+                    : "Accesso non autorizzato",
                 "C"),
             new DashboardKpiItem(
                 "Ordini fornitori",
@@ -100,7 +121,7 @@ public class IndexModel : PageModel
                 .ToArray();
 
         AlertOperativi =
-            CreaAlertOperativi(preventivi, richieste);
+            CreaAlertOperativi(preventivi, richieste, campionature);
 
         AndamentoPreventivi =
             CreaAndamentoPreventivi(preventivi);
@@ -108,7 +129,8 @@ public class IndexModel : PageModel
 
     private static IReadOnlyList<DashboardAlertItem> CreaAlertOperativi(
         IReadOnlyList<PreventivoListItem> preventivi,
-        IReadOnlyList<RichiestaClienteListItem> richieste)
+        IReadOnlyList<RichiestaClienteListItem> richieste,
+        IReadOnlyList<CampionaturaListItem> campionature)
     {
         var alert = new List<DashboardAlertItem>();
         var oggi = DateOnly.FromDateTime(DateTime.Today);
@@ -142,6 +164,22 @@ public class IndexModel : PageModel
                     "warning",
                     "Preventivo da inviare",
                     $"{preventivo.NumeroCompleto} - {preventivo.Cliente}"));
+        }
+
+        foreach (var campionatura in campionature
+                     .Where(elemento => !CampionaturaValori.StatoFinale(elemento.Stato))
+                     .Where(elemento =>
+                         elemento.Priorita == "Urgente" ||
+                         elemento.DataPrevistaConsegna <= limiteScadenza)
+                     .OrderBy(elemento => elemento.DataPrevistaConsegna ?? DateOnly.MaxValue)
+                     .ThenByDescending(elemento => elemento.Priorita == "Urgente")
+                     .Take(3))
+        {
+            var scaduta = campionatura.DataPrevistaConsegna < oggi;
+            alert.Add(new DashboardAlertItem(
+                scaduta ? "danger" : "warning",
+                scaduta ? "Campionatura in ritardo" : "Campionatura da seguire",
+                $"{campionatura.NumeroCompleto} - {campionatura.Cliente} - {campionatura.Oggetto}"));
         }
 
         foreach (var preventivo in preventivi.Where(IsDaVerificare).Take(3))

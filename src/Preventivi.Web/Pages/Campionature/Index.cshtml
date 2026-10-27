@@ -1,108 +1,163 @@
-﻿@page
-@model Campionature.IndexModel
+@page
+@model global::Preventivi.Web.Pages.Campionature.IndexModel
+@using global::Preventivi.Web.UI.Button
 
 @{
     ViewData["Title"] = "Campionature";
 }
 
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Campionature</h1>
-        <p class="page-subtitle">Monitoraggio campioni, rilievi ed esiti tecnici</p>
-    </div>
-
-    <div>
-        <button class="pfw-btn pfw-btn-primary">Nuova campionatura</button>
-    </div>
-</div>
-
-<section class="pfw-panel pfw-panel-auto mb-3">
-
-    <div class="pfw-filter-bar">
-
-        <input type="text"
-               class="form-control"
-               placeholder="Cerca cliente, richiesta o oggetto..." />
-
-        <select class="form-select">
-            <option>Tutti gli stati</option>
-            <option>Aperta</option>
-            <option>In verifica</option>
-            <option>Approvata</option>
-            <option>Respinta</option>
-        </select>
-
-        <select class="form-select">
-            <option>Tutte le priorità</option>
-            <option>Urgente</option>
-            <option>Alta</option>
-            <option>Media</option>
-            <option>Bassa</option>
-        </select>
-
-        <button class="pfw-btn pfw-btn-secondary">Aggiorna</button>
-
-    </div>
-
-</section>
-
-<section class="pfw-panel">
-
-    <div class="pfw-panel-header">
+<div class="workspace-page">
+    <div class="workspace-header d-flex justify-content-between align-items-start gap-3">
         <div>
-            <h2 class="pfw-panel-title">Campionature aperte</h2>
-            <div class="pfw-panel-subtitle">3 attività in corso</div>
+            <h1 class="workspace-title">Campionature</h1>
+            <p class="page-subtitle">Ricerca e gestione delle campionature collegate alle richieste clienti</p>
+        </div>
+        <div class="d-flex gap-2 no-print">
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Stampa risultati",
+                    Variante = "secondary",
+                    OnClick = "window.print()"
+                })
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Nuova campionatura",
+                    Variante = "primary",
+                    Url = Url.Page("/Campionature/Nuova")
+                })
         </div>
     </div>
 
-    <div class="table-responsive">
+    @if (TempData["MessaggioSuccesso"] is string messaggio)
+    {
+        <div class="alert alert-success">@messaggio</div>
+    }
 
-        <table class="table pfw-table align-middle mb-0">
+    <section class="pfw-panel mb-3 no-print">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Filtri</h2>
+                <div class="pfw-panel-subtitle">I filtri possono essere combinati</div>
+            </div>
+        </div>
+        <form method="get" class="p-3">
+            <div class="row g-3">
+                <div class="col-12 col-lg-4">
+                    <label asp-for="Ricerca" class="form-label">Testo libero</label>
+                    <input asp-for="Ricerca" class="form-control" placeholder="Numero, cliente, richiesta o oggetto" />
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label asp-for="IdCliente" class="form-label">Cliente</label>
+                    <select asp-for="IdCliente" class="form-select">
+                        <option value="">Tutti i clienti</option>
+                        @foreach (var cliente in Model.Clienti)
+                        {
+                            <option value="@cliente.IdCliente">@cliente.CodiceCliente - @cliente.RagioneSociale</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label asp-for="IdRichiestaCliente" class="form-label">Richiesta cliente</label>
+                    <select asp-for="IdRichiestaCliente" class="form-select">
+                        <option value="">Tutte le richieste</option>
+                        @foreach (var richiesta in Model.Richieste)
+                        {
+                            <option value="@richiesta.IdRichiestaCliente">
+                                @richiesta.NumeroRichiesta - @richiesta.Cliente - @richiesta.Oggetto
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label asp-for="Stato" class="form-label">Stato</label>
+                    <select asp-for="Stato" class="form-select">
+                        <option value="">Tutti gli stati</option>
+                        @foreach (var stato in Model.Stati)
+                        {
+                            <option value="@stato">@stato</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label asp-for="Priorita" class="form-label">Priorita</label>
+                    <select asp-for="Priorita" class="form-select">
+                        <option value="">Tutte le priorita</option>
+                        @foreach (var priorita in Model.PrioritaDisponibili)
+                        {
+                            <option value="@priorita">@priorita</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <label asp-for="ConsegnaDa" class="form-label">Consegna dal</label>
+                    <input asp-for="ConsegnaDa" type="date" class="form-control" />
+                </div>
+                <div class="col-6 col-lg-3">
+                    <label asp-for="ConsegnaA" class="form-label">Consegna al</label>
+                    <input asp-for="ConsegnaA" type="date" class="form-control" />
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Azzera filtri</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Cerca</button>
+            </div>
+        </form>
+    </section>
 
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Oggetto</th>
-                    <th>Priorità</th>
-                    <th>Consegna prevista</th>
-                    <th>Esito</th>
-                    <th></th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                <tr>
-                    <td>Rossi S.p.A.</td>
-                    <td>Espositore promozionale</td>
-                    <td><span class="pfw-badge pfw-badge-danger">Urgente</span></td>
-                    <td>22/08/2026</td>
-                    <td><span class="pfw-badge pfw-badge-warning">In verifica</span></td>
-                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
-                </tr>
-
-                <tr>
-                    <td>Beta S.r.l.</td>
-                    <td>Prototipo packaging</td>
-                    <td><span class="pfw-badge pfw-badge-warning">Alta</span></td>
-                    <td>30/08/2026</td>
-                    <td><span class="pfw-badge pfw-badge-secondary">Aperta</span></td>
-                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
-                </tr>
-
-                <tr>
-                    <td>Gamma S.p.A.</td>
-                    <td>Revisione struttura</td>
-                    <td><span class="pfw-badge pfw-badge-primary">Media</span></td>
-                    <td>04/09/2026</td>
-                    <td><span class="pfw-badge pfw-badge-success">Approvata</span></td>
-                    <td class="text-end"><a href="#" class="pfw-action-link">Apri</a></td>
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</section>
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Elenco campionature</h2>
+                <div class="pfw-panel-subtitle">@Model.Campionature.Count risultati</div>
+            </div>
+        </div>
+        @if (Model.Campionature.Count == 0)
+        {
+            <div class="pfw-panel-body text-muted">Nessuna campionatura corrisponde ai filtri impostati.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table pfw-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Campionatura</th>
+                            <th>Data</th>
+                            <th>Cliente</th>
+                            <th>Richiesta</th>
+                            <th>Oggetto</th>
+                            <th>Priorita</th>
+                            <th>Consegna prevista</th>
+                            <th>Stato</th>
+                            <th class="text-end">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var campionatura in Model.Campionature)
+                        {
+                            <tr>
+                                <td>@campionatura.NumeroCompleto</td>
+                                <td>@campionatura.DataCampionatura.ToString("dd/MM/yyyy")</td>
+                                <td>@campionatura.Cliente</td>
+                                <td>@campionatura.NumeroRichiesta</td>
+                                <td>@campionatura.Oggetto</td>
+                                <td>@campionatura.Priorita</td>
+                                <td>@(campionatura.DataPrevistaConsegna?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                <td>@campionatura.Stato</td>
+                                <td class="text-end">
+                                    <a asp-page="./Dettaglio"
+                                       asp-route-id="@campionatura.IdCampionatura"
+                                       class="pfw-action-link">Apri</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>

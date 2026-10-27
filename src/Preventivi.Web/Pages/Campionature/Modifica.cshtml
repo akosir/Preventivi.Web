@@ -1,0 +1,45 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.ModificaModel
+
+@{
+    var campionatura = Model.Campionatura!;
+    ViewData["Title"] = $"Modifica campionatura {campionatura.NumeroCompleto}";
+    ViewData["Richieste"] = Model.Richieste;
+    ViewData["Preventivi"] = Model.Preventivi;
+    ViewData["Varianti"] = Model.Varianti;
+    ViewData["PrecompilaDaRichiesta"] = false;
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="./Index">Campionature</a>
+            <span>/</span>
+            <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a>
+            <span>/</span>
+            <span>Modifica</span>
+        </div>
+        <h1 class="workspace-title">Modifica campionatura @campionatura.NumeroCompleto</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati campionatura</h2>
+                <div class="pfw-panel-subtitle">Dati identificativi e operativi</div>
+            </div>
+        </div>
+        <form method="post" class="p-3">
+            <input asp-for="Dati.VersioneRigaBase64" type="hidden" />
+            <partial name="Shared/Campionature/_CampionaturaForm" for="Dati" view-data="ViewData" />
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

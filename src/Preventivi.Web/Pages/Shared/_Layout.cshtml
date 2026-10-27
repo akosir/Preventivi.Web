@@ -79,17 +79,35 @@
                 }
 
                 @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                    User,
-                    global::Preventivi.Core.Sicurezza.PermessiApplicazione.RichiesteClienti))
+                         User,
+                         global::Preventivi.Core.Sicurezza.PermessiApplicazione.RichiesteClienti) ||
+                     global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                         User,
+                         global::Preventivi.Core.Sicurezza.PermessiApplicazione.Campionature))
                 {
                     <div class="app-menu-section">
                         Commerciale
                     </div>
 
-                    <a class="app-menu-item"
-                       asp-page="/RichiesteClienti/Index">
-                        Richieste clienti
-                    </a>
+                    @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                        User,
+                        global::Preventivi.Core.Sicurezza.PermessiApplicazione.RichiesteClienti))
+                    {
+                        <a class="app-menu-item"
+                           asp-page="/RichiesteClienti/Index">
+                            Richieste clienti
+                        </a>
+                    }
+
+                    @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                        User,
+                        global::Preventivi.Core.Sicurezza.PermessiApplicazione.Campionature))
+                    {
+                        <a class="app-menu-item"
+                           asp-page="/Campionature/Index">
+                            Campionature
+                        </a>
+                    }
                 }
 
                 @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(

@@ -215,3 +215,21 @@ sicurezza recuperabile. Dopo l'esecuzione riavviare Preventivi.Web e collaudare
 il flusso completo; l'applicazione aggiornata richiede la versione
 `2026102701` e blocca le funzioni operative finche entrambi gli script non
 sono installati.
+
+## Gestione base Campionature TEC-014
+
+Su un database aggiornato alla versione `2026102701`, eseguire:
+
+1. `06_Aggiornamenti/TEC-014_01_Gestione_Campionature.sql`.
+
+Lo script aggiunge a `dbo.Campionature` l'audit applicativo e la colonna
+`rowversion`, crea le procedure di elenco, dettaglio, lookup, inserimento e
+modifica e registra la versione `2026102702` con codice `TEC-014-BASE`.
+La numerazione annuale viene assegnata nella transazione di inserimento con un
+lock applicativo dedicato. Preventivo e variante sono facoltativi, ma devono
+appartenere rispettivamente alla richiesta e al preventivo selezionati.
+
+Lo script e transazionale, non contiene `USE` e non modifica rilievi o
+adeguamenti esistenti. Prima dell'esecuzione verificare il database di
+destinazione e una copia di sicurezza recuperabile. L'applicazione aggiornata
+richiede la versione `2026102702`.

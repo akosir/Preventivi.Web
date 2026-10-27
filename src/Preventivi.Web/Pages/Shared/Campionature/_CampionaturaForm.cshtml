@@ -1,0 +1,192 @@
+@model global::Preventivi.Web.UI.Modules.Campionature.CampionaturaFormModel
+@using global::Preventivi.Core.Campionature
+@{
+    var richieste = ViewData["Richieste"] as IReadOnlyList<CampionaturaRichiestaLookupItem>
+        ?? Array.Empty<CampionaturaRichiestaLookupItem>();
+    var preventivi = ViewData["Preventivi"] as IReadOnlyList<CampionaturaPreventivoLookupItem>
+        ?? Array.Empty<CampionaturaPreventivoLookupItem>();
+    var varianti = ViewData["Varianti"] as IReadOnlyList<CampionaturaVarianteLookupItem>
+        ?? Array.Empty<CampionaturaVarianteLookupItem>();
+    var precompilaDaRichiesta = ViewData["PrecompilaDaRichiesta"] as bool? ?? false;
+}
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+<div class="row g-3">
+    <div class="col-12 col-md-3 pfw-field-required">
+        <label asp-for="DataCampionatura" class="form-label">Data campionatura</label>
+        <input asp-for="DataCampionatura" type="date" class="form-control" />
+        <span asp-validation-for="DataCampionatura" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-9 pfw-field-required">
+        <label asp-for="IdRichiestaCliente" class="form-label">Richiesta cliente</label>
+        <select asp-for="IdRichiestaCliente" class="form-select" id="campionatura-richiesta">
+            <option value="">Seleziona una richiesta</option>
+            @foreach (var richiesta in richieste)
+            {
+                <option value="@richiesta.IdRichiestaCliente"
+                        data-cliente="@($"{richiesta.CodiceCliente} - {richiesta.Cliente}")"
+                        data-oggetto="@richiesta.Oggetto"
+                        data-priorita="@richiesta.Priorita">
+                    @richiesta.NumeroRichiesta - @richiesta.Cliente - @richiesta.Oggetto (@richiesta.Stato)
+                </option>
+            }
+        </select>
+        <span asp-validation-for="IdRichiestaCliente" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label for="campionatura-cliente" class="form-label">Cliente</label>
+        <input id="campionatura-cliente" class="form-control" readonly />
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="IdPreventivo" class="form-label">Preventivo collegato</label>
+        <select asp-for="IdPreventivo" class="form-select" id="campionatura-preventivo">
+            <option value="">Nessun preventivo</option>
+            @foreach (var preventivo in preventivi)
+            {
+                <option value="@preventivo.IdPreventivo" data-richiesta="@preventivo.IdRichiestaCliente">
+                    @preventivo.NumeroPreventivo - @preventivo.Oggetto (@preventivo.Stato)
+                </option>
+            }
+        </select>
+        <span asp-validation-for="IdPreventivo" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="IdVariantePreventivo" class="form-label">Variante collegata</label>
+        <select asp-for="IdVariantePreventivo" class="form-select" id="campionatura-variante">
+            <option value="">Nessuna variante</option>
+            @foreach (var variante in varianti)
+            {
+                <option value="@variante.IdVariantePreventivo" data-preventivo="@variante.IdPreventivo">
+                    @variante.CodiceVariante - @variante.DescrizioneVariante
+                </option>
+            }
+        </select>
+        <span asp-validation-for="IdVariantePreventivo" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 pfw-field-required">
+        <label asp-for="Oggetto" class="form-label">Oggetto</label>
+        <input asp-for="Oggetto" class="form-control" id="campionatura-oggetto" />
+        <span asp-validation-for="Oggetto" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="DescrizioneCampione" class="form-label">Descrizione campione</label>
+        <textarea asp-for="DescrizioneCampione" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="col-12 col-md-3 pfw-field-required">
+        <label asp-for="Stato" class="form-label">Stato</label>
+        <select asp-for="Stato" class="form-select">
+            @foreach (var stato in CampionaturaValori.Stati)
+            {
+                <option value="@stato">@stato</option>
+            }
+        </select>
+        <span asp-validation-for="Stato" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-3 pfw-field-required">
+        <label asp-for="Priorita" class="form-label">Priorita</label>
+        <select asp-for="Priorita" class="form-select" id="campionatura-priorita">
+            @foreach (var priorita in CampionaturaValori.Priorita)
+            {
+                <option value="@priorita">@priorita</option>
+            }
+        </select>
+        <span asp-validation-for="Priorita" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="Esito" class="form-label">Esito</label>
+        <select asp-for="Esito" class="form-select">
+            <option value="">Non specificato</option>
+            @foreach (var esito in CampionaturaValori.Esiti)
+            {
+                <option value="@esito">@esito</option>
+            }
+        </select>
+        <span asp-validation-for="Esito" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="DataRichiestaCampione" class="form-label">Data richiesta campione</label>
+        <input asp-for="DataRichiestaCampione" type="date" class="form-control" />
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="DataPrevistaConsegna" class="form-label">Consegna prevista</label>
+        <input asp-for="DataPrevistaConsegna" type="date" class="form-control" />
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="DataConsegnaCampione" class="form-label">Consegna effettiva</label>
+        <input asp-for="DataConsegnaCampione" type="date" class="form-control" />
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="DataChiusura" class="form-label">Data chiusura</label>
+        <input asp-for="DataChiusura" type="date" class="form-control" />
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Note" class="form-label">Note</label>
+        <textarea asp-for="Note" class="form-control" rows="4"></textarea>
+    </div>
+</div>
+
+<script>
+    (() => {
+        const richiesta = document.getElementById("campionatura-richiesta");
+        const cliente = document.getElementById("campionatura-cliente");
+        const preventivo = document.getElementById("campionatura-preventivo");
+        const variante = document.getElementById("campionatura-variante");
+        const oggetto = document.getElementById("campionatura-oggetto");
+        const priorita = document.getElementById("campionatura-priorita");
+        const precompila = @precompilaDaRichiesta.ToString().ToLowerInvariant();
+
+        const filtraVarianti = () => {
+            const idPreventivo = preventivo.value;
+            Array.from(variante.options).forEach(option => {
+                const visibile = !option.value || option.dataset.preventivo === idPreventivo;
+                option.hidden = !visibile;
+                option.disabled = !visibile;
+            });
+            if (variante.selectedOptions[0]?.disabled) {
+                variante.value = "";
+            }
+        };
+
+        const filtraPreventivi = () => {
+            const idRichiesta = richiesta.value;
+            Array.from(preventivo.options).forEach(option => {
+                const visibile = !option.value || option.dataset.richiesta === idRichiesta;
+                option.hidden = !visibile;
+                option.disabled = !visibile;
+            });
+            if (preventivo.selectedOptions[0]?.disabled) {
+                preventivo.value = "";
+            }
+            filtraVarianti();
+        };
+
+        const aggiornaRichiesta = (daInterazione) => {
+            const option = richiesta.options[richiesta.selectedIndex];
+            cliente.value = option?.dataset.cliente || "";
+            if (daInterazione && precompila && option?.value) {
+                oggetto.value = option.dataset.oggetto || "";
+                priorita.value = option.dataset.priorita || "Media";
+            }
+            filtraPreventivi();
+        };
+
+        richiesta.addEventListener("change", () => aggiornaRichiesta(true));
+        preventivo.addEventListener("change", filtraVarianti);
+        aggiornaRichiesta(false);
+    })();
+</script>

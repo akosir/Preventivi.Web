@@ -1162,8 +1162,7 @@ dalle decisioni 239-245.
 
 **Classificazione:** [D].
 
-**Stato:** approvate; gestione principale installata e collaudata, estensione
-di riattivazione predisposta e da installare.
+**Stato:** approvate, installate e collaudate.
 
 **Data di approvazione:** 26 ottobre 2026.
 
@@ -1256,12 +1255,57 @@ Lo script `TEC-013_01` risulta installato nel database con versione
 dell'elenco, creazione, modifica, annullamento logico, filtri combinati e
 allegati. Il collegamento completo richiesta-preventivo resta da collaudare.
 
-Per le decisioni 266-270 sono predisposti il comando applicativo, la pagina
-Razor di conferma e lo script incrementale
+Per le decisioni 266-270 sono stati installati e collaudati il comando
+applicativo, la pagina Razor di conferma e lo script incrementale
 `TEC-013_02_Riattivazione_Richieste_Clienti.sql`, che porta lo schema a
-`2026102701`. Installazione dello script e collaudo runtime della riattivazione
-restano da eseguire. La verifica statica dell'estensione ha validato lo script
-esterno e il batch dinamico; risultano superati 34 test Data e 41 test Web.
+`2026102701`. Il collaudo runtime ha confermato anche la trasformazione della
+richiesta in preventivo.
+
+### 5.18 Decisioni TEC-014 — Gestione base Campionature
+
+**Classificazione:** [D].
+
+**Stato:** approvate; implementazione predisposta, script non ancora applicato
+al database.
+
+**Data di approvazione:** 27 ottobre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita delle decisioni 271-275 nella
+sessione Work.
+
+Le decisioni approvate sono:
+
+- **271:** sostituire la pagina dimostrativa Campionature con le pagine
+  operative `Elenco`, `Nuova`, `Dettaglio` e `Modifica`, alimentate dai dati
+  reali;
+- **272:** rendere obbligatorio per ogni campionatura il collegamento a una
+  richiesta cliente;
+- **273:** mantenere facoltativi preventivo e variante, verificando che il
+  preventivo appartenga alla richiesta e la variante al preventivo;
+- **274:** consentire la creazione sia dall'elenco Campionature sia dal
+  dettaglio Richiesta Cliente, con preselezione di richiesta, cliente, oggetto
+  e priorita;
+- **275:** non riutilizzare direttamente la procedura legacy
+  `sp_CreaCampionaturaDaRichiesta`; distribuire procedure versionate e
+  transazionali con numerazione annuale concorrente, validazione, audit e
+  controllo `rowversion`.
+
+**Riscontri [C] al 27 ottobre 2026**
+
+Nel repository sono predisposti contratti Core, Application Service,
+repository ADO.NET, pagine Razor, collegamenti da sidebar, dashboard e
+richiesta cliente e lo script incrementale
+`TEC-014_01_Gestione_Campionature.sql`. Lo script richiede `2026102701` e
+registra `2026102702` con codice `TEC-014-BASE`. Rilievi, adeguamenti,
+allegati e azioni dedicate di chiusura o annullamento restano fuori da questo
+pacchetto e richiedono decisioni successive.
+
+La soluzione compila con zero errori. Sono stati superati 37 test Data e 44
+test Web. ScriptDom ha validato lo script esterno e tutti i 13 batch dinamici;
+l'impronta SHA-256 dichiarata e stata ricalcolata e verificata. Persistono gli
+avvisi NuGet noti relativi a `System.Security.Cryptography.Pkcs` 9.0.13. Lo
+script non e stato eseguito sul database e il flusso non e ancora collaudato a
+runtime.
 
 ## 6. Implementazioni e proposte non promosse a decisioni
 

@@ -54,6 +54,17 @@
                         Url = Url.Page("/Preventivi/Nuovo", new { idRichiestaCliente = richiesta.IdRichiestaCliente })
                     })
             }
+            @if (!string.Equals(richiesta.Stato, "Annullata", StringComparison.Ordinal))
+            {
+                @await Html.PartialAsync(
+                    "Shared/PFW/Button/_PFWButton",
+                    new PFWButtonModel
+                    {
+                        Testo = "Nuova campionatura",
+                        Variante = "primary",
+                        Url = Url.Page("/Campionature/Nuova", new { idRichiestaCliente = richiesta.IdRichiestaCliente })
+                    })
+            }
             @if (!global::Preventivi.Core.RichiesteClienti.RichiestaClienteValori.StatoFinale(richiesta.Stato))
             {
                 @await Html.PartialAsync(
@@ -184,7 +195,7 @@
             <div class="table-responsive">
                 <table class="table pfw-table align-middle mb-0">
                     <thead>
-                        <tr><th>Campionatura</th><th>Data</th><th>Stato</th><th>Priorita</th></tr>
+                        <tr><th>Campionatura</th><th>Data</th><th>Stato</th><th>Priorita</th><th class="text-end">Azioni</th></tr>
                     </thead>
                     <tbody>
                         @foreach (var campionatura in Model.Campionature)
@@ -194,6 +205,11 @@
                                 <td>@campionatura.DataCampionatura.ToString("dd/MM/yyyy")</td>
                                 <td>@campionatura.Stato</td>
                                 <td>@campionatura.Priorita</td>
+                                <td class="text-end">
+                                    <a asp-page="/Campionature/Dettaglio"
+                                       asp-route-id="@campionatura.IdCampionatura"
+                                       class="pfw-action-link">Apri</a>
+                                </td>
                             </tr>
                         }
                     </tbody>

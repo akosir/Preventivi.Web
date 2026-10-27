@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Preventivi.Core.Allegati.Storage;
+using Preventivi.Core.Campionature;
 using Preventivi.Core.Database;
 using Preventivi.Core.ParametriSistema;
 using Preventivi.Core.Preventivi;
@@ -11,6 +12,7 @@ using Preventivi.Core.Preventivi.Eliminazione;
 using Preventivi.Core.RichiesteClienti;
 using Preventivi.Core.Sicurezza;
 using Preventivi.Data.Allegati;
+using Preventivi.Data.Campionature;
 using Preventivi.Data.Comune;
 using Preventivi.Data.ParametriSistema;
 using Preventivi.Data.Preventivi;
@@ -95,6 +97,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IRichiestaClienteApplicationService,
     RichiestaClienteApplicationService>();
+
+builder.Services.AddScoped<
+    ICampionaturaRepository,
+    CampionaturaRepository>();
+
+builder.Services.AddScoped<
+    ICampionaturaApplicationService,
+    CampionaturaApplicationService>();
 
 builder.Services.AddScoped<
     global::Preventivi.Core.Clienti.IClienteRepository,

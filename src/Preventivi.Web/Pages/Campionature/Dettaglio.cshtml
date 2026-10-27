@@ -1,0 +1,133 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.DettaglioModel
+@using global::Preventivi.Web.UI.Button
+
+@{
+    var campionatura = Model.Campionatura!;
+    ViewData["Title"] = $"Campionatura {campionatura.NumeroCompleto}";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header d-flex justify-content-between align-items-start gap-3">
+        <div>
+            <div class="workspace-breadcrumb">
+                <a asp-page="./Index">Campionature</a>
+                <span>/</span>
+                <span>@campionatura.NumeroCompleto</span>
+            </div>
+            <h1 class="workspace-title">Campionatura @campionatura.NumeroCompleto</h1>
+            <p class="page-subtitle">@campionatura.Oggetto</p>
+        </div>
+        <div class="d-flex gap-2 no-print">
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Stampa",
+                    Variante = "secondary",
+                    OnClick = "window.print()"
+                })
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Nuova campionatura",
+                    Variante = "secondary",
+                    Url = Url.Page("/Campionature/Nuova", new { idRichiestaCliente = campionatura.IdRichiestaCliente })
+                })
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Modifica",
+                    Variante = "primary",
+                    Url = Url.Page("/Campionature/Modifica", new { id = campionatura.IdCampionatura })
+                })
+        </div>
+    </div>
+
+    @if (TempData["MessaggioSuccesso"] is string messaggio)
+    {
+        <div class="alert alert-success">@messaggio</div>
+    }
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati campionatura</h2>
+                <div class="pfw-panel-subtitle">Dati identificativi e operativi</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Numero campionatura</dt>
+                <dd class="col-sm-9">@campionatura.NumeroCompleto</dd>
+                <dt class="col-sm-3">Data campionatura</dt>
+                <dd class="col-sm-9">@campionatura.DataCampionatura.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-sm-3">Cliente</dt>
+                <dd class="col-sm-9">@campionatura.CodiceCliente - @campionatura.Cliente</dd>
+                <dt class="col-sm-3">Richiesta cliente</dt>
+                <dd class="col-sm-9">
+                    <a asp-page="/RichiesteClienti/Dettaglio"
+                       asp-route-id="@campionatura.IdRichiestaCliente"
+                       class="pfw-action-link">@campionatura.NumeroRichiesta</a>
+                </dd>
+                <dt class="col-sm-3">Preventivo collegato</dt>
+                <dd class="col-sm-9">
+                    @if (campionatura.IdPreventivo.HasValue)
+                    {
+                        <a asp-page="/Preventivi/Dettaglio"
+                           asp-route-id="@campionatura.IdPreventivo"
+                           class="pfw-action-link">@campionatura.NumeroPreventivo</a>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </dd>
+                <dt class="col-sm-3">Variante collegata</dt>
+                <dd class="col-sm-9">
+                    @if (campionatura.IdVariantePreventivo.HasValue)
+                    {
+                        <a asp-page="/Preventivi/Varianti/Dettaglio"
+                           asp-route-idPreventivo="@campionatura.IdPreventivo"
+                           asp-route-idVariantePreventivo="@campionatura.IdVariantePreventivo"
+                           class="pfw-action-link">@campionatura.VariantePreventivo</a>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </dd>
+                <dt class="col-sm-3">Oggetto</dt>
+                <dd class="col-sm-9">@campionatura.Oggetto</dd>
+                <dt class="col-sm-3">Descrizione campione</dt>
+                <dd class="col-sm-9">@(campionatura.DescrizioneCampione ?? "-")</dd>
+                <dt class="col-sm-3">Stato</dt>
+                <dd class="col-sm-9">@campionatura.Stato</dd>
+                <dt class="col-sm-3">Priorita</dt>
+                <dd class="col-sm-9">@campionatura.Priorita</dd>
+                <dt class="col-sm-3">Data richiesta campione</dt>
+                <dd class="col-sm-9">@(campionatura.DataRichiestaCampione?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                <dt class="col-sm-3">Consegna prevista</dt>
+                <dd class="col-sm-9">@(campionatura.DataPrevistaConsegna?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                <dt class="col-sm-3">Consegna effettiva</dt>
+                <dd class="col-sm-9">@(campionatura.DataConsegnaCampione?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                <dt class="col-sm-3">Data chiusura</dt>
+                <dd class="col-sm-9">@(campionatura.DataChiusura?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                <dt class="col-sm-3">Esito</dt>
+                <dd class="col-sm-9">@(campionatura.Esito ?? "-")</dd>
+                <dt class="col-sm-3">Note</dt>
+                <dd class="col-sm-9">@(campionatura.Note ?? "-")</dd>
+                <dt class="col-sm-3">Creato il</dt>
+                <dd class="col-sm-9">@campionatura.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @campionatura.UtenteCreazione</dd>
+                <dt class="col-sm-3">Ultima modifica</dt>
+                <dd class="col-sm-9">
+                    @(campionatura.DataModifica.HasValue
+                        ? $"{campionatura.DataModifica:dd/MM/yyyy HH:mm} da {campionatura.UtenteModifica ?? "utente non disponibile"}"
+                        : "-")
+                </dd>
+            </dl>
+        </div>
+    </section>
+</div>
