@@ -1,0 +1,229 @@
+@page
+@model global::Preventivi.Web.Pages.RichiesteClienti.DettaglioModel
+@using global::Preventivi.Web.UI.Button
+
+@{
+    var richiesta = Model.Richiesta!;
+    ViewData["Title"] = $"Richiesta {richiesta.NumeroCompleto}";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header d-flex justify-content-between align-items-start gap-3">
+        <div>
+            <div class="workspace-breadcrumb">
+                <a asp-page="./Index">Richieste clienti</a>
+                <span>/</span>
+                <span>@richiesta.NumeroCompleto</span>
+            </div>
+            <h1 class="workspace-title">Richiesta @richiesta.NumeroCompleto</h1>
+            <p class="page-subtitle">@richiesta.Oggetto</p>
+        </div>
+        <div class="d-flex gap-2 no-print">
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Stampa",
+                    Variante = "secondary",
+                    OnClick = "window.print()"
+                })
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Nuova richiesta",
+                    Variante = "secondary",
+                    Url = Url.Page("/RichiesteClienti/Nuova")
+                })
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Modifica",
+                    Variante = "primary",
+                    Url = Url.Page("/RichiesteClienti/Modifica", new { id = richiesta.IdRichiestaCliente })
+                })
+            @if (global::Preventivi.Core.RichiesteClienti.RichiestaClienteValori.ConsenteNuovoPreventivo(richiesta.Stato))
+            {
+                @await Html.PartialAsync(
+                    "Shared/PFW/Button/_PFWButton",
+                    new PFWButtonModel
+                    {
+                        Testo = "Crea preventivo",
+                        Variante = "primary",
+                        Url = Url.Page("/Preventivi/Nuovo", new { idRichiestaCliente = richiesta.IdRichiestaCliente })
+                    })
+            }
+            @if (!global::Preventivi.Core.RichiesteClienti.RichiestaClienteValori.StatoFinale(richiesta.Stato))
+            {
+                @await Html.PartialAsync(
+                    "Shared/PFW/Button/_PFWButton",
+                    new PFWButtonModel
+                    {
+                        Testo = "Annulla richiesta",
+                        Variante = "danger",
+                        Url = Url.Page("/RichiesteClienti/Annulla", new { id = richiesta.IdRichiestaCliente })
+                    })
+            }
+            @if (string.Equals(richiesta.Stato, "Annullata", StringComparison.Ordinal))
+            {
+                @await Html.PartialAsync(
+                    "Shared/PFW/Button/_PFWButton",
+                    new PFWButtonModel
+                    {
+                        Testo = "Riattiva richiesta",
+                        Variante = "primary",
+                        Url = Url.Page("/RichiesteClienti/Riattiva", new { id = richiesta.IdRichiestaCliente })
+                    })
+            }
+        </div>
+    </div>
+
+    @if (TempData["MessaggioSuccesso"] is string messaggio)
+    {
+        <div class="alert alert-success">@messaggio</div>
+    }
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati richiesta</h2>
+                <div class="pfw-panel-subtitle">Dati commerciali e operativi</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Numero richiesta</dt>
+                <dd class="col-sm-9">@richiesta.NumeroCompleto</dd>
+                <dt class="col-sm-3">Data richiesta</dt>
+                <dd class="col-sm-9">@richiesta.DataRichiesta.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-sm-3">Cliente</dt>
+                <dd class="col-sm-9">@richiesta.CodiceCliente - @richiesta.Cliente@(!richiesta.ClienteAttivo ? " (non attivo)" : "")</dd>
+                <dt class="col-sm-3">Oggetto</dt>
+                <dd class="col-sm-9">@richiesta.Oggetto</dd>
+                <dt class="col-sm-3">Descrizione richiesta</dt>
+                <dd class="col-sm-9">@(richiesta.DescrizioneRichiesta ?? "-")</dd>
+                <dt class="col-sm-3">Stato</dt>
+                <dd class="col-sm-9">@richiesta.Stato</dd>
+                <dt class="col-sm-3">Priorita</dt>
+                <dd class="col-sm-9">@richiesta.Priorita</dd>
+                <dt class="col-sm-3">Interesse cliente</dt>
+                <dd class="col-sm-9">@(richiesta.InteresseCliente ?? "-")</dd>
+                <dt class="col-sm-3">Data scadenza</dt>
+                <dd class="col-sm-9">@(richiesta.DataScadenza?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                <dt class="col-sm-3">Probabilita di chiusura</dt>
+                <dd class="col-sm-9">@(richiesta.ProbabilitaChiusura.HasValue ? $"{richiesta.ProbabilitaChiusura}%" : "-")</dd>
+                <dt class="col-sm-3">Data attivazione</dt>
+                <dd class="col-sm-9">@(richiesta.DataAttivazione?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                <dt class="col-sm-3">Data chiusura</dt>
+                <dd class="col-sm-9">@(richiesta.DataChiusura?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                <dt class="col-sm-3">Note</dt>
+                <dd class="col-sm-9">@(richiesta.Note ?? "-")</dd>
+                <dt class="col-sm-3">Creato il</dt>
+                <dd class="col-sm-9">@richiesta.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @richiesta.UtenteCreazione</dd>
+                <dt class="col-sm-3">Ultima modifica</dt>
+                <dd class="col-sm-9">
+                    @(richiesta.DataModifica.HasValue
+                        ? $"{richiesta.DataModifica:dd/MM/yyyy HH:mm} da {richiesta.UtenteModifica ?? "utente non disponibile"}"
+                        : "-")
+                </dd>
+            </dl>
+        </div>
+    </section>
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Preventivi collegati</h2>
+                <div class="pfw-panel-subtitle">@Model.Preventivi.Count documenti</div>
+            </div>
+        </div>
+        @if (Model.Preventivi.Count == 0)
+        {
+            <div class="pfw-panel-body text-muted">Nessun preventivo collegato.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table pfw-table align-middle mb-0">
+                    <thead>
+                        <tr><th>Preventivo</th><th>Data</th><th>Stato</th><th class="text-end">Totale vendita</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var preventivo in Model.Preventivi)
+                        {
+                            <tr>
+                                <td>@preventivo.NumeroCompleto</td>
+                                <td>@preventivo.DataPreventivo.ToString("dd/MM/yyyy")</td>
+                                <td>@preventivo.Stato</td>
+                                <td class="text-end">@preventivo.TotaleVendita.ToString("C")</td>
+                                <td class="text-end">
+                                    <a asp-page="/Preventivi/Dettaglio" asp-route-id="@preventivo.IdPreventivo" class="pfw-action-link">Apri</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Campionature collegate</h2>
+                <div class="pfw-panel-subtitle">@Model.Campionature.Count documenti</div>
+            </div>
+        </div>
+        @if (Model.Campionature.Count == 0)
+        {
+            <div class="pfw-panel-body text-muted">Nessuna campionatura collegata.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table pfw-table align-middle mb-0">
+                    <thead>
+                        <tr><th>Campionatura</th><th>Data</th><th>Stato</th><th>Priorita</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var campionatura in Model.Campionature)
+                        {
+                            <tr>
+                                <td>@campionatura.NumeroCompleto</td>
+                                <td>@campionatura.DataCampionatura.ToString("dd/MM/yyyy")</td>
+                                <td>@campionatura.Stato</td>
+                                <td>@campionatura.Priorita</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Allegati</h2>
+                <div class="pfw-panel-subtitle">Documenti associati alla richiesta cliente</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <div class="no-print">
+                @await Html.PartialAsync(
+                    "~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml",
+                    new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+                    {
+                        TestoNuovo = "Nuovo allegato",
+                        UrlNuovo = $"/Allegati/Nuovo?Entita=RichiesteClienti&IdEntita={richiesta.IdRichiestaCliente}&ReturnUrl={Uri.EscapeDataString(Url.Page("/RichiesteClienti/Dettaglio", new { id = richiesta.IdRichiestaCliente })!)}",
+                        MostraNuovo = true,
+                        MostraAggiorna = false
+                    })
+            </div>
+            @await Html.PartialAsync(
+                "~/Pages/Shared/Allegati/_AllegatiGrid.cshtml",
+                Model.Allegati)
+        </div>
+    </section>
+</div>

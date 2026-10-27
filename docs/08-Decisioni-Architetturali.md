@@ -502,10 +502,10 @@ un registro di versione del database.
 **Risoluzione dei punti aperti [D] al 26 ottobre 2026**
 
 Le decisioni 239-245, registrate nella sezione 5.16, definiscono il meccanismo
-tecnico, la versione iniziale, la numerazione e il controllo applicativo. La
-decisione DA-023 non presenta quindi piu punti funzionali aperti; restano da
-completare e verificare l'applicazione dello script iniziale e il collaudo
-runtime.
+tecnico, la versione iniziale, la numerazione e il controllo applicativo. Lo
+script iniziale e stato applicato e il collaudo runtime e stato completato il
+26 ottobre 2026. La decisione DA-023 non presenta quindi punti funzionali
+aperti per la baseline TEC-012.
 
 ### DA-024 — Label funzionali leggibili
 
@@ -1146,9 +1146,122 @@ il collaudo runtime ha confermato il riconoscimento dello stato
 pagina di manutenzione HTTP 200 con versione richiesta `2026102601` e versione
 installata non rilevata.
 
-Lo script non risulta ancora applicato al database. La compatibilita operativa
-dopo l'installazione della baseline deve quindi essere verificata separatamente
-e non e attestata dai controlli precedenti.
+Il 26 ottobre 2026 lo script e stato applicato senza errori al database di
+test. La verifica successiva ha confermato la baseline `2026102601`, il codice
+`TEC-012-BASELINE`, il nome e l'impronta dello script, la procedura
+`dbo.Sistema_VersioneSchema_Corrente` e il trigger append-only attivo come
+`INSTEAD OF UPDATE, DELETE`.
+
+Il collaudo applicativo post-installazione ha avviato Preventivi.Web senza
+segnalazioni di incompatibilita. La richiesta a `/Preventivi` e tornata al
+normale flusso di autenticazione, con redirect a `/Account/Login`, invece della
+pagina di manutenzione. TEC-012 risulta quindi chiusa per l'ambito approvato
+dalle decisioni 239-245.
+
+### 5.17 Decisioni TEC-013 — Gestione Richieste Clienti
+
+**Classificazione:** [D].
+
+**Stato:** approvate; gestione principale installata e collaudata, estensione
+di riattivazione predisposta e da installare.
+
+**Data di approvazione:** 26 ottobre 2026.
+
+**Fonte dell'approvazione:** conferme esplicite, in quattro pacchetti da cinque
+decisioni, nella sessione Work.
+
+Le decisioni approvate sono:
+
+- **246:** sostituire la pagina dimostrativa con le pagine operative `Elenco`,
+  `Nuova`, `Dettaglio` e `Modifica`;
+- **247:** usare dati reali e filtri combinabili per testo libero, cliente,
+  stato, priorita, interesse e intervallo di scadenza;
+- **248:** assegnare il numero progressivo annuale nella stessa transazione
+  SQL dell'inserimento, con protezione dalla concorrenza;
+- **249:** richiedere un cliente attivo alla creazione e per ogni cambio di
+  cliente, conservando la leggibilita del cliente corrente se disattivato;
+- **250:** valorizzare `DataAttivazione` al primo avanzamento e
+  `DataChiusura` per gli stati finali `Confermata`, `Persa` e `Annullata`, che
+  non possono essere riaperti senza una nuova decisione;
+- **251:** non eliminare fisicamente le richieste; l'azione approvata e
+  `Annulla richiesta`, con conferma e conservazione di collegamenti, allegati
+  e storico;
+- **252:** mostrare nel dettaglio tutti i campi e i preventivi e le
+  campionature collegati, usando collegamenti solo verso pagine operative;
+- **253:** consentire dal dettaglio la creazione di piu preventivi con
+  richiesta, cliente e oggetto preselezionati;
+- **254:** estendere MB-01 con la chiave allegato `RichiesteClienti` e le
+  operazioni esistenti di inserimento, apertura, download ed eliminazione;
+- **255:** usare `rowversion` per modifica e annullamento, mostrando un
+  messaggio leggibile in caso di conflitto concorrente;
+- **256:** alimentare la dashboard con conteggi e alert reali per richieste
+  urgenti, scadute o in scadenza;
+- **257:** proteggere pagine e operazioni con il permesso applicativo
+  `frmRichiesteClientiElenco`, verificato sul server;
+- **258:** distribuire TEC-013 mediante uno script transazionale che porta il
+  database da `2026102601` a `2026102602` e registra l'intervento in
+  `dbo.VersioniSchema`;
+- **259:** coprire validazione, servizi, concorrenza, annullamento,
+  autorizzazioni e collegamenti con test automatici e completare un collaudo
+  runtime comprensivo di richiesta e preventivo collegato;
+- **260:** applicare PFW e DA-022/DA-024; data, cliente, oggetto, stato e
+  priorita sono obbligatori, mentre probabilita 0-100, descrizione, interesse,
+  scadenza e note sono facoltativi; le date operative non sono modificabili
+  manualmente;
+- **261:** mantenere il flusso UI -> Application Service -> Repository ->
+  Database tramite `IRichiestaClienteApplicationService`;
+- **262:** rendere il cliente immutabile dopo il collegamento del primo
+  preventivo o della prima campionatura;
+- **263:** consentire la creazione di preventivi soltanto negli stati `Nuova`,
+  `In Valutazione`, `Da Preventivare` e `Preventivata`; una richiesta sospesa
+  deve essere prima riattivata e gli stati finali non ammettono nuove
+  operazioni;
+- **264:** rendere stampabili elenco filtrato e dettaglio, nascondendo i
+  controlli operativi in stampa;
+- **265:** registrare utente di creazione, utente di ultima modifica,
+  `DataCreazione` e `DataModifica`; cambi stato, annullamento e creazione del
+  preventivo aggiornano l'audit con l'utente autenticato.
+
+Estensione approvata il 27 ottobre 2026:
+
+- **266:** conservare nel database la richiesta annullata con numero,
+  allegati e documenti collegati;
+- **267:** escludere le richieste annullate dalle attivita operative e dagli
+  alert ordinari;
+- **268:** aggiungere nel dettaglio il comando dedicato `Riattiva richiesta`,
+  separato dalla normale modifica e protetto da conferma esplicita;
+- **269:** riportare la richiesta riattivata allo stato `Nuova`, rimuovere la
+  data di chiusura, conservare la prima attivazione e registrare utente e data
+  dell'operazione applicando il controllo `rowversion`;
+- **270:** non esporre eliminazioni fisiche nella gestione ordinaria; una
+  futura pulizia definitiva richiedera una funzione amministrativa separata e
+  una decisione esplicita.
+
+**Riscontri [C] al 26 ottobre 2026**
+
+Nel repository sono predisposti i contratti Core, l'Application Service, il
+repository ADO.NET, le pagine Razor operative, i filtri, l'annullamento, i
+collegamenti, gli allegati, la dashboard, la stampa e lo script incrementale
+`TEC-013_01_Gestione_Richieste_Clienti.sql`. Lo script attende la baseline
+`2026102601`, aggiunge audit e `rowversion`, crea nove procedure e registra la
+versione `2026102602` con impronta SHA-256.
+
+La soluzione compila con zero errori. Il controllo ScriptDom ha validato lo
+script esterno e tutte le nove definizioni dinamiche; risultano superati 32
+test Data e 41 test Web. Persistono gli avvisi NuGet noti relativi a
+`System.Security.Cryptography.Pkcs` 9.0.13.
+
+Lo script `TEC-013_01` risulta installato nel database con versione
+`2026102602` e impronta verificata. Sono stati collaudati a runtime apertura
+dell'elenco, creazione, modifica, annullamento logico, filtri combinati e
+allegati. Il collegamento completo richiesta-preventivo resta da collaudare.
+
+Per le decisioni 266-270 sono predisposti il comando applicativo, la pagina
+Razor di conferma e lo script incrementale
+`TEC-013_02_Riattivazione_Richieste_Clienti.sql`, che porta lo schema a
+`2026102701`. Installazione dello script e collaudo runtime della riattivazione
+restano da eseguire. La verifica statica dell'estensione ha validato lo script
+esterno e il batch dinamico; risultano superati 34 test Data e 41 test Web.
 
 ## 6. Implementazioni e proposte non promosse a decisioni
 

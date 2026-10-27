@@ -102,6 +102,7 @@ public static class AutorizzazioneApplicazione
             AllegatoEntita.PreventiviRigheMateriali => PermessiApplicazione.Preventivi,
             AllegatoEntita.PreventiviRigheLavorazioni => PermessiApplicazione.Preventivi,
             AllegatoEntita.Clienti => PermessiApplicazione.Clienti,
+            AllegatoEntita.RichiesteClienti => PermessiApplicazione.RichiesteClienti,
             _ => null
         };
 

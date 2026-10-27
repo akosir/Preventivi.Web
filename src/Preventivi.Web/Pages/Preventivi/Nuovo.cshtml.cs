@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.SqlClient;
 using Preventivi.Core.Clienti;
 using Preventivi.Core.Preventivi;
+using Preventivi.Core.RichiesteClienti;
 
 namespace Preventivi.Web.Pages.Preventivi;
 
@@ -21,15 +22,18 @@ public class NuovoModel : PageModel
 
     private readonly IPreventivoRepository _preventivoRepository;
     private readonly IClienteRepository _clienteRepository;
+    private readonly IRichiestaClienteApplicationService _richiestaClienteService;
     private readonly ILogger<NuovoModel> _logger;
 
     public NuovoModel(
         IPreventivoRepository preventivoRepository,
         IClienteRepository clienteRepository,
+        IRichiestaClienteApplicationService richiestaClienteService,
         ILogger<NuovoModel> logger)
     {
         _preventivoRepository = preventivoRepository;
         _clienteRepository = clienteRepository;
+        _richiestaClienteService = richiestaClienteService;
         _logger = logger;
     }
 
@@ -45,7 +49,9 @@ public class NuovoModel : PageModel
     public IReadOnlyList<PreventivoModelloLookupItem> Modelli { get; private set; }
         = Array.Empty<PreventivoModelloLookupItem>();
 
-    public async Task OnGetAsync(CancellationToken cancellationToken)
+    public async Task OnGetAsync(
+        int? idRichiestaCliente,
+        CancellationToken cancellationToken)
     {
         Dati = new PreventivoCreateModel
         {
@@ -55,6 +61,25 @@ public class NuovoModel : PageModel
         };
 
         await CaricaLookupAsync(cancellationToken);
+
+        if (idRichiestaCliente.HasValue)
+        {
+            var richiesta = Richieste.FirstOrDefault(
+                elemento => elemento.IdRichiestaCliente == idRichiestaCliente.Value);
+
+            if (richiesta is null)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "La richiesta selezionata non e disponibile per la creazione di un preventivo.");
+                return;
+            }
+
+            Dati.Origine = OrigineRichiesta;
+            Dati.IdRichiestaCliente = richiesta.IdRichiestaCliente;
+            Dati.IdCliente = richiesta.IdCliente;
+            Dati.Oggetto = richiesta.Oggetto;
+        }
     }
 
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
@@ -69,9 +94,17 @@ public class NuovoModel : PageModel
 
         try
         {
-            var idPreventivo = await _preventivoRepository.CreaPreventivoAsync(
-                Dati,
-                cancellationToken);
+            var idPreventivo = string.Equals(
+                Dati.Origine,
+                OrigineRichiesta,
+                StringComparison.OrdinalIgnoreCase)
+                ? await _richiestaClienteService.CreaPreventivoAsync(
+                    Dati,
+                    User.Identity?.Name ?? "Sistema",
+                    cancellationToken)
+                : await _preventivoRepository.CreaPreventivoAsync(
+                    Dati,
+                    cancellationToken);
 
             return RedirectToPage("/Preventivi/Dettaglio", new { id = idPreventivo });
         }
@@ -193,7 +226,7 @@ public class NuovoModel : PageModel
     }
 
     private static bool IsErroreCreazionePrevisto(int numero) =>
-        numero is >= 51801 and <= 51810 or 2601 or 2627;
+        numero is >= 51801 and <= 51811 or 2601 or 2627;
 
     private static string GetMessaggioCreazione(int numero) => numero switch
     {
@@ -203,6 +236,7 @@ public class NuovoModel : PageModel
         51808 => "Non e stato possibile assegnare il numero progressivo. Riprovare.",
         51809 => "Il modello contiene una o piu righe con tipo non valido o non attivo.",
         51810 => "Il cliente collegato alla richiesta non e attivo. Riattivarlo prima di creare il preventivo.",
+        51811 => "Lo stato della richiesta non consente la creazione di un nuovo preventivo.",
         2601 or 2627 => "Il numero del preventivo e stato utilizzato da un'altra operazione. Riprovare.",
         _ => "I dati del preventivo non sono validi. Controllare i campi e riprovare."
     };

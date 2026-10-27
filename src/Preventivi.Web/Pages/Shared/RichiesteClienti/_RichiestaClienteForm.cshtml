@@ -1,0 +1,103 @@
+@model global::Preventivi.Web.UI.Modules.RichiesteClienti.RichiestaClienteFormModel
+@using global::Preventivi.Core.Clienti
+@using global::Preventivi.Core.RichiesteClienti
+@{
+    var clienti = ViewData["Clienti"] as IReadOnlyList<ClienteListItem>
+        ?? Array.Empty<ClienteListItem>();
+    var clienteBloccato = ViewData["ClienteBloccato"] as bool? ?? false;
+    var statoBloccato = ViewData["StatoBloccato"] as bool? ?? false;
+}
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+<div class="row g-3">
+    <div class="col-12 col-md-3 pfw-field-required">
+        <label asp-for="DataRichiesta" class="form-label">Data richiesta</label>
+        <input asp-for="DataRichiesta" type="date" class="form-control" />
+        <span asp-validation-for="DataRichiesta" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-6 pfw-field-required">
+        <label asp-for="IdCliente" class="form-label">Cliente</label>
+        <select asp-for="IdCliente" class="form-select" disabled="@clienteBloccato">
+            <option value="">Seleziona un cliente</option>
+            @foreach (var cliente in clienti)
+            {
+                <option value="@cliente.IdCliente">
+                    @cliente.CodiceCliente - @cliente.RagioneSociale@(!cliente.Attivo ? " (non attivo)" : "")
+                </option>
+            }
+        </select>
+        @if (clienteBloccato)
+        {
+            <input asp-for="IdCliente" type="hidden" />
+            <div class="form-text">Il cliente non e modificabile perche la richiesta ha documenti collegati.</div>
+        }
+        <span asp-validation-for="IdCliente" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-3 pfw-field-required">
+        <label asp-for="Stato" class="form-label">Stato</label>
+        <select asp-for="Stato" class="form-select" disabled="@statoBloccato">
+            @foreach (var stato in RichiestaClienteValori.Stati)
+            {
+                <option value="@stato">@stato</option>
+            }
+        </select>
+        @if (statoBloccato)
+        {
+            <input asp-for="Stato" type="hidden" />
+            <div class="form-text">Lo stato finale non puo essere riaperto.</div>
+        }
+        <span asp-validation-for="Stato" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 pfw-field-required">
+        <label asp-for="Oggetto" class="form-label">Oggetto</label>
+        <input asp-for="Oggetto" class="form-control" />
+        <span asp-validation-for="Oggetto" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="DescrizioneRichiesta" class="form-label">Descrizione richiesta</label>
+        <textarea asp-for="DescrizioneRichiesta" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="col-12 col-md-3 pfw-field-required">
+        <label asp-for="Priorita" class="form-label">Priorita</label>
+        <select asp-for="Priorita" class="form-select">
+            @foreach (var priorita in RichiestaClienteValori.Priorita)
+            {
+                <option value="@priorita">@priorita</option>
+            }
+        </select>
+        <span asp-validation-for="Priorita" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="InteresseCliente" class="form-label">Interesse cliente</label>
+        <select asp-for="InteresseCliente" class="form-select">
+            <option value="">Non specificato</option>
+            @foreach (var interesse in RichiestaClienteValori.Interessi)
+            {
+                <option value="@interesse">@interesse</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="DataScadenza" class="form-label">Data scadenza</label>
+        <input asp-for="DataScadenza" type="date" class="form-control" />
+    </div>
+
+    <div class="col-12 col-md-3">
+        <label asp-for="ProbabilitaChiusura" class="form-label">Probabilita di chiusura %</label>
+        <input asp-for="ProbabilitaChiusura" type="number" min="0" max="100" class="form-control text-end" />
+        <span asp-validation-for="ProbabilitaChiusura" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Note" class="form-label">Note</label>
+        <textarea asp-for="Note" class="form-control" rows="4"></textarea>
+    </div>
+</div>

@@ -203,7 +203,25 @@
                     </div>
                     <div class="pfw-request-item">
                         <div>
-                            <div class="fw-semibold">Richieste, campionature e ordini</div>
+                            <div class="fw-semibold">Richieste clienti</div>
+                            <div class="pfw-secondary-text">
+                                @(Model.PuoVisualizzareRichiesteClienti
+                                    ? "Dati collegati al database reale"
+                                    : "Accesso non autorizzato per il profilo")
+                            </div>
+                        </div>
+                        @if (Model.PuoVisualizzareRichiesteClienti)
+                        {
+                            <a asp-page="/RichiesteClienti/Index" class="pfw-btn pfw-btn-secondary">Apri</a>
+                        }
+                        else
+                        {
+                            <span class="pfw-badge pfw-badge-secondary">Non disponibile</span>
+                        }
+                    </div>
+                    <div class="pfw-request-item">
+                        <div>
+                            <div class="fw-semibold">Campionature e ordini</div>
                             <div class="pfw-secondary-text">In attesa del collegamento ai dati reali</div>
                         </div>
                         <span class="pfw-badge pfw-badge-secondary">Non collegato</span>

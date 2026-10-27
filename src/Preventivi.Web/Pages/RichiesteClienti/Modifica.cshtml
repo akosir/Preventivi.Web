@@ -1,0 +1,44 @@
+@page
+@model global::Preventivi.Web.Pages.RichiesteClienti.ModificaModel
+
+@{
+    ViewData["Title"] = $"Modifica richiesta {Model.Richiesta!.NumeroCompleto}";
+    ViewData["Clienti"] = Model.Clienti;
+    ViewData["ClienteBloccato"] = Model.ClienteBloccato;
+    ViewData["StatoBloccato"] = Model.StatoBloccato;
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="./Index">Richieste clienti</a>
+            <span>/</span>
+            <a asp-page="./Dettaglio" asp-route-id="@Model.Richiesta.IdRichiestaCliente">@Model.Richiesta.NumeroCompleto</a>
+            <span>/</span>
+            <span>Modifica</span>
+        </div>
+        <h1 class="workspace-title">Modifica richiesta @Model.Richiesta.NumeroCompleto</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati richiesta</h2>
+                <div class="pfw-panel-subtitle">Le date di attivazione e chiusura sono gestite automaticamente</div>
+            </div>
+        </div>
+        <form method="post" class="p-3">
+            <input asp-for="Dati.VersioneRigaBase64" type="hidden" />
+            <partial name="Shared/RichiesteClienti/_RichiestaClienteForm" for="Dati" view-data="ViewData" />
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a asp-page="./Dettaglio" asp-route-id="@Model.Richiesta.IdRichiestaCliente"
+                   class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

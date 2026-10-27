@@ -190,3 +190,28 @@ Ogni futuro script strutturale o funzionale deve essere transazionale,
 incrementare la versione numerica `AAAAMMGGNN` e registrare in
 `dbo.VersioniSchema` almeno codice intervento, nome script, descrizione,
 impronta SHA-256, data UTC e operatore.
+
+## Gestione Richieste Clienti TEC-013
+
+Su un database allineato alla baseline `2026102601`, eseguire:
+
+1. `06_Aggiornamenti/TEC-013_01_Gestione_Richieste_Clienti.sql`.
+2. `06_Aggiornamenti/TEC-013_02_Riattivazione_Richieste_Clienti.sql`.
+
+Lo script verifica il prerequisito, aggiorna `dbo.RichiesteClienti` con audit
+e `rowversion`, crea le procedure di ricerca e gestione, protegge la
+numerazione annuale e la creazione del preventivo collegato, quindi registra
+la versione `2026102602` in `dbo.VersioniSchema`. L'intervento e
+transazionale, non contiene `USE` e non elimina richieste esistenti.
+
+Il secondo script richiede la versione `2026102602`, introduce la procedura
+dedicata di riattivazione e registra la versione `2026102701`. Una richiesta
+annullata torna allo stato `Nuova`; numero, prima attivazione, allegati e
+documenti collegati restano invariati, mentre la data di chiusura viene
+rimossa e l'audit di modifica viene aggiornato.
+
+Prima dell'esecuzione verificare il database di destinazione e una copia di
+sicurezza recuperabile. Dopo l'esecuzione riavviare Preventivi.Web e collaudare
+il flusso completo; l'applicazione aggiornata richiede la versione
+`2026102701` e blocca le funzioni operative finche entrambi gli script non
+sono installati.

@@ -1,0 +1,46 @@
+@page
+@model global::Preventivi.Web.Pages.RichiesteClienti.RiattivaModel
+
+@{
+    var richiesta = Model.Richiesta!;
+    ViewData["Title"] = $"Riattiva richiesta {richiesta.NumeroCompleto}";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="./Index">Richieste clienti</a>
+            <span>/</span>
+            <a asp-page="./Dettaglio" asp-route-id="@richiesta.IdRichiestaCliente">@richiesta.NumeroCompleto</a>
+            <span>/</span>
+            <span>Riattiva</span>
+        </div>
+        <h1 class="workspace-title">Riattiva richiesta @richiesta.NumeroCompleto</h1>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Conferma riattivazione</h2>
+                <div class="pfw-panel-subtitle">La richiesta tornera nello stato Nuova</div>
+            </div>
+        </div>
+        <form method="post" class="p-3">
+            <input asp-for="Id" type="hidden" />
+            <input asp-for="VersioneRigaBase64" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <p>
+                Confermi la riattivazione della richiesta
+                <strong>@richiesta.NumeroCompleto - @richiesta.Oggetto</strong>?
+            </p>
+            <p class="text-muted mb-0">
+                Numero, allegati e documenti collegati saranno conservati. La data di chiusura verra rimossa.
+            </p>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a asp-page="./Dettaglio" asp-route-id="@richiesta.IdRichiestaCliente"
+                   class="pfw-btn pfw-btn-secondary">Indietro</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Conferma riattivazione</button>
+            </div>
+        </form>
+    </section>
+</div>

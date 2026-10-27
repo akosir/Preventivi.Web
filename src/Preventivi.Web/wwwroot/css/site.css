@@ -874,3 +874,28 @@ body {
             border-color: var(--app-primary);
             box-shadow: 0 0 0 0.15rem rgba(31, 111, 178, 0.12);
         }
+@media print {
+    .app-sidebar,
+    .app-header,
+    .app-footer,
+    .no-print {
+        display: none !important;
+    }
+
+    .app-shell,
+    .app-main,
+    .app-content {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .pfw-panel {
+        box-shadow: none;
+    }
+
+    .table tr {
+        break-inside: avoid;
+    }
+}

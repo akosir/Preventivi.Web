@@ -8,11 +8,13 @@ using Preventivi.Core.Database;
 using Preventivi.Core.ParametriSistema;
 using Preventivi.Core.Preventivi;
 using Preventivi.Core.Preventivi.Eliminazione;
+using Preventivi.Core.RichiesteClienti;
 using Preventivi.Core.Sicurezza;
 using Preventivi.Data.Allegati;
 using Preventivi.Data.Comune;
 using Preventivi.Data.ParametriSistema;
 using Preventivi.Data.Preventivi;
+using Preventivi.Data.RichiesteClienti;
 using Preventivi.Data.Sicurezza;
 using Preventivi.Web.Database;
 using Preventivi.Web.Sicurezza;
@@ -85,6 +87,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IPreventivoEliminazioneService,
     PreventivoEliminazioneService>();
+
+builder.Services.AddScoped<
+    IRichiestaClienteRepository,
+    RichiestaClienteRepository>();
+
+builder.Services.AddScoped<
+    IRichiestaClienteApplicationService,
+    RichiestaClienteApplicationService>();
 
 builder.Services.AddScoped<
     global::Preventivi.Core.Clienti.IClienteRepository,

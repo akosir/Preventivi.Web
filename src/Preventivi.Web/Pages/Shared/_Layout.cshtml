@@ -80,6 +80,20 @@
 
                 @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
                     User,
+                    global::Preventivi.Core.Sicurezza.PermessiApplicazione.RichiesteClienti))
+                {
+                    <div class="app-menu-section">
+                        Commerciale
+                    </div>
+
+                    <a class="app-menu-item"
+                       asp-page="/RichiesteClienti/Index">
+                        Richieste clienti
+                    </a>
+                }
+
+                @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                    User,
                     global::Preventivi.Core.Sicurezza.PermessiApplicazione.Clienti))
                 {
                     <div class="app-menu-section">

@@ -32,6 +32,12 @@ public static class DbMapper
             var targetType = Nullable.GetUnderlyingType(property.PropertyType)
                              ?? property.PropertyType;
 
+            if (targetType.IsInstanceOfType(value))
+            {
+                property.SetValue(item, value);
+                continue;
+            }
+
             if (targetType == typeof(DateOnly))
             {
                 var dateTime = Convert.ToDateTime(value);

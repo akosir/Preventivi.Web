@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Preventivi;
+using Preventivi.Core.RichiesteClienti;
 using Preventivi.Core.Sicurezza;
 using Preventivi.Web.Sicurezza;
 
@@ -8,6 +9,7 @@ namespace Preventivi.Web.Pages;
 public class IndexModel : PageModel
 {
     private readonly IPreventivoRepository _preventivoRepository;
+    private readonly IRichiestaClienteRepository _richiestaClienteRepository;
 
     public IReadOnlyList<DashboardKpiItem> Indicatori { get; private set; }
         = Array.Empty<DashboardKpiItem>();
@@ -24,10 +26,14 @@ public class IndexModel : PageModel
     public int AlertCount => AlertOperativi.Count;
 
     public bool PuoVisualizzarePreventivi { get; private set; }
+    public bool PuoVisualizzareRichiesteClienti { get; private set; }
 
-    public IndexModel(IPreventivoRepository preventivoRepository)
+    public IndexModel(
+        IPreventivoRepository preventivoRepository,
+        IRichiestaClienteRepository richiestaClienteRepository)
     {
         _preventivoRepository = preventivoRepository;
+        _richiestaClienteRepository = richiestaClienteRepository;
     }
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
@@ -37,37 +43,42 @@ public class IndexModel : PageModel
                 User,
                 PermessiApplicazione.Preventivi);
 
-        if (!PuoVisualizzarePreventivi)
-        {
-            Indicatori =
-            [
-                new DashboardKpiItem(
-                    "Preventivi",
-                    "-",
-                    "Accesso non autorizzato",
-                    "P")
-            ];
-            AndamentoPreventivi = CreaAndamentoPreventivi([]);
-            return;
-        }
+        PuoVisualizzareRichiesteClienti =
+            AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                User,
+                PermessiApplicazione.RichiesteClienti);
 
-        var preventivi =
-            await _preventivoRepository.GetElencoAsync(cancellationToken);
+        var preventivi = PuoVisualizzarePreventivi
+            ? await _preventivoRepository.GetElencoAsync(cancellationToken)
+            : Array.Empty<PreventivoListItem>();
+
+        var richieste = PuoVisualizzareRichiesteClienti
+            ? await _richiestaClienteRepository.GetElencoAsync(
+                new RichiestaClienteFiltro(),
+                cancellationToken)
+            : Array.Empty<RichiestaClienteListItem>();
 
         var preventiviDaInviare =
             preventivi.Count(IsDaInviare);
+
+        var richiesteAperte = richieste.Count(richiesta =>
+            !RichiestaClienteValori.StatoFinale(richiesta.Stato));
 
         Indicatori =
         [
             new DashboardKpiItem(
                 "Richieste aperte",
-                "-",
-                "Modulo richieste non collegato",
+                PuoVisualizzareRichiesteClienti ? richiesteAperte.ToString() : "-",
+                PuoVisualizzareRichiesteClienti
+                    ? "Dati aggiornati"
+                    : "Accesso non autorizzato",
                 "R"),
             new DashboardKpiItem(
                 "Preventivi",
-                preventivi.Count.ToString(),
-                $"{preventiviDaInviare} da inviare",
+                PuoVisualizzarePreventivi ? preventivi.Count.ToString() : "-",
+                PuoVisualizzarePreventivi
+                    ? $"{preventiviDaInviare} da inviare"
+                    : "Accesso non autorizzato",
                 "P"),
             new DashboardKpiItem(
                 "Campionature",
@@ -89,16 +100,40 @@ public class IndexModel : PageModel
                 .ToArray();
 
         AlertOperativi =
-            CreaAlertOperativi(preventivi);
+            CreaAlertOperativi(preventivi, richieste);
 
         AndamentoPreventivi =
             CreaAndamentoPreventivi(preventivi);
     }
 
     private static IReadOnlyList<DashboardAlertItem> CreaAlertOperativi(
-        IReadOnlyList<PreventivoListItem> preventivi)
+        IReadOnlyList<PreventivoListItem> preventivi,
+        IReadOnlyList<RichiestaClienteListItem> richieste)
     {
         var alert = new List<DashboardAlertItem>();
+        var oggi = DateOnly.FromDateTime(DateTime.Today);
+        var limiteScadenza = oggi.AddDays(7);
+
+        foreach (var richiesta in richieste
+                     .Where(elemento => !RichiestaClienteValori.StatoFinale(elemento.Stato))
+                     .Where(elemento =>
+                         elemento.Priorita == "Urgente" ||
+                         elemento.DataScadenza <= limiteScadenza)
+                     .OrderBy(elemento => elemento.DataScadenza ?? DateOnly.MaxValue)
+                     .ThenByDescending(elemento => elemento.Priorita == "Urgente")
+                     .Take(4))
+        {
+            var scaduta = richiesta.DataScadenza < oggi;
+            var urgente = richiesta.Priorita == "Urgente";
+            alert.Add(new DashboardAlertItem(
+                scaduta ? "danger" : urgente ? "warning" : "primary",
+                scaduta
+                    ? "Richiesta cliente scaduta"
+                    : urgente
+                        ? "Richiesta cliente urgente"
+                        : "Richiesta cliente in scadenza",
+                $"{richiesta.NumeroCompleto} - {richiesta.Cliente} - {richiesta.Oggetto}"));
+        }
 
         foreach (var preventivo in preventivi.Where(IsDaInviare).Take(3))
         {
@@ -128,7 +163,7 @@ public class IndexModel : PageModel
         }
 
         return alert
-            .Take(6)
+            .Take(8)
             .ToArray();
     }
 

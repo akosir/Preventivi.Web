@@ -4,6 +4,7 @@ public static class AllegatoEntita
 {
     public const string Clienti = "Clienti";
     public const string Preventivi = "Preventivi";
+    public const string RichiesteClienti = "RichiesteClienti";
     public const string PreventiviRigheComponenti = "PreventiviRigheComponenti";
     public const string PreventiviRigheMateriali = "PreventiviRigheMateriali";
     public const string PreventiviRigheLavorazioni = "PreventiviRigheLavorazioni";
@@ -12,6 +13,7 @@ public static class AllegatoEntita
     [
         Clienti,
         Preventivi,
+        RichiesteClienti,
         PreventiviRigheComponenti,
         PreventiviRigheMateriali,
         PreventiviRigheLavorazioni
