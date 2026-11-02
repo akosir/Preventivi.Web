@@ -1,0 +1,221 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.RilievoDettaglioModel
+@using global::Preventivi.Core.Campionature
+
+@{
+    var campionatura = Model.Campionatura!;
+    var rilievo = Model.Rilievo!;
+    var statoFinale = CampionaturaRilievoValori.StatoFinale(rilievo.Stato);
+    var returnUrl = Url.Page(
+        "/Campionature/RilievoDettaglio",
+        new { idCampionatura = campionatura.IdCampionatura, id = rilievo.IdRilievoCampionatura })!;
+    ViewData["Title"] = $"Rilievo {rilievo.RigaNr}";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header d-flex justify-content-between align-items-start gap-3">
+        <div>
+            <div class="workspace-breadcrumb">
+                <a asp-page="./Index">Campionature</a>
+                <span>/</span>
+                <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a>
+                <span>/</span>
+                <span>Rilievo @rilievo.RigaNr</span>
+            </div>
+            <h1 class="workspace-title">Rilievo @rilievo.RigaNr</h1>
+            <p class="page-subtitle">@rilievo.TipoProblematica - @rilievo.Gravita</p>
+        </div>
+        @if (!statoFinale)
+        {
+            <div class="d-flex gap-2 no-print">
+                <a asp-page="./RilievoModifica"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@rilievo.IdRilievoCampionatura"
+                   class="pfw-btn pfw-btn-secondary">Modifica</a>
+                @if (rilievo.Stato == "Aperto" &&
+                     Model.Adeguamenti.Count == 0 &&
+                     Model.Allegati.Allegati.Count == 0)
+                {
+                    <a asp-page="./RilievoElimina"
+                       asp-route-idCampionatura="@campionatura.IdCampionatura"
+                       asp-route-id="@rilievo.IdRilievoCampionatura"
+                       class="pfw-btn pfw-btn-danger">Elimina</a>
+                }
+                <a asp-page="./AdeguamentoNuovo"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-idRilievo="@rilievo.IdRilievoCampionatura"
+                   class="pfw-btn pfw-btn-primary">Nuovo adeguamento</a>
+            </div>
+        }
+    </div>
+
+    @if (TempData["MessaggioSuccesso"] is string messaggio)
+    {
+        <div class="alert alert-success">@messaggio</div>
+    }
+    @if (TempData["MessaggioErrore"] is string errore)
+    {
+        <div class="alert alert-danger">@errore</div>
+    }
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati del rilievo</h2>
+                <div class="pfw-panel-subtitle">Classificazione e valutazione</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Data rilievo</dt>
+                <dd class="col-sm-9">@rilievo.DataRilevazione.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-sm-3">Tipo problematica</dt>
+                <dd class="col-sm-9">@rilievo.TipoProblematica</dd>
+                <dt class="col-sm-3">Problematica standard</dt>
+                <dd class="col-sm-9">@(rilievo.ProblematicaStandard ?? "-")</dd>
+                <dt class="col-sm-3">Descrizione problema</dt>
+                <dd class="col-sm-9">@rilievo.DescrizioneProblema</dd>
+                <dt class="col-sm-3">Gravita</dt>
+                <dd class="col-sm-9">@rilievo.Gravita</dd>
+                <dt class="col-sm-3">Causa presunta</dt>
+                <dd class="col-sm-9">@(rilievo.CausaPresunta ?? "-")</dd>
+                <dt class="col-sm-3">Soluzione proposta</dt>
+                <dd class="col-sm-9">@(rilievo.SoluzioneProposta ?? "-")</dd>
+                <dt class="col-sm-3">Richiede adeguamento</dt>
+                <dd class="col-sm-9">@(rilievo.RichiedeAdeguamentoPreventivo ? "Si" : "No")</dd>
+                <dt class="col-sm-3">Richiede nuovo campione</dt>
+                <dd class="col-sm-9">@(rilievo.RichiedeNuovoCampione ? "Si" : "No")</dd>
+                <dt class="col-sm-3">Esito verifica</dt>
+                <dd class="col-sm-9">@(rilievo.EsitoVerifica ?? "-")</dd>
+                <dt class="col-sm-3">Note per il cliente</dt>
+                <dd class="col-sm-9">@(rilievo.NoteCliente ?? "-")</dd>
+                <dt class="col-sm-3">Note interne</dt>
+                <dd class="col-sm-9">@(rilievo.NoteInterne ?? "-")</dd>
+                <dt class="col-sm-3">Data chiusura</dt>
+                <dd class="col-sm-9">@(rilievo.DataChiusura?.ToString("dd/MM/yyyy") ?? "-")</dd>
+            </dl>
+        </div>
+    </section>
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Stato del rilievo</h2>
+                <div class="pfw-panel-subtitle">Situazione corrente</div>
+            </div>
+        </div>
+        <form method="post" class="p-3">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+            <input asp-for="VersioneRigaBase64" type="hidden" />
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-5 pfw-field-required">
+                    <label class="form-label">Stato corrente</label>
+                    <input value="@rilievo.Stato" class="form-control" readonly />
+                </div>
+                @if (Model.PuoCambiareStato)
+                {
+                    <div class="col-12 col-md-5 pfw-field-required">
+                        <label asp-for="Stato" class="form-label">Nuovo stato</label>
+                        <select asp-for="Stato" class="form-select">
+                            <option value="">Seleziona il nuovo stato</option>
+                            @foreach (var stato in Model.StatiSelezionabili)
+                            {
+                                <option value="@stato">@stato</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Stato" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <button type="submit" class="pfw-btn pfw-btn-primary">Salva stato</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-12 col-md-7">
+                        <div class="alert alert-secondary mb-0">
+                            Lo stato e definitivo e non sono disponibili ulteriori transizioni.
+                        </div>
+                    </div>
+                }
+                @if (Model.IsAmministratore)
+                {
+                    <div class="col-12">
+                        <label asp-for="MotivazioneCorrezione" class="form-label">Motivazione correzione amministrativa</label>
+                        <textarea asp-for="MotivazioneCorrezione" class="form-control" rows="3"></textarea>
+                        <div class="form-text">
+                            Obbligatoria quando il nuovo stato non appartiene al normale flusso operativo.
+                        </div>
+                        <span asp-validation-for="MotivazioneCorrezione" class="text-danger"></span>
+                    </div>
+                }
+            </div>
+        </form>
+    </section>
+
+    @if (Model.CorrezioniStato.Count > 0)
+    {
+        <section class="pfw-panel mb-3">
+            <div class="pfw-panel-header">
+                <div>
+                    <h2 class="pfw-panel-title">Correzioni amministrative</h2>
+                    <div class="pfw-panel-subtitle">Storico delle deroghe al normale flusso degli stati</div>
+                </div>
+            </div>
+            <div class="pfw-panel-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Stato precedente</th>
+                                <th>Nuovo stato</th>
+                                <th>Motivazione</th>
+                                <th>Amministratore</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var correzione in Model.CorrezioniStato)
+                            {
+                                <tr>
+                                    <td>@correzione.DataCorrezione.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@correzione.StatoPrecedente</td>
+                                    <td>@correzione.StatoNuovo</td>
+                                    <td>@correzione.Motivazione</td>
+                                    <td>@correzione.UtenteCorrezione</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    }
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Allegati del rilievo</h2>
+                <div class="pfw-panel-subtitle">Documenti associati esclusivamente al rilievo</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <div class="no-print">
+                @await Html.PartialAsync(
+                    "~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml",
+                    new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+                    {
+                        TestoNuovo = "Nuovo allegato",
+                        UrlNuovo = $"/Allegati/Nuovo?Entita=CampionatureRilievi&IdEntita={rilievo.IdRilievoCampionatura}&ReturnUrl={Uri.EscapeDataString(returnUrl)}",
+                        MostraNuovo = true
+                    })
+            </div>
+            @await Html.PartialAsync(
+                "~/Pages/Shared/Allegati/_AllegatiGrid.cshtml",
+                new global::Preventivi.Web.UI.Modules.Allegati.AllegatiGridModel
+                {
+                    Allegati = Model.Allegati.Allegati,
+                    ReturnUrl = returnUrl
+                })
+        </div>
+    </section>
+</div>

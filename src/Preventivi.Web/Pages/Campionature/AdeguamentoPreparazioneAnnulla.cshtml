@@ -1,0 +1,43 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.AdeguamentoPreparazioneAnnullaModel
+
+@{
+    var campionatura = Model.Campionatura!;
+    var adeguamento = Model.Adeguamento!;
+    ViewData["Title"] = "Annulla preparazione variante";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div>
+            <div class="workspace-breadcrumb">
+                <a asp-page="./Index">Campionature</a><span>/</span>
+                <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a><span>/</span>
+                <a asp-page="./AdeguamentoDettaglio" asp-route-idCampionatura="@campionatura.IdCampionatura" asp-route-id="@adeguamento.IdAdeguamento">Adeguamento</a><span>/</span>
+                <span>Annulla preparazione</span>
+            </div>
+            <h1 class="workspace-title">Annulla preparazione variante</h1>
+        </div>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Conferma annullamento</h2>
+                <div class="pfw-panel-subtitle">La variante preparata verra disattivata</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <p>Vuoi annullare la preparazione della variante <strong>@adeguamento.CodiceVarianteGenerata</strong>?</p>
+            <div class="alert alert-warning">
+                Le modifiche effettuate sulla variante preparata non saranno conservate come variante attiva. L'adeguamento tornera nello stato proposto.
+            </div>
+            <form method="post" class="d-flex justify-content-end gap-2">
+                <input asp-for="VersioneRigaBase64" type="hidden" />
+                <a asp-page="./AdeguamentoDettaglio" asp-route-idCampionatura="@campionatura.IdCampionatura" asp-route-id="@adeguamento.IdAdeguamento" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-danger">Annulla preparazione</button>
+            </form>
+        </div>
+    </section>
+</div>

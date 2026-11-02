@@ -63,6 +63,13 @@ public class EliminaModel : PageModel
                 "La configurazione database delle varianti non è aggiornata. Applicare lo script di correzione TEC-009.");
             return Page();
         }
+        catch (SqlException exception) when (exception.Number == 52752)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "La variante e collegata a un adeguamento di campionatura. Annullare la preparazione dall'adeguamento prima di eliminarla.");
+            return Page();
+        }
 
         return RedirectToPage(
             "/Preventivi/Dettaglio",

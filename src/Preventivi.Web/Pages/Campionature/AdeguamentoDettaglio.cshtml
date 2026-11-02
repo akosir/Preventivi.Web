@@ -1,0 +1,181 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.AdeguamentoDettaglioModel
+
+@{
+    var campionatura = Model.Campionatura!;
+    var adeguamento = Model.Adeguamento!;
+    var returnUrl = Url.Page(
+        "/Campionature/AdeguamentoDettaglio",
+        new { idCampionatura = campionatura.IdCampionatura, id = adeguamento.IdAdeguamento })!;
+    ViewData["Title"] = $"Adeguamento rilievo {adeguamento.RigaNrRilievo}";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header d-flex justify-content-between align-items-start gap-3">
+        <div>
+            <div class="workspace-breadcrumb">
+                <a asp-page="./Index">Campionature</a>
+                <span>/</span>
+                <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a>
+                <span>/</span>
+                <a asp-page="./RilievoDettaglio"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@adeguamento.IdRilievoCampionatura">Rilievo @adeguamento.RigaNrRilievo</a>
+                <span>/</span>
+                <span>Adeguamento</span>
+            </div>
+            <h1 class="workspace-title">Adeguamento rilievo @adeguamento.RigaNrRilievo</h1>
+            <p class="page-subtitle">@adeguamento.DescrizioneProblema</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2 no-print">
+            @if (!adeguamento.Applicato)
+            {
+                <a asp-page="./AdeguamentoModifica"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@adeguamento.IdAdeguamento"
+                   class="pfw-btn pfw-btn-primary">Modifica</a>
+                @if (Model.Allegati.Allegati.Count == 0 && !adeguamento.IdVarianteGenerata.HasValue)
+                {
+                    <a asp-page="./AdeguamentoElimina"
+                       asp-route-idCampionatura="@campionatura.IdCampionatura"
+                       asp-route-id="@adeguamento.IdAdeguamento"
+                       class="pfw-btn pfw-btn-danger">Elimina</a>
+                }
+            }
+            @if (Model.PuoGestirePreventivi &&
+                 adeguamento.IdPreventivo.HasValue &&
+                 !adeguamento.Applicato &&
+                 !adeguamento.IdVarianteGenerata.HasValue)
+            {
+                <a asp-page="./AdeguamentoPrepara"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@adeguamento.IdAdeguamento"
+                   class="pfw-btn pfw-btn-primary">Prepara variante</a>
+            }
+            @if (Model.PuoGestirePreventivi && adeguamento.IdVarianteGenerata.HasValue)
+            {
+                <a asp-page="/Preventivi/Varianti/Dettaglio"
+                   asp-route-idPreventivo="@adeguamento.IdPreventivo"
+                   asp-route-idVariantePreventivo="@adeguamento.IdVarianteGenerata"
+                   class="pfw-btn pfw-btn-secondary">Apri variante</a>
+            }
+            @if (Model.PuoGestirePreventivi && !adeguamento.Applicato && adeguamento.IdVarianteGenerata.HasValue)
+            {
+                <a asp-page="./AdeguamentoConferma"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@adeguamento.IdAdeguamento"
+                   class="pfw-btn pfw-btn-primary">Conferma applicazione</a>
+                <a asp-page="./AdeguamentoPreparazioneAnnulla"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@adeguamento.IdAdeguamento"
+                   class="pfw-btn pfw-btn-danger">Annulla preparazione</a>
+            }
+        </div>
+    </div>
+
+    @if (TempData["MessaggioSuccesso"] is string successo)
+    {
+        <div class="alert alert-success">@successo</div>
+    }
+    @if (TempData["MessaggioErrore"] is string errore)
+    {
+        <div class="alert alert-danger">@errore</div>
+    }
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati dell'adeguamento</h2>
+                <div class="pfw-panel-subtitle">Stato e valutazione economica</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Descrizione adeguamento</dt>
+                <dd class="col-sm-9">@adeguamento.DescrizioneAdeguamento</dd>
+                <dt class="col-sm-3">Impatto stimato sui costi</dt>
+                <dd class="col-sm-9">@adeguamento.ImpattoCostoStimato.ToString("N2")</dd>
+                <dt class="col-sm-3">Impatto stimato sulla vendita</dt>
+                <dd class="col-sm-9">@adeguamento.ImpattoVenditaStimato.ToString("N2")</dd>
+                <dt class="col-sm-3">Stato</dt>
+                <dd class="col-sm-9">@(adeguamento.Applicato ? "Applicato" : adeguamento.IdVarianteGenerata.HasValue ? "Variante preparata" : "Proposto")</dd>
+                <dt class="col-sm-3">Variante generata</dt>
+                <dd class="col-sm-9">
+                    @if (adeguamento.IdVarianteGenerata.HasValue)
+                    {
+                        <span>@adeguamento.CodiceVarianteGenerata - @adeguamento.DescrizioneVarianteGenerata</span>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </dd>
+                <dt class="col-sm-3">Preparata il</dt>
+                <dd class="col-sm-9">@(adeguamento.DataPreparazione?.ToString("dd/MM/yyyy HH:mm") ?? "-")</dd>
+                <dt class="col-sm-3">Preparata da</dt>
+                <dd class="col-sm-9">@(adeguamento.UtentePreparazione ?? "-")</dd>
+                <dt class="col-sm-3">Data applicazione</dt>
+                <dd class="col-sm-9">@(adeguamento.DataApplicazione?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                <dt class="col-sm-3">Applicata da</dt>
+                <dd class="col-sm-9">@(adeguamento.UtenteApplicazione ?? "-")</dd>
+                <dt class="col-sm-3">Note</dt>
+                <dd class="col-sm-9">@(adeguamento.Note ?? "-")</dd>
+            </dl>
+        </div>
+    </section>
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Applicazione al preventivo</h2>
+                <div class="pfw-panel-subtitle">Flusso controllato tramite variante dedicata</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            @if (!adeguamento.IdPreventivo.HasValue)
+            {
+                <div class="alert alert-warning mb-0">La campionatura non e collegata a un preventivo. Non e possibile preparare una variante.</div>
+            }
+            else if (adeguamento.Applicato)
+            {
+                <div class="alert alert-success mb-0">L'adeguamento e stato applicato e costituisce storico.</div>
+            }
+            else if (adeguamento.IdVarianteGenerata.HasValue)
+            {
+                <div class="alert alert-info mb-0">La variante e pronta. Verificare e modificare le righe necessarie prima di confermare l'applicazione.</div>
+            }
+            else
+            {
+                <div class="alert alert-secondary mb-0">Gli importi indicati sono stime di confronto e non verranno sommati automaticamente ai totali.</div>
+            }
+        </div>
+    </section>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Allegati dell'adeguamento</h2>
+                <div class="pfw-panel-subtitle">Documenti associati esclusivamente all'adeguamento</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <div class="no-print">
+                @await Html.PartialAsync(
+                    "~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml",
+                    new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+                    {
+                        TestoNuovo = "Nuovo allegato",
+                        UrlNuovo = $"/Allegati/Nuovo?Entita=CampionatureAdeguamenti&IdEntita={adeguamento.IdAdeguamento}&ReturnUrl={Uri.EscapeDataString(returnUrl)}",
+                        MostraNuovo = true
+                    })
+            </div>
+            @await Html.PartialAsync(
+                "~/Pages/Shared/Allegati/_AllegatiGrid.cshtml",
+                new global::Preventivi.Web.UI.Modules.Allegati.AllegatiGridModel
+                {
+                    Allegati = Model.Allegati.Allegati,
+                    ReturnUrl = returnUrl
+                })
+        </div>
+    </section>
+</div>

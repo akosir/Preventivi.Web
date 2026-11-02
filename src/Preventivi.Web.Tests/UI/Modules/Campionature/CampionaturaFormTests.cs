@@ -42,7 +42,6 @@ public sealed class CampionaturaFormTests
         DataCampionatura = new DateOnly(2026, 10, 27),
         IdRichiestaCliente = 1,
         Oggetto = "Nuovo campione",
-        Stato = "Aperta",
         Priorita = "Media"
     };
 

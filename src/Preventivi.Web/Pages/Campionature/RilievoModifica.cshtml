@@ -1,0 +1,150 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.RilievoModificaModel
+@using global::Preventivi.Core.Campionature
+
+@{
+    var campionatura = Model.Campionatura!;
+    var rilievo = Model.Rilievo!;
+    ViewData["Title"] = $"Modifica rilievo {rilievo.RigaNr}";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="./Index">Campionature</a>
+            <span>/</span>
+            <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a>
+            <span>/</span>
+            <a asp-page="./RilievoDettaglio"
+               asp-route-idCampionatura="@campionatura.IdCampionatura"
+               asp-route-id="@rilievo.IdRilievoCampionatura">Rilievo @rilievo.RigaNr</a>
+            <span>/</span>
+            <span>Modifica</span>
+        </div>
+        <h1 class="workspace-title">Modifica rilievo @rilievo.RigaNr</h1>
+        <p class="page-subtitle">Campionatura @campionatura.NumeroCompleto</p>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati del rilievo</h2>
+                <div class="pfw-panel-subtitle">Numero e campionatura non sono modificabili</div>
+            </div>
+        </div>
+        <form method="post" class="p-3">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+            <input asp-for="Dati.VersioneRigaBase64" type="hidden" />
+            <div class="row g-3">
+                <div class="col-12 col-md-3 pfw-field-required">
+                    <label asp-for="Dati.DataRilevazione" class="form-label">Data rilievo</label>
+                    <input asp-for="Dati.DataRilevazione" type="date" class="form-control" />
+                    <span asp-validation-for="Dati.DataRilevazione" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-4 pfw-field-required">
+                    <label asp-for="Dati.IdTipoProblematica" class="form-label">Tipo problematica</label>
+                    <select asp-for="Dati.IdTipoProblematica" class="form-select" id="rilievo-tipo">
+                        <option value="">Seleziona un tipo</option>
+                        @foreach (var tipo in Model.Tipi)
+                        {
+                            <option value="@tipo.IdTipoProblematica">@tipo.CodiceTipo - @tipo.Descrizione</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dati.IdTipoProblematica" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-5">
+                    <label asp-for="Dati.IdProblematicaStandard" class="form-label">Problematica standard</label>
+                    <select asp-for="Dati.IdProblematicaStandard" class="form-select" id="rilievo-standard">
+                        <option value="">Descrizione libera</option>
+                        @foreach (var problematica in Model.Problematiche)
+                        {
+                            <option value="@problematica.IdProblematicaStandard"
+                                    data-tipo="@problematica.IdTipoProblematica"
+                                    data-descrizione="@problematica.DescrizioneProblematica"
+                                    data-soluzione="@problematica.SoluzioneStandard">
+                                @problematica.CodiceProblematica - @problematica.DescrizioneProblematica
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dati.IdProblematicaStandard" class="text-danger"></span>
+                </div>
+                <div class="col-12 pfw-field-required">
+                    <label asp-for="Dati.DescrizioneProblema" class="form-label">Descrizione problema</label>
+                    <textarea asp-for="Dati.DescrizioneProblema" class="form-control" rows="4" id="rilievo-descrizione"></textarea>
+                    <span asp-validation-for="Dati.DescrizioneProblema" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-3 pfw-field-required">
+                    <label asp-for="Dati.Gravita" class="form-label">Gravita</label>
+                    <select asp-for="Dati.Gravita" class="form-select">
+                        @foreach (var gravita in CampionaturaRilievoValori.Gravita)
+                        {
+                            <option value="@gravita">@gravita</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dati.Gravita" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-9 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input asp-for="Dati.RichiedeNuovoCampione" class="form-check-input" />
+                        <label asp-for="Dati.RichiedeNuovoCampione" class="form-check-label">Richiede un nuovo campione</label>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="Dati.CausaPresunta" class="form-label">Causa presunta</label>
+                    <textarea asp-for="Dati.CausaPresunta" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="Dati.SoluzioneProposta" class="form-label">Soluzione proposta</label>
+                    <textarea asp-for="Dati.SoluzioneProposta" class="form-control" rows="3" id="rilievo-soluzione"></textarea>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="Dati.NoteCliente" class="form-label">Note per il cliente</label>
+                    <textarea asp-for="Dati.NoteCliente" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="Dati.NoteInterne" class="form-label">Note interne</label>
+                    <textarea asp-for="Dati.NoteInterne" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a asp-page="./RilievoDettaglio"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@rilievo.IdRilievoCampionatura"
+                   class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const tipo = document.getElementById("rilievo-tipo");
+            const standard = document.getElementById("rilievo-standard");
+            const descrizione = document.getElementById("rilievo-descrizione");
+            const soluzione = document.getElementById("rilievo-soluzione");
+
+            const filtraStandard = () => {
+                Array.from(standard.options).forEach(option => {
+                    const visibile = !option.value || option.dataset.tipo === tipo.value;
+                    option.hidden = !visibile;
+                    option.disabled = !visibile;
+                });
+                if (standard.selectedOptions[0]?.disabled) {
+                    standard.value = "";
+                }
+            };
+
+            tipo.addEventListener("change", filtraStandard);
+            standard.addEventListener("change", () => {
+                const option = standard.selectedOptions[0];
+                if (!option?.value) return;
+                descrizione.value = option.dataset.descrizione || "";
+                soluzione.value = option.dataset.soluzione || "";
+            });
+            filtraStandard();
+        })();
+    </script>
+}

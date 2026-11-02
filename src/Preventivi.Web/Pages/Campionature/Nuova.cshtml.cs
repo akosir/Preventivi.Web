@@ -45,8 +45,7 @@ public class NuovaModel : PageModel
             DataRichiestaCampione = DateOnly.FromDateTime(DateTime.Today),
             IdRichiestaCliente = richiesta?.IdRichiestaCliente ?? 0,
             Oggetto = richiesta?.Oggetto ?? string.Empty,
-            Priorita = richiesta?.Priorita ?? "Media",
-            Stato = "Aperta"
+            Priorita = richiesta?.Priorita ?? "Media"
         };
     }
 
@@ -90,13 +89,13 @@ public class NuovaModel : PageModel
         IdVariantePreventivo = Dati.IdVariantePreventivo,
         Oggetto = Dati.Oggetto,
         DescrizioneCampione = Dati.DescrizioneCampione,
-        Stato = Dati.Stato,
+        Stato = "Aperta",
         Priorita = Dati.Priorita,
         DataRichiestaCampione = Dati.DataRichiestaCampione,
         DataPrevistaConsegna = Dati.DataPrevistaConsegna,
-        DataConsegnaCampione = Dati.DataConsegnaCampione,
-        DataChiusura = Dati.DataChiusura,
-        Esito = Dati.Esito,
+        DataConsegnaCampione = null,
+        DataChiusura = null,
+        Esito = null,
         Note = Dati.Note,
         Utente = utente
     };

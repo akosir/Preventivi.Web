@@ -1,5 +1,6 @@
 @page
 @model global::Preventivi.Web.Pages.Campionature.DettaglioModel
+@using global::Preventivi.Core.Campionature
 @using global::Preventivi.Web.UI.Button
 
 @{
@@ -40,8 +41,16 @@
                 new PFWButtonModel
                 {
                     Testo = "Modifica",
-                    Variante = "primary",
+                    Variante = "secondary",
                     Url = Url.Page("/Campionature/Modifica", new { id = campionatura.IdCampionatura })
+                })
+            @await Html.PartialAsync(
+                "Shared/PFW/Button/_PFWButton",
+                new PFWButtonModel
+                {
+                    Testo = "Aggiorna stato",
+                    Variante = "primary",
+                    Url = Url.Page("/Campionature/Stato", new { id = campionatura.IdCampionatura })
                 })
         </div>
     </div>
@@ -49,6 +58,10 @@
     @if (TempData["MessaggioSuccesso"] is string messaggio)
     {
         <div class="alert alert-success">@messaggio</div>
+    }
+    @if (TempData["MessaggioErrore"] is string errore)
+    {
+        <div class="alert alert-danger">@errore</div>
     }
 
     <section class="pfw-panel mb-3">
@@ -128,6 +141,216 @@
                         : "-")
                 </dd>
             </dl>
+        </div>
+    </section>
+
+    @if (Model.CorrezioniStato.Count > 0)
+    {
+        <section class="pfw-panel mb-3">
+            <div class="pfw-panel-header">
+                <div>
+                    <h2 class="pfw-panel-title">Correzioni amministrative</h2>
+                    <div class="pfw-panel-subtitle">Storico delle variazioni esterne al workflow ordinario</div>
+                </div>
+            </div>
+            <div class="pfw-panel-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Stato precedente</th>
+                                <th>Nuovo stato</th>
+                                <th>Motivazione</th>
+                                <th>Utente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var correzione in Model.CorrezioniStato)
+                            {
+                                <tr>
+                                    <td>@correzione.DataCorrezione.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@correzione.StatoPrecedente</td>
+                                    <td>@correzione.StatoNuovo</td>
+                                    <td>@correzione.Motivazione</td>
+                                    <td>@correzione.UtenteCorrezione</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    }
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Rilievi</h2>
+                <div class="pfw-panel-subtitle">Problematiche rilevate durante la campionatura</div>
+            </div>
+            <a asp-page="./RilievoNuovo"
+               asp-route-idCampionatura="@campionatura.IdCampionatura"
+               class="pfw-btn pfw-btn-primary no-print">Nuovo rilievo</a>
+        </div>
+        <div class="pfw-panel-body p-0">
+            @if (Model.Rilievi.Count == 0)
+            {
+                <p class="p-3 mb-0 text-muted">Nessun rilievo registrato.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Numero</th>
+                                <th>Data</th>
+                                <th>Tipo problematica</th>
+                                <th>Descrizione</th>
+                                <th>Gravita</th>
+                                <th>Stato</th>
+                                <th class="text-end no-print">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rilievo in Model.Rilievi)
+                            {
+                                <tr>
+                                    <td>@rilievo.RigaNr</td>
+                                    <td>@rilievo.DataRilevazione.ToString("dd/MM/yyyy")</td>
+                                    <td>@rilievo.TipoProblematica</td>
+                                    <td>@rilievo.DescrizioneProblema</td>
+                                    <td>@rilievo.Gravita</td>
+                                    <td>@rilievo.Stato</td>
+                                    <td class="text-end no-print">
+                                        <a asp-page="./RilievoDettaglio"
+                                           asp-route-idCampionatura="@campionatura.IdCampionatura"
+                                           asp-route-id="@rilievo.IdRilievoCampionatura"
+                                           class="pfw-action-link">Apri</a>
+                                        @if (!CampionaturaRilievoValori.StatoFinale(rilievo.Stato))
+                                        {
+                                            <span class="text-muted mx-1">|</span>
+                                            <a asp-page="./RilievoModifica"
+                                               asp-route-idCampionatura="@campionatura.IdCampionatura"
+                                               asp-route-id="@rilievo.IdRilievoCampionatura"
+                                               class="pfw-action-link">Modifica</a>
+                                        }
+                                        @if (rilievo.Stato == "Aperto" &&
+                                             Model.Adeguamenti.All(a => a.IdRilievoCampionatura != rilievo.IdRilievoCampionatura))
+                                        {
+                                            <span class="text-muted mx-1">|</span>
+                                            <a asp-page="./RilievoElimina"
+                                               asp-route-idCampionatura="@campionatura.IdCampionatura"
+                                               asp-route-id="@rilievo.IdRilievoCampionatura"
+                                               class="pfw-action-link text-danger">Elimina</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Adeguamenti preventivo</h2>
+                <div class="pfw-panel-subtitle">Valutazioni economiche collegate ai rilievi</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body p-0">
+            @if (Model.Adeguamenti.Count == 0)
+            {
+                <p class="p-3 mb-0 text-muted">Nessun adeguamento registrato.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Rilievo</th>
+                                <th>Descrizione</th>
+                                <th class="text-end">Impatto costi</th>
+                                <th class="text-end">Impatto vendita</th>
+                                <th>Stato</th>
+                                <th class="text-end no-print">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var adeguamento in Model.Adeguamenti)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-page="./RilievoDettaglio"
+                                           asp-route-idCampionatura="@campionatura.IdCampionatura"
+                                           asp-route-id="@adeguamento.IdRilievoCampionatura"
+                                           class="pfw-action-link">@adeguamento.RigaNrRilievo</a>
+                                    </td>
+                                    <td>@adeguamento.DescrizioneAdeguamento</td>
+                                    <td class="text-end">@adeguamento.ImpattoCostoStimato.ToString("N2")</td>
+                                    <td class="text-end">@adeguamento.ImpattoVenditaStimato.ToString("N2")</td>
+                                    <td>
+                                        @(adeguamento.Applicato
+                                            ? "Applicato"
+                                            : adeguamento.IdVarianteGenerata.HasValue
+                                                ? "Preparato"
+                                                : "Proposto")
+                                    </td>
+                                    <td class="text-end no-print">
+                                        <a asp-page="./AdeguamentoDettaglio"
+                                           asp-route-idCampionatura="@campionatura.IdCampionatura"
+                                           asp-route-id="@adeguamento.IdAdeguamento"
+                                           class="pfw-action-link">Apri</a>
+                                        @if (!adeguamento.Applicato)
+                                        {
+                                            <span class="text-muted mx-1">|</span>
+                                            <a asp-page="./AdeguamentoModifica"
+                                               asp-route-idCampionatura="@campionatura.IdCampionatura"
+                                               asp-route-id="@adeguamento.IdAdeguamento"
+                                               class="pfw-action-link">Modifica</a>
+                                            <span class="text-muted mx-1">|</span>
+                                            <a asp-page="./AdeguamentoElimina"
+                                               asp-route-idCampionatura="@campionatura.IdCampionatura"
+                                               asp-route-id="@adeguamento.IdAdeguamento"
+                                               class="pfw-action-link text-danger">Elimina</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Allegati</h2>
+                <div class="pfw-panel-subtitle">Documenti associati alla campionatura</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <div class="no-print">
+                @await Html.PartialAsync(
+                    "~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml",
+                    new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+                    {
+                        TestoNuovo = "Nuovo allegato",
+                        UrlNuovo = $"/Allegati/Nuovo?Entita=Campionature&IdEntita={campionatura.IdCampionatura}&ReturnUrl={Uri.EscapeDataString(Url.Page("/Campionature/Dettaglio", new { id = campionatura.IdCampionatura })!)}",
+                        MostraNuovo = true,
+                        MostraAggiorna = false
+                    })
+            </div>
+            @await Html.PartialAsync(
+                "~/Pages/Shared/Allegati/_AllegatiGrid.cshtml",
+                Model.Allegati)
         </div>
     </section>
 </div>

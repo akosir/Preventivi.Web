@@ -1,0 +1,52 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.AdeguamentoPreparaModel
+
+@{
+    var campionatura = Model.Campionatura!;
+    var adeguamento = Model.Adeguamento!;
+    ViewData["Title"] = "Prepara variante di adeguamento";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div>
+            <div class="workspace-breadcrumb">
+                <a asp-page="./Index">Campionature</a><span>/</span>
+                <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a><span>/</span>
+                <a asp-page="./AdeguamentoDettaglio" asp-route-idCampionatura="@campionatura.IdCampionatura" asp-route-id="@adeguamento.IdAdeguamento">Adeguamento</a><span>/</span>
+                <span>Prepara variante</span>
+            </div>
+            <h1 class="workspace-title">Prepara variante di adeguamento</h1>
+            <p class="page-subtitle">La variante origine rimarra invariata</p>
+        </div>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Dati della nuova variante</h2>
+                <div class="pfw-panel-subtitle">La conferma dell'applicazione avverra in un passaggio successivo</div>
+            </div>
+        </div>
+        <form method="post" class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input asp-for="VersioneRigaBase64" type="hidden" />
+            <div class="row g-3">
+                <div class="col-12 col-md-4 pfw-field-required">
+                    <label asp-for="Dati.CodiceVariante" class="form-label">Codice variante</label>
+                    <input asp-for="Dati.CodiceVariante" class="form-control" />
+                    <span asp-validation-for="Dati.CodiceVariante" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-8 pfw-field-required">
+                    <label asp-for="Dati.DescrizioneVariante" class="form-label">Descrizione variante</label>
+                    <input asp-for="Dati.DescrizioneVariante" class="form-control" />
+                    <span asp-validation-for="Dati.DescrizioneVariante" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a asp-page="./AdeguamentoDettaglio" asp-route-idCampionatura="@campionatura.IdCampionatura" asp-route-id="@adeguamento.IdAdeguamento" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Prepara variante</button>
+            </div>
+        </form>
+    </section>
+</div>

@@ -156,6 +156,9 @@ public sealed class SicurezzaApplicazioneTests
     [InlineData(AllegatoEntita.PreventiviRigheLavorazioni, PermessiApplicazione.Preventivi)]
     [InlineData(AllegatoEntita.Clienti, PermessiApplicazione.Clienti)]
     [InlineData(AllegatoEntita.RichiesteClienti, PermessiApplicazione.RichiesteClienti)]
+    [InlineData(AllegatoEntita.Campionature, PermessiApplicazione.Campionature)]
+    [InlineData(AllegatoEntita.CampionatureRilievi, PermessiApplicazione.Campionature)]
+    [InlineData(AllegatoEntita.CampionatureAdeguamenti, PermessiApplicazione.Campionature)]
     public void Allegati_PermessoEntitaCorrispondente_Autorizza(
         string entita,
         string permesso)

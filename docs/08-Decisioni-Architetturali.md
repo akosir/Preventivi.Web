@@ -1265,8 +1265,9 @@ richiesta in preventivo.
 
 **Classificazione:** [D].
 
-**Stato:** approvate; implementazione predisposta, script non ancora applicato
-al database.
+**Stato:** chiusa per l'ambito base approvato dalle decisioni 271-280.
+L'installazione dello script e il collaudo runtime restano verifiche operative
+da registrare separatamente se non gia eseguite.
 
 **Data di approvazione:** 27 ottobre 2026.
 
@@ -1306,6 +1307,230 @@ l'impronta SHA-256 dichiarata e stata ricalcolata e verificata. Persistono gli
 avvisi NuGet noti relativi a `System.Security.Cryptography.Pkcs` 9.0.13. Lo
 script non e stato eseguito sul database e il flusso non e ancora collaudato a
 runtime.
+
+Estensione allegati approvata il 27 ottobre 2026:
+
+- **276:** usare la chiave tecnica allegato `Campionature`, associata a
+  `IdCampionatura`;
+- **277:** mostrare nel dettaglio Campionatura la gestione MB-01 completa con
+  inserimento, apertura, download ed eliminazione;
+- **278:** proteggere tutte le operazioni con il permesso applicativo
+  `frmCampionature` e verificare l'esistenza della campionatura durante
+  l'upload;
+- **279:** riutilizzare lo storage configurato da `PercorsoRootAllegati`, i
+  metadati in `dbo.Allegati` e l'eliminazione fisica definitiva gia approvati
+  per MB-01;
+- **280:** conservare gli allegati durante modifiche e cambi di stato, senza
+  cancellazioni automatiche o propagazioni verso richiesta, preventivo o
+  variante.
+
+L'estensione non richiede modifiche allo schema: l'associazione generica
+`Entita` e `IdEntita` di `dbo.Allegati` supporta gia la nuova chiave. Nel
+repository sono predisposti la chiave applicativa, la mappatura del permesso,
+il controllo di esistenza in upload e la griglia allegati nel dettaglio della
+campionatura. TEC-014 risulta chiusa per l'ambito base; rilievi, adeguamenti e
+ulteriori transizioni operative costituiscono evoluzioni distinte.
+
+### 5.19 Decisioni TEC-015 — Rilievi e adeguamenti campionatura
+
+**Classificazione:** [D].
+
+**Stato:** decisioni 281-305 approvate e implementate nel repository. I cinque
+aggiornamenti risultano installati e collaudati dall'utente per i casi
+riproducibili.
+
+**Data di approvazione:** dal 29 ottobre al 2 novembre 2026.
+
+**Fonte dell'approvazione:** conferma esplicita delle decisioni 281-285,
+286-290 e 291-295 con integrazione della decisione 292, quindi delle decisioni
+296-300 e 301-305, ciascuna seguita dall'approvazione della relativa
+implementazione, nella sessione Work.
+
+Le decisioni approvate sono:
+
+- **281:** gestire nel dettaglio della campionatura i rilievi qualitativi e gli
+  eventuali adeguamenti del preventivo derivanti da essi;
+- **282:** consentire piu rilievi per campionatura; ogni rilievo appartiene a
+  una sola campionatura e riceve un numero progressivo univoco nel proprio
+  contesto, assegnato transazionalmente dal database;
+- **283:** richiedere un tipo di problematica attivo e mantenere facoltativa la
+  problematica standard, filtrata per tipo e stato attivo; la selezione propone
+  descrizione e soluzione standard, entrambe modificabili;
+- **284:** utilizzare gli stati `Aperto`, `In Analisi`, `Soluzione Proposta`,
+  `Risolto`, `Respinto` e `Chiuso`; `Risolto` indica una soluzione eseguita ma
+  ancora da verificare, mentre `Respinto` e `Chiuso` sono finali e determinano
+  automaticamente la data di chiusura;
+- **285:** creare ogni adeguamento mediante un'azione esplicita da uno specifico
+  rilievo della stessa campionatura; la creazione imposta la richiesta di
+  adeguamento ma non modifica automaticamente preventivo, variante o totali.
+
+Il secondo pacchetto approvato stabilisce inoltre:
+
+- **286:** esporre per rilievi e adeguamenti le azioni reali `Apri`, `Modifica`
+  ed `Elimina`, con conferma prima delle eliminazioni;
+- **287:** consentire la modifica dei dati descrittivi e tecnici di un rilievo
+  non finale, mantenendo immutabili campionatura, numero progressivo e
+  identita; i rilievi `Respinto` e `Chiuso` restano in sola lettura;
+- **288:** consentire l'eliminazione fisica di un rilievo soltanto nello stato
+  `Aperto` e in assenza di adeguamenti collegati, mostrando un errore
+  funzionale negli altri casi;
+- **289:** consentire modifica ed eliminazione degli adeguamenti non applicati;
+  un adeguamento applicato costituisce storico e resta in sola lettura;
+- **290:** quando viene eliminato l'ultimo adeguamento di un rilievo, azzerare
+  `RichiedeAdeguamentoPreventivo` e, se lo stato e `Soluzione Proposta`,
+  riportarlo a `In Analisi`; eliminazione e riallineamento devono avvenire
+  nella stessa transazione con controllo `rowversion`.
+
+Il terzo pacchetto approvato stabilisce inoltre:
+
+- **291:** applicare ai rilievi una matrice esplicita delle transizioni
+  ordinarie: `Aperto` verso `In Analisi` o `Respinto`; `In Analisi` verso
+  `Soluzione Proposta` o `Respinto`; `Soluzione Proposta` verso `In Analisi` o
+  `Risolto`; `Risolto` verso `In Analisi` o `Chiuso`; `Respinto` e `Chiuso`
+  sono finali per gli operatori;
+- **292:** riservare al ruolo `ADMIN` le correzioni esterne alla matrice e la
+  riapertura degli stati finali, richiedendo una motivazione obbligatoria e un
+  audit con stato precedente, nuovo stato, amministratore e data. Questa
+  costituisce la regola architetturale generale per ogni procedura dotata di
+  stato, da applicare ai singoli moduli dopo la ricognizione del relativo
+  workflow; in questo pacchetto viene implementata soltanto sui rilievi di
+  campionatura;
+- **293:** associare allegati MB-01 autonomi a ogni rilievo tramite la chiave
+  `CampionatureRilievi` e l'identificativo del rilievo;
+- **294:** associare allegati MB-01 autonomi a ogni adeguamento tramite la
+  chiave `CampionatureAdeguamenti` e l'identificativo dell'adeguamento;
+- **295:** impedire l'eliminazione di un rilievo o di un adeguamento che
+  possiede allegati, richiedendo la loro eliminazione esplicita prima di
+  eliminare l'entita principale.
+
+Il quarto pacchetto approvato stabilisce inoltre:
+
+- **296:** applicare un adeguamento con due azioni esplicite, `Prepara variante`
+  e `Conferma applicazione`; entrambe richiedono i permessi Campionature e
+  Preventivi e la sola registrazione dell'adeguamento non modifica il
+  preventivo;
+- **297:** mantenere invariati il preventivo e la variante di origine,
+  registrando separatamente sull'adeguamento la variante generata;
+- **298:** durante la preparazione clonare integralmente righe, componenti,
+  materiali e lavorazioni nella nuova variante, conservando le identita e le
+  gerarchie operative definite da TEC-001; gli allegati non vengono copiati
+  automaticamente;
+- **299:** consentire la conferma soltanto se la variante generata esiste,
+  appartiene allo stesso preventivo ed e stata ricalcolata; la conferma rende
+  storico l'adeguamento, registra utente e data, collega la variante generata e
+  porta il rilievo a `Risolto`. Gli importi stimati restano dati di confronto e
+  non sostituiscono i totali ricalcolati;
+- **300:** consentire prima della conferma l'annullamento della preparazione,
+  disattivando la variante generata e riportando l'adeguamento allo stato
+  proposto; dopo la conferma l'applicazione e immutabile e ogni correzione
+  richiede un nuovo adeguamento.
+
+Il quinto pacchetto approvato stabilisce inoltre:
+
+- **301:** applicare alla testata della campionatura la matrice ordinaria
+  `Aperta` verso `In Lavorazione` o `Annullata`; `In Lavorazione` verso
+  `In Verifica` o `Annullata`; `In Verifica` verso `In Lavorazione`,
+  `Inviata al Cliente` o `Annullata`; `Inviata al Cliente` verso
+  `In Verifica`, `In Lavorazione`, `Approvata` o `Respinta`; `Approvata` e
+  `Respinta` verso `Chiusa`. Per gli operatori `Chiusa` e `Annullata` sono
+  stati finali;
+- **302:** consentire agli operatori soltanto le transizioni della matrice e
+  riservare al ruolo `ADMIN` le correzioni esterne, comprese le riaperture,
+  richiedendo una motivazione e registrando stato precedente, nuovo stato,
+  amministratore e data;
+- **303:** creare ogni campionatura nello stato `Aperta`, senza esito, data di
+  consegna effettiva o data di chiusura; stato, esito e date operative non
+  appartengono alla modifica generica e sono gestiti da un'azione dedicata nel
+  dettaglio;
+- **304:** richiedere la data di consegna effettiva per il passaggio a
+  `Inviata al Cliente`; impedire approvazione, rifiuto e chiusura finche
+  esistono rilievi non finali; impedire la chiusura con adeguamenti ancora
+  proposti o preparati, mentre quelli applicati non costituiscono un blocco;
+- **305:** vincolare l'esito allo stato: `Approvata` ammette `Positivo` o
+  `Positivo con modifiche`, `Respinta` richiede `Negativo` e il ritorno a
+  `In Lavorazione` puo registrare `Da rifare`; `Chiusa` e `Annullata`
+  valorizzano automaticamente la data di chiusura, mentre una riapertura
+  amministrativa la azzera conservando l'audit.
+
+**Riscontri [C] al 2 novembre 2026**
+
+Nel repository sono predisposti contratti Core, Application Service,
+repository ADO.NET, modelli UI e pagine Razor per elenco e creazione dei
+rilievi, consultazione e aggiornamento dello stato e registrazione degli
+adeguamenti proposti. Il dettaglio Campionatura espone i dati reali di rilievi
+e adeguamenti.
+
+La soluzione, compilata in un output isolato per non interferire con
+l'istanza applicativa aperta, compila con zero errori. Sono stati superati 68
+test Data e 49 test Web. Persistono gli avvisi NuGet gia noti relativi a
+`System.Security.Cryptography.Pkcs` 9.0.13.
+
+Lo script incrementale
+`TEC-015_01_Rilievi_Adeguamenti_Campionature.sql` richiede la versione
+`2026102702`, aggiunge audit e `rowversion`, rende univoco il numero del rilievo
+nella campionatura, crea otto procedure operative e registra la versione
+`2026102901` con codice `TEC-015`. L'utente ha riferito di averlo applicato
+senza errori e ha verificato la visualizzazione dei rilievi e degli
+adeguamenti; non e stata eseguita in questa sessione una query indipendente al
+registro del database. ScriptDom aveva validato il batch esterno e tutti i 23
+batch dinamici; l'impronta SHA-256 dichiarata risultava coincidente.
+
+Il secondo script
+`TEC-015_02_Modifica_Eliminazione_Rilievi_Adeguamenti.sql` richiede la versione
+`2026102901`, aggiunge l'audit di modifica degli adeguamenti e installa le
+procedure di dettaglio, modifica ed eliminazione controllata. Registra la
+versione `2026102902` con codice `TEC-015-MODIFICA`. ScriptDom ha validato il
+batch esterno e tutti i 7 batch dinamici; l'impronta SHA-256 dichiarata e
+coincidente. L'utente ha riferito di aver applicato lo script e ha verificato
+con esito positivo: modifica del rilievo, eliminazione del rilievo aperto senza
+adeguamenti, blocco dell'eliminazione in presenza di adeguamenti, modifica di
+un adeguamento proposto, eliminazione dell'ultimo adeguamento con azzeramento
+della richiesta e ritorno a `In Analisi`, sola lettura dei rilievi finali.
+Il blocco runtime dell'adeguamento applicato e stato successivamente verificato
+nel collaudo del quarto aggiornamento.
+
+Il terzo script
+`TEC-015_03_Workflow_Stati_Allegati.sql` richiede la versione `2026102902`,
+installa la matrice delle transizioni, l'audit delle correzioni amministrative
+e i blocchi di eliminazione in presenza di allegati. Registra la versione
+`2026103001` con codice `TEC-015-WORKFLOW`. ScriptDom ha validato il batch
+esterno e tutti i 6 batch dinamici; l'impronta SHA-256 dichiarata coincide con
+il payload normalizzato. L'utente ha riferito di aver applicato lo script senza
+errori e di aver completato con esito positivo il collaudo runtime delle
+decisioni 291-295. Non e stata eseguita in questa sessione una query
+indipendente al registro delle versioni del database.
+
+Il quarto script
+`TEC-015_04_Applicazione_Adeguamenti.sql` richiede la versione `2026103001`,
+separa la variante di origine da quella generata, installa le procedure di
+preparazione, annullamento e conferma e registra la versione `2026103002` con
+codice `TEC-015-APPLICAZIONE`. ScriptDom ha validato il batch esterno e tutti i
+13 batch dinamici e l'impronta SHA-256 dichiarata coincide con il payload
+normalizzato. L'utente ha riferito di aver applicato lo script e ha verificato
+con esito positivo: preparazione della variante, conservazione dell'origine,
+clonazione di righe, componenti, materiali e lavorazioni senza allegati,
+annullamento della preparazione, nuova preparazione e conferma definitiva con
+passaggio del rilievo a `Risolto`, registrazione dell'applicazione e blocco
+delle operazioni successive. Non e stata eseguita in questa sessione una query
+indipendente al registro delle versioni del database.
+
+Il quinto script
+`TEC-015_05_Workflow_Stato_Campionature.sql` richiede la versione
+`2026103002`, installa la matrice della testata, l'audit delle correzioni
+amministrative e i vincoli fra stato, esito, consegna, rilievi e adeguamenti.
+Registra la versione `2026110201` con codice
+`TEC-015-CAMPIONATURA-WORKFLOW`. ScriptDom ha validato il batch esterno e
+tutti i 6 batch dinamici; l'impronta SHA-256 dichiarata coincide con il
+payload normalizzato. L'utente ha riferito di aver applicato lo script senza
+errori e ha collaudato con esito positivo: transizioni ordinarie senza audit,
+obbligo della consegna effettiva per l'invio, blocco in presenza di rilievi
+non finali, approvazione e chiusura con esito coerente, valorizzazione della
+data di chiusura, riapertura amministrativa con motivazione e audit e blocco
+della chiusura con adeguamenti non applicati. Non e stata eseguita in questa
+sessione una query indipendente al registro delle versioni del database.
+
+La ricognizione dei workflow di stato degli altri moduli e le decisioni
+successive alla 305 restano fuori da questo pacchetto.
 
 ## 6. Implementazioni e proposte non promosse a decisioni
 

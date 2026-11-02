@@ -48,13 +48,9 @@ public class ModificaModel : PageModel
             IdVariantePreventivo = Campionatura.IdVariantePreventivo,
             Oggetto = Campionatura.Oggetto,
             DescrizioneCampione = Campionatura.DescrizioneCampione,
-            Stato = Campionatura.Stato,
             Priorita = Campionatura.Priorita,
             DataRichiestaCampione = Campionatura.DataRichiestaCampione,
             DataPrevistaConsegna = Campionatura.DataPrevistaConsegna,
-            DataConsegnaCampione = Campionatura.DataConsegnaCampione,
-            DataChiusura = Campionatura.DataChiusura,
-            Esito = Campionatura.Esito,
             Note = Campionatura.Note,
             VersioneRigaBase64 = Convert.ToBase64String(Campionatura.VersioneRiga)
         };
@@ -100,7 +96,7 @@ public class ModificaModel : PageModel
             ModelState.AddModelError(string.Empty, exception.Message);
             return Page();
         }
-        catch (SqlException exception) when (exception.Number is >= 52600 and <= 52619)
+        catch (SqlException exception) when (exception.Number is >= 52600 and <= 52628)
         {
             _logger.LogWarning(exception, "Aggiornamento campionatura {Id} rifiutato", id);
             ModelState.AddModelError(string.Empty, MessaggioSql(exception.Number));
@@ -117,13 +113,13 @@ public class ModificaModel : PageModel
         IdVariantePreventivo = Dati.IdVariantePreventivo,
         Oggetto = Dati.Oggetto,
         DescrizioneCampione = Dati.DescrizioneCampione,
-        Stato = Dati.Stato,
+        Stato = Campionatura!.Stato,
         Priorita = Dati.Priorita,
         DataRichiestaCampione = Dati.DataRichiestaCampione,
         DataPrevistaConsegna = Dati.DataPrevistaConsegna,
-        DataConsegnaCampione = Dati.DataConsegnaCampione,
-        DataChiusura = Dati.DataChiusura,
-        Esito = Dati.Esito,
+        DataConsegnaCampione = Campionatura.DataConsegnaCampione,
+        DataChiusura = Campionatura.DataChiusura,
+        Esito = Campionatura.Esito,
         Note = Dati.Note,
         Utente = utente,
         VersioneRiga = versioneRiga
@@ -177,6 +173,7 @@ public class ModificaModel : PageModel
         52604 => "La variante deve appartenere al preventivo selezionato.",
         52606 => "La campionatura e stata modificata da un altro utente. Ricaricare la pagina.",
         52607 => "La data della campionatura deve rimanere nello stesso anno del numero progressivo.",
+        52628 => "Stato, esito e date operative devono essere aggiornati dalla funzione Aggiorna stato.",
         _ => "I dati della campionatura non sono validi. Controllare i campi e riprovare."
     };
 }

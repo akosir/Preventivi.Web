@@ -5,6 +5,9 @@ public static class AllegatoEntita
     public const string Clienti = "Clienti";
     public const string Preventivi = "Preventivi";
     public const string RichiesteClienti = "RichiesteClienti";
+    public const string Campionature = "Campionature";
+    public const string CampionatureRilievi = "CampionatureRilievi";
+    public const string CampionatureAdeguamenti = "CampionatureAdeguamenti";
     public const string PreventiviRigheComponenti = "PreventiviRigheComponenti";
     public const string PreventiviRigheMateriali = "PreventiviRigheMateriali";
     public const string PreventiviRigheLavorazioni = "PreventiviRigheLavorazioni";
@@ -14,6 +17,9 @@ public static class AllegatoEntita
         Clienti,
         Preventivi,
         RichiesteClienti,
+        Campionature,
+        CampionatureRilievi,
+        CampionatureAdeguamenti,
         PreventiviRigheComponenti,
         PreventiviRigheMateriali,
         PreventiviRigheLavorazioni

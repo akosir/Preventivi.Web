@@ -1,0 +1,85 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.StatoModel
+@using global::Preventivi.Core.Campionature
+
+@{
+    var campionatura = Model.Campionatura!;
+    ViewData["Title"] = $"Aggiorna stato {campionatura.NumeroCompleto}";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="./Index">Campionature</a>
+            <span>/</span>
+            <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a>
+            <span>/</span>
+            <span>Aggiorna stato</span>
+        </div>
+        <h1 class="workspace-title">Aggiorna stato campionatura</h1>
+        <p class="page-subtitle">@campionatura.NumeroCompleto - @campionatura.Oggetto</p>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Stato operativo</h2>
+                <div class="pfw-panel-subtitle">Stato corrente: @campionatura.Stato</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+                <input asp-for="VersioneRigaBase64" type="hidden" />
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-4 pfw-field-required">
+                        <label asp-for="Stato" class="form-label">Nuovo stato</label>
+                        <select asp-for="Stato" class="form-select" id="campionatura-nuovo-stato">
+                            <option value="">Seleziona uno stato</option>
+                            @foreach (var stato in Model.StatiSelezionabili)
+                            {
+                                <option value="@stato">@stato</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Stato" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label asp-for="DataConsegnaCampione" class="form-label">Consegna effettiva</label>
+                        <input asp-for="DataConsegnaCampione" type="date" class="form-control" />
+                        <span asp-validation-for="DataConsegnaCampione" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label asp-for="Esito" class="form-label">Esito</label>
+                        <select asp-for="Esito" class="form-select">
+                            <option value="">Non specificato</option>
+                            @foreach (var esito in CampionaturaValori.Esiti)
+                            {
+                                <option value="@esito">@esito</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Esito" class="text-danger"></span>
+                    </div>
+
+                    @if (Model.IsAmministratore)
+                    {
+                        <div class="col-12">
+                            <label asp-for="MotivazioneCorrezione" class="form-label">Motivazione correzione amministrativa</label>
+                            <textarea asp-for="MotivazioneCorrezione" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="MotivazioneCorrezione" class="text-danger"></span>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a asp-page="./Dettaglio"
+                       asp-route-id="@campionatura.IdCampionatura"
+                       class="pfw-btn pfw-btn-secondary">Annulla</a>
+                    <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>

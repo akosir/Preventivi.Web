@@ -1,0 +1,63 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.RilievoEliminaModel
+
+@{
+    var campionatura = Model.Campionatura!;
+    var rilievo = Model.Rilievo!;
+    ViewData["Title"] = $"Elimina rilievo {rilievo.RigaNr}";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="./Index">Campionature</a>
+            <span>/</span>
+            <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a>
+            <span>/</span>
+            <a asp-page="./RilievoDettaglio"
+               asp-route-idCampionatura="@campionatura.IdCampionatura"
+               asp-route-id="@rilievo.IdRilievoCampionatura">Rilievo @rilievo.RigaNr</a>
+            <span>/</span>
+            <span>Elimina</span>
+        </div>
+        <h1 class="workspace-title">Elimina rilievo @rilievo.RigaNr</h1>
+        <p class="page-subtitle">Campionatura @campionatura.NumeroCompleto</p>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Conferma eliminazione</h2>
+                <div class="pfw-panel-subtitle">L'operazione elimina definitivamente il rilievo</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+            @if (!Model.Eliminabile)
+            {
+                <div class="alert alert-warning">
+                    Il rilievo puo essere eliminato solo quando e aperto e non contiene adeguamenti o allegati collegati.
+                </div>
+            }
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Numero rilievo</dt>
+                <dd class="col-sm-9">@rilievo.RigaNr</dd>
+                <dt class="col-sm-3">Stato</dt>
+                <dd class="col-sm-9">@rilievo.Stato</dd>
+                <dt class="col-sm-3">Descrizione problema</dt>
+                <dd class="col-sm-9">@rilievo.DescrizioneProblema</dd>
+            </dl>
+            <form method="post" class="d-flex justify-content-end gap-2 mt-3">
+                <input asp-for="VersioneRigaBase64" type="hidden" />
+                <a asp-page="./RilievoDettaglio"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@rilievo.IdRilievoCampionatura"
+                   class="pfw-btn pfw-btn-secondary">Annulla</a>
+                @if (Model.Eliminabile)
+                {
+                    <button type="submit" class="pfw-btn pfw-btn-danger">Elimina</button>
+                }
+            </form>
+        </div>
+    </section>
+</div>

@@ -103,6 +103,9 @@ public static class AutorizzazioneApplicazione
             AllegatoEntita.PreventiviRigheLavorazioni => PermessiApplicazione.Preventivi,
             AllegatoEntita.Clienti => PermessiApplicazione.Clienti,
             AllegatoEntita.RichiesteClienti => PermessiApplicazione.RichiesteClienti,
+            AllegatoEntita.Campionature => PermessiApplicazione.Campionature,
+            AllegatoEntita.CampionatureRilievi => PermessiApplicazione.Campionature,
+            AllegatoEntita.CampionatureAdeguamenti => PermessiApplicazione.Campionature,
             _ => null
         };
 

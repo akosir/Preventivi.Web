@@ -31,5 +31,20 @@ public static class CampionaturaValori
     ];
 
     public static bool StatoFinale(string stato) =>
-        stato is "Approvata" or "Respinta" or "Chiusa" or "Annullata";
+        stato is "Chiusa" or "Annullata";
+
+    public static IReadOnlyList<string> StatiDestinazioneOrdinaria(string stato) =>
+        stato switch
+        {
+            "Aperta" => ["In Lavorazione", "Annullata"],
+            "In Lavorazione" => ["In Verifica", "Annullata"],
+            "In Verifica" => ["In Lavorazione", "Inviata al Cliente", "Annullata"],
+            "Inviata al Cliente" => ["In Verifica", "In Lavorazione", "Approvata", "Respinta"],
+            "Approvata" => ["Chiusa"],
+            "Respinta" => ["Chiusa"],
+            _ => []
+        };
+
+    public static bool TransizioneOrdinariaConsentita(string statoCorrente, string nuovoStato) =>
+        StatiDestinazioneOrdinaria(statoCorrente).Contains(nuovoStato, StringComparer.Ordinal);
 }

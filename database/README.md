@@ -232,4 +232,56 @@ appartenere rispettivamente alla richiesta e al preventivo selezionati.
 Lo script e transazionale, non contiene `USE` e non modifica rilievi o
 adeguamenti esistenti. Prima dell'esecuzione verificare il database di
 destinazione e una copia di sicurezza recuperabile. L'applicazione aggiornata
-richiede la versione `2026102702`.
+richiede la versione `2026102902`.
+
+## Rilievi e adeguamenti campionatura TEC-015
+
+Su un database aggiornato alla versione `2026102702`, eseguire:
+
+1. `06_Aggiornamenti/TEC-015_01_Rilievi_Adeguamenti_Campionature.sql`.
+2. `06_Aggiornamenti/TEC-015_02_Modifica_Eliminazione_Rilievi_Adeguamenti.sql`.
+3. `06_Aggiornamenti/TEC-015_03_Workflow_Stati_Allegati.sql`.
+4. `06_Aggiornamenti/TEC-015_04_Applicazione_Adeguamenti.sql`.
+5. `06_Aggiornamenti/TEC-015_05_Workflow_Stato_Campionature.sql`.
+
+Lo script completa le tabelle esistenti dei rilievi e degli adeguamenti con
+audit e `rowversion`, crea il vincolo di unicita del numero rilievo nella
+campionatura e installa le procedure di elenco, dettaglio, lookup, inserimento,
+aggiornamento stato e creazione dell'adeguamento. Registra la versione
+`2026102901` con codice `TEC-015`.
+
+Il secondo script richiede la versione `2026102901`, aggiunge l'audit di
+modifica degli adeguamenti e installa le procedure di dettaglio, modifica ed
+eliminazione controllata di rilievi e adeguamenti. Registra la versione
+`2026102902` con codice `TEC-015-MODIFICA`.
+
+Il terzo script richiede la versione `2026102902`, installa la matrice delle
+transizioni di stato dei rilievi, l'audit delle correzioni amministrative e i
+blocchi di eliminazione in presenza di allegati specifici. Registra la
+versione `2026103001` con codice `TEC-015-WORKFLOW`. Le correzioni esterne alla
+matrice sono riservate all'amministratore e richiedono una motivazione.
+
+Il quarto script richiede la versione `2026103001`, separa la variante di
+origine dalla variante generata e installa la preparazione, l'annullamento e la
+conferma dell'applicazione economica. Registra la versione `2026103002` con
+codice `TEC-015-APPLICAZIONE`. La preparazione clona righe, componenti,
+materiali e lavorazioni senza copiare gli allegati; la conferma ricalcola la
+variante generata e rende storico l'adeguamento.
+
+Il quinto script richiede la versione `2026103002`, installa la matrice delle
+transizioni della testata Campionatura, l'audit delle correzioni
+amministrative e i controlli su consegna effettiva, esito, rilievi e
+adeguamenti. Registra la versione `2026110201` con codice
+`TEC-015-CAMPIONATURA-WORKFLOW`. La creazione parte sempre da `Aperta`; stato,
+esito e date operative sono aggiornati soltanto dalla procedura dedicata.
+
+Un rilievo e eliminabile soltanto quando e `Aperto` e senza adeguamenti; un
+adeguamento applicato resta storico. L'eliminazione dell'ultimo adeguamento
+riallinea il rilievo nella stessa transazione. Tutti gli script devono
+essere eseguiti nell'ordine indicato.
+
+La creazione dell'adeguamento non modifica automaticamente il preventivo o la
+variante. Prima dell'esecuzione verificare che non esistano numeri rilievo
+duplicati nella stessa campionatura e predisporre una copia di sicurezza
+recuperabile. Dopo l'esecuzione riavviare l'applicazione e collaudare il flusso
+dal dettaglio Campionatura.

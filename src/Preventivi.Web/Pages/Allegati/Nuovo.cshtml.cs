@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Allegati;
 using Preventivi.Core.Allegati.Application;
 using Preventivi.Core.Allegati.Storage;
+using Preventivi.Core.Campionature;
 using Preventivi.Web.Sicurezza;
 using Preventivi.Web.UI.Modules.Allegati;
 
@@ -13,15 +14,18 @@ public class NuovoModel : PageModel
 {
     private readonly IAllegatoRepository _allegatoRepository;
     private readonly IAllegatoApplicationService _applicationService;
+    private readonly ICampionaturaRepository _campionaturaRepository;
     private readonly ILogger<NuovoModel> _logger;
 
     public NuovoModel(
         IAllegatoRepository allegatoRepository,
         IAllegatoApplicationService applicationService,
+        ICampionaturaRepository campionaturaRepository,
         ILogger<NuovoModel> logger)
     {
         _allegatoRepository = allegatoRepository;
         _applicationService = applicationService;
+        _campionaturaRepository = campionaturaRepository;
         _logger = logger;
     }
 
@@ -56,6 +60,11 @@ public class NuovoModel : PageModel
             return BadRequest("IdEntità non valido.");
         }
 
+        if (!await EntitaEsisteAsync(cancellationToken))
+        {
+            return NotFound();
+        }
+
         Form.TipiAllegato =
     await _allegatoRepository.GetTipiAsync(
         cancellationToken);
@@ -82,6 +91,12 @@ public class NuovoModel : PageModel
             ModelState.AddModelError(
                 string.Empty,
                 "IdEntità non valido.");
+        }
+        else if (!await EntitaEsisteAsync(cancellationToken))
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "L'elemento indicato non esiste.");
         }
 
         if (string.IsNullOrWhiteSpace(Form.TipoAllegato))
@@ -168,6 +183,16 @@ public class NuovoModel : PageModel
                     });
             }
 
+            if (Entita == AllegatoEntita.Campionature)
+            {
+                return RedirectToPage(
+                    "/Campionature/Dettaglio",
+                    new
+                    {
+                        id = IdEntita
+                    });
+            }
+
             if (IsLocalReturnUrl(ReturnUrl))
             {
                 return LocalRedirect(ReturnUrl!);
@@ -219,5 +244,19 @@ public class NuovoModel : PageModel
         return !string.IsNullOrWhiteSpace(returnUrl) &&
             returnUrl.StartsWith("/", StringComparison.Ordinal) &&
             !returnUrl.StartsWith("//", StringComparison.Ordinal);
+    }
+
+    private async Task<bool> EntitaEsisteAsync(CancellationToken cancellationToken)
+    {
+        return Entita switch
+        {
+            AllegatoEntita.Campionature =>
+                await _campionaturaRepository.GetDettaglioAsync(IdEntita, cancellationToken) is not null,
+            AllegatoEntita.CampionatureRilievi =>
+                await _campionaturaRepository.GetRilievoAsync(IdEntita, cancellationToken) is not null,
+            AllegatoEntita.CampionatureAdeguamenti =>
+                await _campionaturaRepository.GetAdeguamentoAsync(IdEntita, cancellationToken) is not null,
+            _ => true
+        };
     }
 }

@@ -81,17 +81,6 @@
     </div>
 
     <div class="col-12 col-md-3 pfw-field-required">
-        <label asp-for="Stato" class="form-label">Stato</label>
-        <select asp-for="Stato" class="form-select">
-            @foreach (var stato in CampionaturaValori.Stati)
-            {
-                <option value="@stato">@stato</option>
-            }
-        </select>
-        <span asp-validation-for="Stato" class="text-danger"></span>
-    </div>
-
-    <div class="col-12 col-md-3 pfw-field-required">
         <label asp-for="Priorita" class="form-label">Priorita</label>
         <select asp-for="Priorita" class="form-select" id="campionatura-priorita">
             @foreach (var priorita in CampionaturaValori.Priorita)
@@ -103,18 +92,6 @@
     </div>
 
     <div class="col-12 col-md-3">
-        <label asp-for="Esito" class="form-label">Esito</label>
-        <select asp-for="Esito" class="form-select">
-            <option value="">Non specificato</option>
-            @foreach (var esito in CampionaturaValori.Esiti)
-            {
-                <option value="@esito">@esito</option>
-            }
-        </select>
-        <span asp-validation-for="Esito" class="text-danger"></span>
-    </div>
-
-    <div class="col-12 col-md-3">
         <label asp-for="DataRichiestaCampione" class="form-label">Data richiesta campione</label>
         <input asp-for="DataRichiestaCampione" type="date" class="form-control" />
     </div>
@@ -122,16 +99,6 @@
     <div class="col-12 col-md-3">
         <label asp-for="DataPrevistaConsegna" class="form-label">Consegna prevista</label>
         <input asp-for="DataPrevistaConsegna" type="date" class="form-control" />
-    </div>
-
-    <div class="col-12 col-md-3">
-        <label asp-for="DataConsegnaCampione" class="form-label">Consegna effettiva</label>
-        <input asp-for="DataConsegnaCampione" type="date" class="form-control" />
-    </div>
-
-    <div class="col-12 col-md-3">
-        <label asp-for="DataChiusura" class="form-label">Data chiusura</label>
-        <input asp-for="DataChiusura" type="date" class="form-control" />
     </div>
 
     <div class="col-12">

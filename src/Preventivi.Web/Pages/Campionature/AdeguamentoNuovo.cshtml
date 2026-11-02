@@ -1,0 +1,69 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.AdeguamentoNuovoModel
+
+@{
+    var campionatura = Model.Campionatura!;
+    var rilievo = Model.Rilievo!;
+    ViewData["Title"] = "Nuovo adeguamento";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div class="workspace-breadcrumb">
+            <a asp-page="./Index">Campionature</a>
+            <span>/</span>
+            <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a>
+            <span>/</span>
+            <a asp-page="./RilievoDettaglio"
+               asp-route-idCampionatura="@campionatura.IdCampionatura"
+               asp-route-id="@rilievo.IdRilievoCampionatura">Rilievo @rilievo.RigaNr</a>
+            <span>/</span>
+            <span>Nuovo adeguamento</span>
+        </div>
+        <h1 class="workspace-title">Nuovo adeguamento</h1>
+        <p class="page-subtitle">Campionatura @campionatura.NumeroCompleto - Rilievo @rilievo.RigaNr</p>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Adeguamento proposto</h2>
+                <div class="pfw-panel-subtitle">Rilievo @rilievo.RigaNr - @rilievo.DescrizioneProblema</div>
+            </div>
+        </div>
+        <form method="post" class="p-3">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+            <input asp-for="Dati.VersioneRilievoBase64" type="hidden" />
+            <div class="row g-3">
+                <div class="col-12 pfw-field-required">
+                    <label asp-for="Dati.DescrizioneAdeguamento" class="form-label">Descrizione adeguamento</label>
+                    <textarea asp-for="Dati.DescrizioneAdeguamento" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Dati.DescrizioneAdeguamento" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label asp-for="Dati.ImpattoCostoStimato" class="form-label">Impatto stimato sui costi</label>
+                    <input asp-for="Dati.ImpattoCostoStimato" type="text" inputmode="decimal" class="form-control js-flexible-decimal" />
+                </div>
+                <div class="col-12 col-md-4">
+                    <label asp-for="Dati.ImpattoVenditaStimato" class="form-label">Impatto stimato sulla vendita</label>
+                    <input asp-for="Dati.ImpattoVenditaStimato" type="text" inputmode="decimal" class="form-control js-flexible-decimal" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="Dati.Note" class="form-label">Note</label>
+                    <textarea asp-for="Dati.Note" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a asp-page="./RilievoDettaglio"
+                   asp-route-idCampionatura="@campionatura.IdCampionatura"
+                   asp-route-id="@rilievo.IdRilievoCampionatura"
+                   class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

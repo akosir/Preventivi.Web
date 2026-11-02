@@ -1,0 +1,54 @@
+@page
+@model global::Preventivi.Web.Pages.Campionature.AdeguamentoConfermaModel
+
+@{
+    var campionatura = Model.Campionatura!;
+    var adeguamento = Model.Adeguamento!;
+    ViewData["Title"] = "Conferma applicazione adeguamento";
+}
+
+<div class="workspace-page">
+    <div class="workspace-header">
+        <div>
+            <div class="workspace-breadcrumb">
+                <a asp-page="./Index">Campionature</a><span>/</span>
+                <a asp-page="./Dettaglio" asp-route-id="@campionatura.IdCampionatura">@campionatura.NumeroCompleto</a><span>/</span>
+                <a asp-page="./AdeguamentoDettaglio" asp-route-idCampionatura="@campionatura.IdCampionatura" asp-route-id="@adeguamento.IdAdeguamento">Adeguamento</a><span>/</span>
+                <span>Conferma applicazione</span>
+            </div>
+            <h1 class="workspace-title">Conferma applicazione adeguamento</h1>
+            <p class="page-subtitle">La conferma rendera l'adeguamento storico</p>
+        </div>
+    </div>
+
+    <section class="pfw-panel">
+        <div class="pfw-panel-header">
+            <div>
+                <h2 class="pfw-panel-title">Riepilogo applicazione</h2>
+                <div class="pfw-panel-subtitle">Verificare la variante prima di confermare</div>
+            </div>
+        </div>
+        <div class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Adeguamento</dt>
+                <dd class="col-sm-9">@adeguamento.DescrizioneAdeguamento</dd>
+                <dt class="col-sm-3">Variante generata</dt>
+                <dd class="col-sm-9">@adeguamento.CodiceVarianteGenerata - @adeguamento.DescrizioneVarianteGenerata</dd>
+                <dt class="col-sm-3">Impatto stimato sui costi</dt>
+                <dd class="col-sm-9">@adeguamento.ImpattoCostoStimato.ToString("N2")</dd>
+                <dt class="col-sm-3">Impatto stimato sulla vendita</dt>
+                <dd class="col-sm-9">@adeguamento.ImpattoVenditaStimato.ToString("N2")</dd>
+            </dl>
+            <div class="alert alert-warning mt-3 mb-0">
+                Dopo la conferma l'adeguamento non potra essere modificato, eliminato o annullato. Il rilievo passera allo stato Risolto.
+            </div>
+            <form method="post" class="d-flex justify-content-end gap-2 mt-4">
+                <input asp-for="VersioneRigaBase64" type="hidden" />
+                <input asp-for="VersioneRilievoBase64" type="hidden" />
+                <a asp-page="./AdeguamentoDettaglio" asp-route-idCampionatura="@campionatura.IdCampionatura" asp-route-id="@adeguamento.IdAdeguamento" class="pfw-btn pfw-btn-secondary">Annulla</a>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Conferma applicazione</button>
+            </form>
+        </div>
+    </section>
+</div>

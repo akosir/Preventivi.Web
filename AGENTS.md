@@ -229,6 +229,14 @@ gestione dell'errore.
 permesso mancante nega l'accesso; il solo occultamento del collegamento nel
 menu non costituisce autorizzazione.
 
+[D] Nelle procedure dotate di stato, gli operatori possono utilizzare soltanto
+le transizioni approvate dal workflow. Una correzione al di fuori della
+matrice, compresa la riapertura di uno stato finale, e riservata al ruolo
+`ADMIN`, richiede una motivazione obbligatoria e deve registrare stato
+precedente, nuovo stato, amministratore e data. La regola si applica a ogni
+modulo dopo la ricognizione del relativo workflow; non autorizza modifiche
+indiscriminate ai moduli non ancora esaminati.
+
 [D] Ogni operazione diretta, compresi apertura, download, inserimento ed
 eliminazione degli allegati, deve verificare il permesso del modulo padre.
 
@@ -317,6 +325,8 @@ Conservare i contratti esistenti e segnalare le decisioni mancanti.
 [C] Tra le chiavi utilizzate figurano:
 - Clienti;
 - Preventivi;
+- RichiesteClienti;
+- Campionature;
 - PreventiviRigheComponenti;
 - PreventiviRigheMateriali;
 - PreventiviRigheLavorazioni.
