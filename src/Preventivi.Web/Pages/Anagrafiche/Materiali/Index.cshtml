@@ -1,0 +1,100 @@
+@page
+@model global::Preventivi.Web.Pages.Anagrafiche.Materiali.IndexModel
+
+@{
+    ViewData["Title"] = "Materiali";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="../Index">Anagrafiche</a></div>
+        <h1 class="h3 mb-1">Materiali</h1>
+        <p class="pfw-secondary-text mb-0">Anagrafica costi e approvvigionamento materiali</p>
+    </div>
+    <a asp-page="./Nuovo" class="pfw-btn pfw-btn-primary">Nuovo</a>
+</div>
+
+@if (TempData["MessaggioSuccesso"] is string messaggio)
+{
+    <div class="alert alert-success" role="alert">@messaggio</div>
+}
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-12 col-xl-5">
+                <label asp-for="Ricerca" class="form-label">Codice o descrizione</label>
+                <input asp-for="Ricerca" class="form-control" />
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <label asp-for="TipoMateriale" class="form-label">Tipo materiale</label>
+                <select asp-for="TipoMateriale" class="form-select">
+                    <option value="">Tutti</option>
+                    <option value="MateriaPrima">Materia prima</option>
+                    <option value="Accessorio">Accessorio</option>
+                    <option value="Semilavorato">Semilavorato</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-6 col-xl-2">
+                <label asp-for="Stato" class="form-label">Stato</label>
+                <select asp-for="Stato" class="form-select">
+                    <option value="attivi">Attivi</option>
+                    <option value="nonattivi">Non attivi</option>
+                    <option value="tutti">Tutti</option>
+                </select>
+            </div>
+            <div class="col-12 col-xl-2 d-flex gap-2">
+                <button type="submit" class="pfw-btn pfw-btn-primary flex-grow-1">Cerca</button>
+                <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Azzera</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="pfw-panel">
+    @if (Model.Materiali.Count == 0)
+    {
+        <div class="pfw-panel-body">
+            @await Html.PartialAsync("Shared/PFW/EmptyState/_PFWEmptyState",
+                new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+                {
+                    Titolo = "Nessun materiale",
+                    Messaggio = "Non sono presenti materiali corrispondenti ai filtri selezionati."
+                })
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table pfw-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Codice</th>
+                        <th>Descrizione</th>
+                        <th>Tipo</th>
+                        <th>UM</th>
+                        <th class="text-end">Costo unitario</th>
+                        <th>Acquisto</th>
+                        <th>Stato</th>
+                        <th class="text-end">Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var materiale in Model.Materiali)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@materiale.CodiceMateriale</td>
+                            <td>@materiale.Descrizione</td>
+                            <td>@IndexModel.EtichettaTipo(materiale.TipoMateriale)</td>
+                            <td>@materiale.CodiceUM</td>
+                            <td class="text-end">@materiale.CostoUnitario.ToString("N4")</td>
+                            <td>@(materiale.GestitoAAcquisto ? "Si" : "No")</td>
+                            <td><span class="pfw-badge @(materiale.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(materiale.Attivo ? "Attivo" : "Non attivo")</span></td>
+                            <td class="text-end"><a asp-page="./Dettaglio" asp-route-id="@materiale.IdMateriale" class="pfw-btn pfw-btn-secondary">Apri</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

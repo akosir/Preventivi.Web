@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Preventivi.Core.Allegati.Storage;
+using Preventivi.Core.Anagrafiche;
 using Preventivi.Core.Campionature;
 using Preventivi.Core.Database;
 using Preventivi.Core.ParametriSistema;
@@ -12,6 +13,7 @@ using Preventivi.Core.Preventivi.Eliminazione;
 using Preventivi.Core.RichiesteClienti;
 using Preventivi.Core.Sicurezza;
 using Preventivi.Data.Allegati;
+using Preventivi.Data.Anagrafiche;
 using Preventivi.Data.Campionature;
 using Preventivi.Data.Comune;
 using Preventivi.Data.ParametriSistema;
@@ -73,6 +75,14 @@ builder.Services.AddSingleton<
 builder.Services.AddSingleton<StatoSchemaDatabaseApplicazione>();
 
 builder.Services.AddScoped<DatabaseExecutor>();
+
+builder.Services.AddScoped<
+    IAnagraficheBaseRepository,
+    AnagraficheBaseRepository>();
+
+builder.Services.AddScoped<
+    IAnagraficheProduttiveRepository,
+    AnagraficheProduttiveRepository>();
 
 builder.Services.AddScoped<
     IPreventivoRepository,

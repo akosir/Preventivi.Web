@@ -1,0 +1,6 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Lavorazioni.ModificaModel
+@{ ViewData["Title"] = "Modifica lavorazione"; }
+<div class="mb-3"><div class="pfw-secondary-text mb-1"><a asp-page="./Dettaglio" asp-route-id="@Model.IdLavorazione">Dettaglio lavorazione</a></div><h1 class="h3 mb-0">Modifica lavorazione</h1></div>
+<section class="pfw-panel"><div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati lavorazione</h2><div class="pfw-panel-subtitle">Costi e tempi sono valori predefiniti per i nuovi utilizzi</div></div></div><form method="post"><div class="pfw-panel-body"><partial name="Shared/Anagrafiche/_LavorazioneForm" model="Model.Dati" view-data="Model.ViewData" /></div><div class="pfw-panel-footer d-flex justify-content-end gap-2"><a asp-page="./Dettaglio" asp-route-id="@Model.IdLavorazione" class="pfw-btn pfw-btn-secondary">Annulla</a><button type="submit" class="pfw-btn pfw-btn-primary">Salva</button></div></form></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

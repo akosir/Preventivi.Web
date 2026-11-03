@@ -1,0 +1,17 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Materiali.EliminaModel
+@{ var materiale = Model.Materiale!; ViewData["Title"] = "Elimina materiale"; }
+
+<div class="mb-3"><div class="pfw-secondary-text mb-1"><a asp-page="./Dettaglio" asp-route-id="@materiale.IdMateriale">Dettaglio materiale</a></div><h1 class="h3 mb-0">Elimina materiale</h1></div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Conferma eliminazione</h2><div class="pfw-panel-subtitle">L'operazione e consentita soltanto per materiali mai utilizzati</div></div></div>
+    <form method="post">
+        <input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(materiale.VersioneRiga)" />
+        <div class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <p>Confermi l'eliminazione di <strong>@materiale.CodiceMateriale - @materiale.Descrizione</strong>?</p>
+            <p class="pfw-secondary-text mb-0">I materiali gia utilizzati devono essere disattivati.</p>
+        </div>
+        <div class="pfw-panel-footer d-flex justify-content-end gap-2"><a asp-page="./Dettaglio" asp-route-id="@materiale.IdMateriale" class="pfw-btn pfw-btn-secondary">Annulla</a><button type="submit" class="pfw-btn pfw-btn-danger">Elimina</button></div>
+    </form>
+</section>

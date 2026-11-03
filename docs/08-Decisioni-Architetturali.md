@@ -1532,6 +1532,88 @@ sessione una query indipendente al registro delle versioni del database.
 La ricognizione dei workflow di stato degli altri moduli e le decisioni
 successive alla 305 restano fuori da questo pacchetto.
 
+### 5.19 Decisioni TEC-016 — Gestione anagrafiche
+
+**Classificazione:** [D].
+**Stato:** approvate.
+**Data di approvazione:** 3 novembre 2026.
+**Fonte dell'approvazione:** conferma esplicita nella sessione Work.
+
+Il primo pacchetto approvato stabilisce:
+
+- **306:** creare un'area autonoma `Anagrafiche`, raggiungibile dalla
+  dashboard e dalla navigazione applicativa, con collegamenti soltanto alle
+  gestioni realmente disponibili;
+- **307:** suddividere le anagrafiche in dati di base, prodotto e costo,
+  struttura produttiva, approvvigionamento e tabelle tecniche di sistema,
+  rispettandone le dipendenze nell'ordine di implementazione;
+- **308:** fornire per ogni gestione ricerca con filtri, dettaglio, nuovo,
+  modifica ed eliminazione o disattivazione, applicando i componenti PFW,
+  label esplicite, evidenza dei campi obbligatori e lookup per gli
+  identificativi;
+- **309:** consentire la cancellazione fisica soltanto per record mai
+  utilizzati; i record referenziati devono essere conservati e disattivati,
+  senza cancellazioni a cascata implicite;
+- **310:** limitare il primo pacchetto applicativo a `UnitaMisura` e
+  `TipiNodoDistinta`, adeguandole al modello comune con stato attivo, audit e
+  controllo di concorrenza. Articoli, materiali, lavorazioni, distinte,
+  modelli ciclo e fornitori saranno affrontati in pacchetti successivi.
+
+**Riscontri [C] al 3 novembre 2026**
+
+Nel repository sono predisposti il contratto Core condiviso, il repository
+ADO.NET, le pagine Razor dell'area Anagrafiche e l'aggiornamento SQL
+`TEC-016_01_Anagrafiche_Base.sql`. Lo script dichiara la versione
+`2026110301`, richiede `2026110201`, aggiunge audit e `rowversion`, installa
+le procedure operative e predispone il permesso `frmAnagrafiche` per il ruolo
+`ADMIN`. L'utente ha riferito di aver applicato lo script al database senza
+errori il 3 novembre 2026; non e stata eseguita una query indipendente al
+registro `VersioniSchema`.
+
+Il collaudo runtime e stato completato dall'utente con esito positivo per
+entrambe le gestioni: caricamento e filtri, creazione, modifica con audit,
+disattivazione, riattivazione ed eliminazione di record non referenziati. Sono
+stati inoltre verificati il blocco dell'eliminazione di un'unita di misura
+utilizzata da `Materiali` e il blocco dell'eliminazione di un tipo nodo
+utilizzato da `DistintaBaseNodi`.
+
+Il secondo pacchetto approvato stabilisce:
+
+- **311:** limitare il secondo pacchetto TEC-016 alle anagrafiche `Materiali`
+  e `Lavorazioni`; articoli, distinte base, modelli ciclo e fornitori restano
+  fuori dall'ambito;
+- **312:** gestire per i materiali codice, descrizione, unita di misura, tipo
+  (`MateriaPrima`, `Accessorio`, `Semilavorato`), costo unitario non negativo,
+  gestione ad acquisto e fornitore predefinito opzionale soltanto quando il
+  materiale e gestito ad acquisto;
+- **313:** gestire per le lavorazioni codice, descrizione, tipologia interna o
+  esterna, costo orario e tempi standard non negativi, acquistabilita esterna
+  e fornitore predefinito opzionale soltanto per lavorazioni acquistabili
+  esternamente;
+- **314:** consentire la cancellazione fisica di materiali e lavorazioni
+  soltanto in assenza di riferimenti da distinte, preventivi, modelli ciclo,
+  associazioni fornitori, ordini e altri documenti collegati; in presenza di
+  riferimenti l'elemento deve essere disattivato. Modifica, stato ed
+  eliminazione sono soggetti ad audit e controllo di concorrenza;
+- **315:** considerare costi e tempi dell'anagrafica valori predefiniti per i
+  nuovi utilizzi, senza aggiornamento retroattivo dei preventivi, delle
+  distinte o degli altri documenti esistenti.
+
+**Riscontri [C] del secondo pacchetto al 3 novembre 2026**
+
+Nel repository sono predisposti i modelli e il contratto Core, il repository
+ADO.NET, i form e le pagine Razor di ricerca, dettaglio, creazione, modifica,
+stato ed eliminazione per entrambe le anagrafiche. Lo script incrementale
+`TEC-016_02_Materiali_Lavorazioni.sql` dichiara la versione `2026110302`,
+richiede `2026110301`, aggiunge audit e `rowversion` e installa lookup e
+procedure operative. L'utente ha riferito di aver applicato lo script al
+database di test senza errori il 3 novembre 2026; non e stata eseguita una
+query indipendente al registro `VersioniSchema`. Il comportamento runtime non
+e stato collaudato dall'utente con esito positivo per entrambe le anagrafiche:
+caricamento e filtri, creazione, modifica, audit, disattivazione,
+riattivazione, eliminazione dei record non utilizzati e blocco dei record
+referenziati.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

@@ -19,6 +19,7 @@ public static class AutorizzazioneApplicazione
     public const string PolicyClienti = "Clienti";
     public const string PolicyRichiesteClienti = "RichiesteClienti";
     public const string PolicyCampionature = "Campionature";
+    public const string PolicyAnagrafiche = "Anagrafiche";
 
     public static void ConfiguraCookie(
         CookieAuthenticationOptions options,
@@ -60,6 +61,10 @@ public static class AutorizzazioneApplicazione
             options,
             PolicyCampionature,
             PermessiApplicazione.Campionature);
+        AggiungiPolicyModulo(
+            options,
+            PolicyAnagrafiche,
+            PermessiApplicazione.Anagrafiche);
     }
 
     public static void ConfiguraPagine(RazorPagesOptions options)
@@ -73,6 +78,7 @@ public static class AutorizzazioneApplicazione
             "/RichiesteClienti",
             PolicyRichiesteClienti);
         options.Conventions.AuthorizeFolder("/Campionature", PolicyCampionature);
+        options.Conventions.AuthorizeFolder("/Anagrafiche", PolicyAnagrafiche);
         options.Conventions.AuthorizeFolder("/Dev", PolicyDevelopmentAdmin);
         options.Conventions.AuthorizePage("/TestDb", PolicyDevelopmentAdmin);
     }

@@ -6,4 +6,5 @@ public static class PermessiApplicazione
     public const string Clienti = "frmClienti";
     public const string RichiesteClienti = "frmRichiesteClientiElenco";
     public const string Campionature = "frmCampionature";
+    public const string Anagrafiche = "frmAnagrafiche";
 }

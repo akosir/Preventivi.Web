@@ -111,17 +111,35 @@
                 }
 
                 @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                    User,
-                    global::Preventivi.Core.Sicurezza.PermessiApplicazione.Clienti))
+                         User,
+                         global::Preventivi.Core.Sicurezza.PermessiApplicazione.Clienti) ||
+                     global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                         User,
+                         global::Preventivi.Core.Sicurezza.PermessiApplicazione.Anagrafiche))
                 {
                     <div class="app-menu-section">
                         Anagrafiche
                     </div>
 
-                    <a class="app-menu-item"
-                       asp-page="/Clienti/Index">
-                        Clienti
-                    </a>
+                    @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                        User,
+                        global::Preventivi.Core.Sicurezza.PermessiApplicazione.Clienti))
+                    {
+                        <a class="app-menu-item"
+                           asp-page="/Clienti/Index">
+                            Clienti
+                        </a>
+                    }
+
+                    @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                        User,
+                        global::Preventivi.Core.Sicurezza.PermessiApplicazione.Anagrafiche))
+                    {
+                        <a class="app-menu-item"
+                           asp-page="/Anagrafiche/Index">
+                            Gestione anagrafiche
+                        </a>
+                    }
                 }
 
             </nav>

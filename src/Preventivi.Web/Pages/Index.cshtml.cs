@@ -30,6 +30,7 @@ public class IndexModel : PageModel
     public bool PuoVisualizzarePreventivi { get; private set; }
     public bool PuoVisualizzareRichiesteClienti { get; private set; }
     public bool PuoVisualizzareCampionature { get; private set; }
+    public bool PuoVisualizzareAnagrafiche { get; private set; }
 
     public IndexModel(
         IPreventivoRepository preventivoRepository,
@@ -57,6 +58,11 @@ public class IndexModel : PageModel
             AutorizzazioneApplicazione.PuoAccedereAlPermesso(
                 User,
                 PermessiApplicazione.Campionature);
+
+        PuoVisualizzareAnagrafiche =
+            AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+                User,
+                PermessiApplicazione.Anagrafiche);
 
         var preventivi = PuoVisualizzarePreventivi
             ? await _preventivoRepository.GetElencoAsync(cancellationToken)

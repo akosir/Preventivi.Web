@@ -1,0 +1,83 @@
+@model global::Preventivi.Web.UI.Modules.Anagrafiche.MaterialeFormModel
+@using global::Preventivi.Core.Anagrafiche
+@{
+    var unitaMisura = ViewData["UnitaMisura"] as IReadOnlyList<UnitaMisuraLookupItem> ?? [];
+    var fornitori = ViewData["Fornitori"] as IReadOnlyList<FornitoreAnagraficaLookupItem> ?? [];
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input asp-for="VersioneRigaBase64" type="hidden" />
+
+<div class="row g-3">
+    <div class="col-12 col-md-4">
+        <label asp-for="CodiceMateriale" class="form-label">Codice materiale *</label>
+        <input asp-for="CodiceMateriale" class="form-control pfw-required" maxlength="50" />
+        <span asp-validation-for="CodiceMateriale" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-8">
+        <label asp-for="Descrizione" class="form-label">Descrizione *</label>
+        <input asp-for="Descrizione" class="form-control pfw-required" maxlength="200" />
+        <span asp-validation-for="Descrizione" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="IdUM" class="form-label">Unita di misura *</label>
+        <select asp-for="IdUM" class="form-select pfw-required">
+            <option value="">Seleziona un'unita di misura</option>
+            @foreach (var elemento in unitaMisura)
+            {
+                <option value="@elemento.IdUM">@elemento.Display@(elemento.Attivo ? "" : " (non attiva)")</option>
+            }
+        </select>
+        <span asp-validation-for="IdUM" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="TipoMateriale" class="form-label">Tipo materiale *</label>
+        <select asp-for="TipoMateriale" class="form-select pfw-required">
+            <option value="">Seleziona un tipo</option>
+            <option value="MateriaPrima">Materia prima</option>
+            <option value="Accessorio">Accessorio</option>
+            <option value="Semilavorato">Semilavorato</option>
+        </select>
+        <span asp-validation-for="TipoMateriale" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="CostoUnitario" class="form-label">Costo unitario *</label>
+        <input asp-for="CostoUnitario" type="text" inputmode="decimal" class="form-control pfw-required text-end" />
+        <span asp-validation-for="CostoUnitario" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <div class="form-check">
+            <input asp-for="GestitoAAcquisto" class="form-check-input" data-toggle-fornitore="materiale" />
+            <label asp-for="GestitoAAcquisto" class="form-check-label">Gestito ad acquisto</label>
+        </div>
+    </div>
+    <div class="col-12 col-lg-8">
+        <label asp-for="IdFornitorePredefinito" class="form-label">Fornitore predefinito</label>
+        <select asp-for="IdFornitorePredefinito" class="form-select" data-fornitore="materiale">
+            <option value="">Nessun fornitore predefinito</option>
+            @foreach (var fornitore in fornitori)
+            {
+                <option value="@fornitore.IdFornitore">@fornitore.Display@(fornitore.Attivo ? "" : " (non attivo)")</option>
+            }
+        </select>
+        <span asp-validation-for="IdFornitorePredefinito" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Note" class="form-label">Note</label>
+        <textarea asp-for="Note" class="form-control" rows="4" maxlength="500"></textarea>
+        <span asp-validation-for="Note" class="text-danger"></span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const toggle = document.querySelector('[data-toggle-fornitore="materiale"]');
+        const lookup = document.querySelector('[data-fornitore="materiale"]');
+        const aggiorna = () => {
+            lookup.disabled = !toggle.checked;
+            if (!toggle.checked) lookup.value = "";
+        };
+        toggle.addEventListener("change", aggiorna);
+        aggiorna();
+    });
+</script>

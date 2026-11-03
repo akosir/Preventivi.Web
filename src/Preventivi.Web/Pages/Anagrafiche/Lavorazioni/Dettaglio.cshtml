@@ -1,0 +1,51 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Lavorazioni.DettaglioModel
+
+@{
+    var lavorazione = Model.Lavorazione!;
+    ViewData["Title"] = "Dettaglio lavorazione";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="./Index">Lavorazioni</a></div>
+        <h1 class="h3 mb-0">@lavorazione.CodiceLavorazione - @lavorazione.Descrizione</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-page="./Modifica" asp-route-id="@lavorazione.IdLavorazione" class="pfw-btn pfw-btn-primary">Modifica</a>
+        <a asp-page="./Elimina" asp-route-id="@lavorazione.IdLavorazione" class="pfw-btn pfw-btn-danger">Elimina</a>
+    </div>
+</div>
+
+@if (TempData["MessaggioSuccesso"] is string messaggio)
+{
+    <div class="alert alert-success" role="alert">@messaggio</div>
+}
+
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati lavorazione</h2><div class="pfw-panel-subtitle">Valori correnti dell'anagrafica</div></div></div>
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <dl class="row mb-0">
+            <dt class="col-sm-4 col-lg-3">Codice lavorazione</dt><dd class="col-sm-8 col-lg-9">@lavorazione.CodiceLavorazione</dd>
+            <dt class="col-sm-4 col-lg-3">Descrizione</dt><dd class="col-sm-8 col-lg-9">@lavorazione.Descrizione</dd>
+            <dt class="col-sm-4 col-lg-3">Tipologia</dt><dd class="col-sm-8 col-lg-9">@lavorazione.InternaEsterna</dd>
+            <dt class="col-sm-4 col-lg-3">Costo orario standard</dt><dd class="col-sm-8 col-lg-9">@lavorazione.CostoOrarioStandard.ToString("N4")</dd>
+            <dt class="col-sm-4 col-lg-3">Tempo setup predefinito (minuti)</dt><dd class="col-sm-8 col-lg-9">@lavorazione.TempoSetupMinDefault.ToString("N2")</dd>
+            <dt class="col-sm-4 col-lg-3">Tempo per pezzo predefinito (minuti)</dt><dd class="col-sm-8 col-lg-9">@lavorazione.TempoPezzoMinDefault.ToString("N4")</dd>
+            <dt class="col-sm-4 col-lg-3">Acquistabile esternamente</dt><dd class="col-sm-8 col-lg-9">@(lavorazione.AcquistabileEsterna ? "Si" : "No")</dd>
+            <dt class="col-sm-4 col-lg-3">Fornitore predefinito</dt><dd class="col-sm-8 col-lg-9">@(lavorazione.FornitorePredefinito ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Stato</dt><dd class="col-sm-8 col-lg-9"><span class="pfw-badge @(lavorazione.Attiva ? "pfw-badge-success" : "pfw-badge-secondary")">@(lavorazione.Attiva ? "Attiva" : "Non attiva")</span></dd>
+            <dt class="col-sm-4 col-lg-3">Note</dt><dd class="col-sm-8 col-lg-9">@(lavorazione.Note ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Creata il</dt><dd class="col-sm-8 col-lg-9">@lavorazione.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @lavorazione.UtenteCreazione</dd>
+            <dt class="col-sm-4 col-lg-3">Ultima modifica</dt><dd class="col-sm-8 col-lg-9">@(lavorazione.DataModifica.HasValue ? $"{lavorazione.DataModifica:dd/MM/yyyy HH:mm} da {lavorazione.UtenteModifica}" : "-")</dd>
+        </dl>
+    </div>
+    <div class="pfw-panel-footer d-flex justify-content-between gap-2">
+        <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Torna all'elenco</a>
+        <form method="post" asp-page-handler="@(lavorazione.Attiva ? "Disattiva" : "Attiva")">
+            <input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(lavorazione.VersioneRiga)" />
+            <button type="submit" class="pfw-btn pfw-btn-secondary">@(lavorazione.Attiva ? "Disattiva" : "Riattiva")</button>
+        </form>
+    </div>
+</section>

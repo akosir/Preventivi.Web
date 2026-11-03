@@ -1,0 +1,50 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Materiali.DettaglioModel
+
+@{
+    var materiale = Model.Materiale!;
+    ViewData["Title"] = "Dettaglio materiale";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="./Index">Materiali</a></div>
+        <h1 class="h3 mb-0">@materiale.CodiceMateriale - @materiale.Descrizione</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-page="./Modifica" asp-route-id="@materiale.IdMateriale" class="pfw-btn pfw-btn-primary">Modifica</a>
+        <a asp-page="./Elimina" asp-route-id="@materiale.IdMateriale" class="pfw-btn pfw-btn-danger">Elimina</a>
+    </div>
+</div>
+
+@if (TempData["MessaggioSuccesso"] is string messaggio)
+{
+    <div class="alert alert-success" role="alert">@messaggio</div>
+}
+
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati materiale</h2><div class="pfw-panel-subtitle">Valori correnti dell'anagrafica</div></div></div>
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <dl class="row mb-0">
+            <dt class="col-sm-4 col-lg-3">Codice materiale</dt><dd class="col-sm-8 col-lg-9">@materiale.CodiceMateriale</dd>
+            <dt class="col-sm-4 col-lg-3">Descrizione</dt><dd class="col-sm-8 col-lg-9">@materiale.Descrizione</dd>
+            <dt class="col-sm-4 col-lg-3">Unita di misura</dt><dd class="col-sm-8 col-lg-9">@materiale.CodiceUM - @materiale.DescrizioneUM</dd>
+            <dt class="col-sm-4 col-lg-3">Tipo materiale</dt><dd class="col-sm-8 col-lg-9">@IndexModel.EtichettaTipo(materiale.TipoMateriale)</dd>
+            <dt class="col-sm-4 col-lg-3">Costo unitario</dt><dd class="col-sm-8 col-lg-9">@materiale.CostoUnitario.ToString("N4")</dd>
+            <dt class="col-sm-4 col-lg-3">Gestito ad acquisto</dt><dd class="col-sm-8 col-lg-9">@(materiale.GestitoAAcquisto ? "Si" : "No")</dd>
+            <dt class="col-sm-4 col-lg-3">Fornitore predefinito</dt><dd class="col-sm-8 col-lg-9">@(materiale.FornitorePredefinito ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Stato</dt><dd class="col-sm-8 col-lg-9"><span class="pfw-badge @(materiale.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(materiale.Attivo ? "Attivo" : "Non attivo")</span></dd>
+            <dt class="col-sm-4 col-lg-3">Note</dt><dd class="col-sm-8 col-lg-9">@(materiale.Note ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Creato il</dt><dd class="col-sm-8 col-lg-9">@materiale.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @materiale.UtenteCreazione</dd>
+            <dt class="col-sm-4 col-lg-3">Ultima modifica</dt><dd class="col-sm-8 col-lg-9">@(materiale.DataModifica.HasValue ? $"{materiale.DataModifica:dd/MM/yyyy HH:mm} da {materiale.UtenteModifica}" : "-")</dd>
+        </dl>
+    </div>
+    <div class="pfw-panel-footer d-flex justify-content-between gap-2">
+        <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Torna all'elenco</a>
+        <form method="post" asp-page-handler="@(materiale.Attivo ? "Disattiva" : "Attiva")">
+            <input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(materiale.VersioneRiga)" />
+            <button type="submit" class="pfw-btn pfw-btn-secondary">@(materiale.Attivo ? "Disattiva" : "Riattiva")</button>
+        </form>
+    </div>
+</section>

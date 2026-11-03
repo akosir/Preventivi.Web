@@ -134,6 +134,23 @@ public sealed class SicurezzaApplicazioneTests
     }
 
     [Fact]
+    public async Task PolicyAnagrafiche_PermessoPresente_Autorizza()
+    {
+        var service = CreaAuthorizationService(isDevelopment: false);
+        var principal = CreaPrincipal(
+            new Claim(
+                AutorizzazioneApplicazione.ClaimPermesso,
+                PermessiApplicazione.Anagrafiche));
+
+        var risultato = await service.AuthorizeAsync(
+            principal,
+            resource: null,
+            AutorizzazioneApplicazione.PolicyAnagrafiche);
+
+        Assert.True(risultato.Succeeded);
+    }
+
+    [Fact]
     public async Task PolicyModulo_AdminAutorizzaSenzaPermessoEsplicito()
     {
         var service = CreaAuthorizationService(isDevelopment: false);

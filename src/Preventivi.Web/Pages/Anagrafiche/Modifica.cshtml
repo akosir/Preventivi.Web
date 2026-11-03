@@ -1,0 +1,52 @@
+@page "{tipo}/{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.ModificaModel
+
+@{
+    var pagina = Model.Pagina!;
+    ViewData["Title"] = $"Modifica {pagina.TitoloSingolare}";
+}
+
+<div class="mb-3">
+    <div class="pfw-secondary-text mb-1">
+        <a asp-page="./Gestione" asp-route-tipo="@pagina.Chiave">@pagina.Titolo</a>
+        <span class="mx-1">/</span>
+        <a asp-page="./Dettaglio" asp-route-tipo="@pagina.Chiave" asp-route-id="@Model.Id">Dettaglio</a>
+    </div>
+    <h1 class="h3 mb-0">Modifica @pagina.TitoloSingolare</h1>
+</div>
+
+<section class="pfw-panel">
+    <div class="pfw-panel-header">
+        <div>
+            <h2 class="pfw-panel-title">Dati anagrafici</h2>
+            <div class="pfw-panel-subtitle">I campi contrassegnati sono obbligatori</div>
+        </div>
+    </div>
+    <form method="post">
+        <input asp-for="Dati.VersioneRigaBase64" type="hidden" />
+        <div class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            @if (pagina.MostraCodice)
+            {
+                <div class="mb-3">
+                    <label asp-for="Dati.Codice" class="form-label">Codice *</label>
+                    <input asp-for="Dati.Codice" class="form-control pfw-required" maxlength="@pagina.LunghezzaCodice" />
+                    <span asp-validation-for="Dati.Codice" class="text-danger"></span>
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="Dati.Descrizione" class="form-label">Descrizione *</label>
+                <input asp-for="Dati.Descrizione" class="form-control pfw-required" maxlength="@pagina.LunghezzaDescrizione" />
+                <span asp-validation-for="Dati.Descrizione" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="pfw-panel-footer d-flex justify-content-end gap-2">
+            <a asp-page="./Dettaglio" asp-route-tipo="@pagina.Chiave" asp-route-id="@Model.Id" class="pfw-btn pfw-btn-secondary">Annulla</a>
+            <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,34 @@
+@page
+@model global::Preventivi.Web.Pages.Anagrafiche.Lavorazioni.IndexModel
+@{ ViewData["Title"] = "Lavorazioni"; }
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div><div class="pfw-secondary-text mb-1"><a asp-page="../Index">Anagrafiche</a></div><h1 class="h3 mb-1">Lavorazioni</h1><p class="pfw-secondary-text mb-0">Anagrafica tempi e costi standard</p></div>
+    <a asp-page="./Nuova" class="pfw-btn pfw-btn-primary">Nuova</a>
+</div>
+@if (TempData["MessaggioSuccesso"] is string messaggio) { <div class="alert alert-success" role="alert">@messaggio</div> }
+
+<section class="pfw-panel mb-3"><div class="pfw-panel-body">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-12 col-xl-5"><label asp-for="Ricerca" class="form-label">Codice o descrizione</label><input asp-for="Ricerca" class="form-control" /></div>
+        <div class="col-12 col-md-6 col-xl-3"><label asp-for="InternaEsterna" class="form-label">Tipologia</label><select asp-for="InternaEsterna" class="form-select"><option value="">Tutte</option><option value="Interna">Interna</option><option value="Esterna">Esterna</option></select></div>
+        <div class="col-12 col-md-6 col-xl-2"><label asp-for="Stato" class="form-label">Stato</label><select asp-for="Stato" class="form-select"><option value="attive">Attive</option><option value="nonattive">Non attive</option><option value="tutte">Tutte</option></select></div>
+        <div class="col-12 col-xl-2 d-flex gap-2"><button type="submit" class="pfw-btn pfw-btn-primary flex-grow-1">Cerca</button><a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Azzera</a></div>
+    </form>
+</div></section>
+
+<section class="pfw-panel">
+@if (Model.Lavorazioni.Count == 0)
+{
+    <div class="pfw-panel-body">@await Html.PartialAsync("Shared/PFW/EmptyState/_PFWEmptyState", new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel { Titolo = "Nessuna lavorazione", Messaggio = "Non sono presenti lavorazioni corrispondenti ai filtri selezionati." })</div>
+}
+else
+{
+    <div class="table-responsive"><table class="table pfw-table align-middle mb-0"><thead><tr><th>Codice</th><th>Descrizione</th><th>Tipologia</th><th class="text-end">Costo orario</th><th>Acquisto esterno</th><th>Stato</th><th class="text-end">Azioni</th></tr></thead><tbody>
+    @foreach (var lavorazione in Model.Lavorazioni)
+    {
+        <tr><td class="fw-semibold">@lavorazione.CodiceLavorazione</td><td>@lavorazione.Descrizione</td><td>@lavorazione.InternaEsterna</td><td class="text-end">@lavorazione.CostoOrarioStandard.ToString("N4")</td><td>@(lavorazione.AcquistabileEsterna ? "Si" : "No")</td><td><span class="pfw-badge @(lavorazione.Attiva ? "pfw-badge-success" : "pfw-badge-secondary")">@(lavorazione.Attiva ? "Attiva" : "Non attiva")</span></td><td class="text-end"><a asp-page="./Dettaglio" asp-route-id="@lavorazione.IdLavorazione" class="pfw-btn pfw-btn-secondary">Apri</a></td></tr>
+    }
+    </tbody></table></div>
+}
+</section>

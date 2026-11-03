@@ -1,0 +1,68 @@
+@page
+@model global::Preventivi.Web.Pages.Anagrafiche.IndexModel
+
+@{
+    ViewData["Title"] = "Anagrafiche";
+}
+
+<div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Anagrafiche</h1>
+        <p class="pfw-secondary-text mb-0">Tabelle di base disponibili per la gestione operativa</p>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-12 col-lg-6">
+        <section class="pfw-panel h-100">
+            <div class="pfw-panel-header">
+                <div>
+                    <h2 class="pfw-panel-title">Materiali</h2>
+                    <div class="pfw-panel-subtitle">Costi, acquisto e classificazione dei materiali</div>
+                </div>
+            </div>
+            <div class="pfw-panel-body d-flex justify-content-end">
+                <a asp-page="./Materiali/Index" class="pfw-btn pfw-btn-primary">Apri</a>
+            </div>
+        </section>
+    </div>
+    <div class="col-12 col-lg-6">
+        <section class="pfw-panel h-100">
+            <div class="pfw-panel-header">
+                <div>
+                    <h2 class="pfw-panel-title">Lavorazioni</h2>
+                    <div class="pfw-panel-subtitle">Tempi e costi standard delle lavorazioni</div>
+                </div>
+            </div>
+            <div class="pfw-panel-body d-flex justify-content-end">
+                <a asp-page="./Lavorazioni/Index" class="pfw-btn pfw-btn-primary">Apri</a>
+            </div>
+        </section>
+    </div>
+    <div class="col-12 col-lg-6">
+        <section class="pfw-panel h-100">
+            <div class="pfw-panel-header">
+                <div>
+                    <h2 class="pfw-panel-title">Unita di misura</h2>
+                    <div class="pfw-panel-subtitle">Codici utilizzati dall'anagrafica materiali</div>
+                </div>
+            </div>
+            <div class="pfw-panel-body d-flex justify-content-end">
+                <a asp-page="./Gestione" asp-route-tipo="unita-misura" class="pfw-btn pfw-btn-primary">Apri</a>
+            </div>
+        </section>
+    </div>
+    <div class="col-12 col-lg-6">
+        <section class="pfw-panel h-100">
+            <div class="pfw-panel-header">
+                <div>
+                    <h2 class="pfw-panel-title">Tipi nodo distinta</h2>
+                    <div class="pfw-panel-subtitle">Classificazione dei nodi delle distinte base</div>
+                </div>
+            </div>
+            <div class="pfw-panel-body d-flex justify-content-end">
+                <a asp-page="./Gestione" asp-route-tipo="tipi-nodo-distinta" class="pfw-btn pfw-btn-primary">Apri</a>
+            </div>
+        </section>
+    </div>
+</div>

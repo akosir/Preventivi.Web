@@ -1,0 +1,80 @@
+@model global::Preventivi.Web.UI.Modules.Anagrafiche.LavorazioneFormModel
+@using global::Preventivi.Core.Anagrafiche
+@{
+    var fornitori = ViewData["Fornitori"] as IReadOnlyList<FornitoreAnagraficaLookupItem> ?? [];
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input asp-for="VersioneRigaBase64" type="hidden" />
+
+<div class="row g-3">
+    <div class="col-12 col-md-4">
+        <label asp-for="CodiceLavorazione" class="form-label">Codice lavorazione *</label>
+        <input asp-for="CodiceLavorazione" class="form-control pfw-required" maxlength="50" />
+        <span asp-validation-for="CodiceLavorazione" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-8">
+        <label asp-for="Descrizione" class="form-label">Descrizione *</label>
+        <input asp-for="Descrizione" class="form-control pfw-required" maxlength="150" />
+        <span asp-validation-for="Descrizione" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="InternaEsterna" class="form-label">Tipologia *</label>
+        <select asp-for="InternaEsterna" class="form-select pfw-required">
+            <option value="">Seleziona una tipologia</option>
+            <option value="Interna">Interna</option>
+            <option value="Esterna">Esterna</option>
+        </select>
+        <span asp-validation-for="InternaEsterna" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="CostoOrarioStandard" class="form-label">Costo orario standard *</label>
+        <input asp-for="CostoOrarioStandard" type="text" inputmode="decimal" class="form-control pfw-required text-end" />
+        <span asp-validation-for="CostoOrarioStandard" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="TempoSetupMinDefault" class="form-label">Tempo setup predefinito (minuti) *</label>
+        <input asp-for="TempoSetupMinDefault" type="text" inputmode="decimal" class="form-control pfw-required text-end" />
+        <span asp-validation-for="TempoSetupMinDefault" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="TempoPezzoMinDefault" class="form-label">Tempo per pezzo predefinito (minuti) *</label>
+        <input asp-for="TempoPezzoMinDefault" type="text" inputmode="decimal" class="form-control pfw-required text-end" />
+        <span asp-validation-for="TempoPezzoMinDefault" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-8 d-flex align-items-end pb-2">
+        <div class="form-check">
+            <input asp-for="AcquistabileEsterna" class="form-check-input" data-toggle-fornitore="lavorazione" />
+            <label asp-for="AcquistabileEsterna" class="form-check-label">Acquistabile esternamente</label>
+        </div>
+    </div>
+    <div class="col-12 col-lg-8">
+        <label asp-for="IdFornitorePredefinito" class="form-label">Fornitore predefinito</label>
+        <select asp-for="IdFornitorePredefinito" class="form-select" data-fornitore="lavorazione">
+            <option value="">Nessun fornitore predefinito</option>
+            @foreach (var fornitore in fornitori)
+            {
+                <option value="@fornitore.IdFornitore">@fornitore.Display@(fornitore.Attivo ? "" : " (non attivo)")</option>
+            }
+        </select>
+        <span asp-validation-for="IdFornitorePredefinito" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Note" class="form-label">Note</label>
+        <textarea asp-for="Note" class="form-control" rows="4" maxlength="500"></textarea>
+        <span asp-validation-for="Note" class="text-danger"></span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const toggle = document.querySelector('[data-toggle-fornitore="lavorazione"]');
+        const lookup = document.querySelector('[data-fornitore="lavorazione"]');
+        const aggiorna = () => {
+            lookup.disabled = !toggle.checked;
+            if (!toggle.checked) lookup.value = "";
+        };
+        toggle.addEventListener("change", aggiorna);
+        aggiorna();
+    });
+</script>
