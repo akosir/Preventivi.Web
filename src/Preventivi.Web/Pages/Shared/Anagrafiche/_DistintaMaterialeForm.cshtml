@@ -1,0 +1,25 @@
+@model global::Preventivi.Web.UI.Modules.Anagrafiche.DistintaMaterialeFormModel
+@using global::Preventivi.Core.Anagrafiche
+@using System.Globalization
+@{
+    var materiali = ViewData["MaterialiLookup"] as IReadOnlyList<DistintaMaterialeLookupItem> ?? [];
+}
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input asp-for="VersioneRigaBase64" type="hidden" />
+<div class="row g-3">
+    <div class="col-12">
+        <label asp-for="IdMateriale" class="form-label">Materiale *</label>
+        <select asp-for="IdMateriale" class="form-select pfw-required" id="materiale-select">
+            <option value="">Seleziona il materiale</option>
+            @foreach (var materiale in materiali)
+            {
+                <option value="@materiale.IdMateriale" data-costo="@materiale.CostoUnitario.ToString(CultureInfo.InvariantCulture)">@materiale.Display (@materiale.CodiceUM)</option>
+            }
+        </select>
+        <span asp-validation-for="IdMateriale" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4"><label asp-for="Quantita" class="form-label">Quantita *</label><input asp-for="Quantita" class="form-control pfw-required" inputmode="decimal" /><span asp-validation-for="Quantita" class="text-danger"></span></div>
+    <div class="col-12 col-md-4"><label asp-for="CoeffScartoPerc" class="form-label">Scarto % *</label><input asp-for="CoeffScartoPerc" class="form-control pfw-required" inputmode="decimal" /><span asp-validation-for="CoeffScartoPerc" class="text-danger"></span></div>
+    <div class="col-12 col-md-4"><label asp-for="CostoUnitario" class="form-label">Costo unitario *</label><input asp-for="CostoUnitario" class="form-control pfw-required" inputmode="decimal" id="materiale-costo" /><span asp-validation-for="CostoUnitario" class="text-danger"></span></div>
+    <div class="col-12"><label asp-for="Note" class="form-label">Note</label><textarea asp-for="Note" class="form-control" rows="4" maxlength="500"></textarea><span asp-validation-for="Note" class="text-danger"></span></div>
+</div>

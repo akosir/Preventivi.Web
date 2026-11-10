@@ -1,0 +1,20 @@
+@page
+@model global::Preventivi.Web.Pages.Anagrafiche.Distinte.Nodi.NuovoModel
+@{ var articolo = Model.Articolo!; ViewData["Title"] = "Nuovo nodo distinta"; }
+
+<div class="mb-3">
+    <div class="pfw-secondary-text mb-1"><a asp-page="../Dettaglio" asp-route-idArticolo="@articolo.IdArticolo">@articolo.CodiceArticolo - Distinta base</a></div>
+    <h1 class="h3 mb-1">Nuovo nodo distinta</h1>
+    <p class="pfw-secondary-text mb-0">@(Model.Padre is null ? "Creazione del nodo radice" : $"Nuovo figlio di {Model.Padre.DescrizioneNodo}")</p>
+</div>
+
+<section class="pfw-panel">
+    <form method="post">
+        <div class="pfw-panel-body"><partial name="Shared/Anagrafiche/_DistintaNodoForm" model="Model.Dati" view-data="Model.ViewData" /></div>
+        <div class="pfw-panel-footer d-flex justify-content-end gap-2">
+            <a asp-page="@(Model.Padre is null ? "../Dettaglio" : "./Dettaglio")" asp-route-idArticolo="@(Model.Padre is null ? articolo.IdArticolo : null)" asp-route-id="@Model.Padre?.IdNodoDistinta" class="pfw-btn pfw-btn-secondary">Annulla</a>
+            <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+        </div>
+    </form>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

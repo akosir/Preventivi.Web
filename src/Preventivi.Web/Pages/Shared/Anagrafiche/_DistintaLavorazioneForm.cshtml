@@ -1,0 +1,14 @@
+@model global::Preventivi.Web.UI.Modules.Anagrafiche.DistintaLavorazioneFormModel
+@using global::Preventivi.Core.Anagrafiche
+@using System.Globalization
+@{ var lavorazioni = ViewData["LavorazioniLookup"] as IReadOnlyList<DistintaLavorazioneLookupItem> ?? []; }
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div><input asp-for="VersioneRigaBase64" type="hidden" />
+<div class="row g-3">
+    <div class="col-12"><label asp-for="IdLavorazione" class="form-label">Lavorazione *</label><select asp-for="IdLavorazione" class="form-select pfw-required" id="lavorazione-select"><option value="">Seleziona la lavorazione</option>@foreach (var lavorazione in lavorazioni) { <option value="@lavorazione.IdLavorazione" data-costo="@lavorazione.CostoOrarioStandard.ToString(CultureInfo.InvariantCulture)" data-setup="@lavorazione.TempoSetupMinDefault.ToString(CultureInfo.InvariantCulture)" data-pezzo="@lavorazione.TempoPezzoMinDefault.ToString(CultureInfo.InvariantCulture)">@lavorazione.Display</option> }</select><span asp-validation-for="IdLavorazione" class="text-danger"></span></div>
+    <div class="col-12 col-md-4"><label asp-for="Sequenza" class="form-label">Sequenza *</label><input asp-for="Sequenza" class="form-control pfw-required" inputmode="numeric" /><span asp-validation-for="Sequenza" class="text-danger"></span></div>
+    <div class="col-12 col-md-4"><label asp-for="TempoSetupMin" class="form-label">Tempo setup (min) *</label><input asp-for="TempoSetupMin" class="form-control pfw-required" inputmode="decimal" id="lavorazione-setup" /><span asp-validation-for="TempoSetupMin" class="text-danger"></span></div>
+    <div class="col-12 col-md-4"><label asp-for="TempoPezzoMin" class="form-label">Tempo per pezzo (min) *</label><input asp-for="TempoPezzoMin" class="form-control pfw-required" inputmode="decimal" id="lavorazione-pezzo" /><span asp-validation-for="TempoPezzoMin" class="text-danger"></span></div>
+    <div class="col-12 col-md-6"><label asp-for="CostoOrario" class="form-label">Costo orario *</label><input asp-for="CostoOrario" class="form-control pfw-required" inputmode="decimal" id="lavorazione-costo" /><span asp-validation-for="CostoOrario" class="text-danger"></span></div>
+    <div class="col-12 col-md-6"><label asp-for="CostoFisso" class="form-label">Costo fisso *</label><input asp-for="CostoFisso" class="form-control pfw-required" inputmode="decimal" /><span asp-validation-for="CostoFisso" class="text-danger"></span></div>
+    <div class="col-12"><label asp-for="Note" class="form-label">Note</label><textarea asp-for="Note" class="form-control" rows="4" maxlength="500"></textarea><span asp-validation-for="Note" class="text-danger"></span></div>
+</div>

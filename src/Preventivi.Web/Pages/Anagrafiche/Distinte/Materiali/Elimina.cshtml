@@ -1,0 +1,5 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Distinte.Materiali.EliminaModel
+@{ var materiale = Model.Materiale!; ViewData["Title"] = "Elimina materiale distinta"; }
+<div class="mb-3"><div class="pfw-secondary-text mb-1"><a asp-page="../Nodi/Dettaglio" asp-route-id="@materiale.IdNodoDistinta">Dettaglio nodo</a></div><h1 class="h3 mb-0">Elimina materiale distinta</h1></div>
+<section class="pfw-panel"><div class="pfw-panel-body"><div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div><p>Confermi la rimozione definitiva di <strong>@materiale.CodiceMateriale - @materiale.DescrizioneMateriale</strong> dalla distinta?</p><p class="pfw-secondary-text mb-0">Gli eventuali allegati devono essere eliminati prima di procedere.</p></div><div class="pfw-panel-footer d-flex justify-content-end gap-2"><a asp-page="../Nodi/Dettaglio" asp-route-id="@materiale.IdNodoDistinta" class="pfw-btn pfw-btn-secondary">Annulla</a><form method="post"><input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(materiale.VersioneRiga)" /><button type="submit" class="pfw-btn pfw-btn-danger">Elimina</button></form></div></section>

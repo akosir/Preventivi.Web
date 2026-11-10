@@ -1,0 +1,54 @@
+@page
+@model global::Preventivi.Web.Pages.Anagrafiche.Distinte.IndexModel
+@{ ViewData["Title"] = "Distinte base"; }
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="../Index">Anagrafiche</a></div>
+        <h1 class="h3 mb-1">Distinte base</h1>
+        <p class="pfw-secondary-text mb-0">Struttura produttiva associata agli articoli</p>
+    </div>
+</div>
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-12 col-lg-9">
+                <label asp-for="Ricerca" class="form-label">Codice o descrizione articolo</label>
+                <input asp-for="Ricerca" class="form-control" />
+            </div>
+            <div class="col-12 col-lg-3 d-flex gap-2">
+                <button type="submit" class="pfw-btn pfw-btn-primary flex-grow-1">Cerca</button>
+                <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Azzera</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="pfw-panel">
+    @if (Model.Articoli.Count == 0)
+    {
+        <div class="pfw-panel-body"><div class="pfw-secondary-text">Nessun articolo corrisponde ai filtri selezionati.</div></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table pfw-table align-middle mb-0">
+                <thead><tr><th>Codice</th><th>Descrizione</th><th>Versione</th><th>Nodi attivi</th><th>Stato articolo</th><th class="text-end">Azioni</th></tr></thead>
+                <tbody>
+                @foreach (var articolo in Model.Articoli)
+                {
+                    <tr>
+                        <td class="fw-semibold">@articolo.CodiceArticolo</td>
+                        <td>@articolo.Descrizione</td>
+                        <td>@(articolo.Versione ?? "-")</td>
+                        <td>@articolo.NumeroNodiAttivi / @articolo.NumeroNodiTotali</td>
+                        <td><span class="pfw-badge @(articolo.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(articolo.Attivo ? "Attivo" : "Non attivo")</span></td>
+                        <td class="text-end"><a asp-page="./Dettaglio" asp-route-idArticolo="@articolo.IdArticolo" class="pfw-btn pfw-btn-secondary">Apri</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

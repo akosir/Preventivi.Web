@@ -1,0 +1,67 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Distinte.Nodi.DettaglioModel
+@using global::Preventivi.Core.Allegati
+@{ var nodo = Model.Nodo!; var returnUrl = Url.Page("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id = nodo.IdNodoDistinta })!; ViewData["Title"] = "Dettaglio nodo distinta"; }
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="../Dettaglio" asp-route-idArticolo="@nodo.IdArticolo">@nodo.CodiceArticolo - Distinta base</a></div>
+        <h1 class="h3 mb-1">@nodo.DescrizioneNodo</h1>
+        <p class="pfw-secondary-text mb-0">@nodo.PercorsoCompleto</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        @if (nodo.Attivo) { <a asp-page="./Nuovo" asp-route-idArticolo="@nodo.IdArticolo" asp-route-idPadre="@nodo.IdNodoDistinta" class="pfw-btn pfw-btn-primary">Nuovo figlio</a> }
+        <a asp-page="./Modifica" asp-route-id="@nodo.IdNodoDistinta" class="pfw-btn pfw-btn-primary">Modifica</a>
+        <a asp-page="./Elimina" asp-route-id="@nodo.IdNodoDistinta" class="pfw-btn pfw-btn-danger">Elimina</a>
+    </div>
+</div>
+
+@if (TempData["MessaggioSuccesso"] is string messaggio) { <div class="alert alert-success" role="alert">@messaggio</div> }
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati nodo</h2><div class="pfw-panel-subtitle">Dati identificativi e gerarchici</div></div></div>
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <dl class="row mb-0">
+            <dt class="col-sm-4 col-lg-3">Codice nodo</dt><dd class="col-sm-8 col-lg-9">@(nodo.CodiceNodo ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Tipo nodo</dt><dd class="col-sm-8 col-lg-9">@nodo.TipoNodo</dd>
+            <dt class="col-sm-4 col-lg-3">Livello</dt><dd class="col-sm-8 col-lg-9">@nodo.Livello</dd>
+            <dt class="col-sm-4 col-lg-3">Quantita base</dt><dd class="col-sm-8 col-lg-9">@nodo.QuantitaBase.ToString("N4")</dd>
+            <dt class="col-sm-4 col-lg-3">Ordine di visualizzazione</dt><dd class="col-sm-8 col-lg-9">@nodo.OrdineVisualizzazione</dd>
+            <dt class="col-sm-4 col-lg-3">Stato</dt><dd class="col-sm-8 col-lg-9"><span class="pfw-badge @(nodo.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(nodo.Attivo ? "Attivo" : "Non attivo")</span></dd>
+            <dt class="col-sm-4 col-lg-3">Note</dt><dd class="col-sm-8 col-lg-9">@(nodo.Note ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Creato il</dt><dd class="col-sm-8 col-lg-9">@nodo.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @nodo.UtenteCreazione</dd>
+            <dt class="col-sm-4 col-lg-3">Ultima modifica</dt><dd class="col-sm-8 col-lg-9">@(nodo.DataModifica.HasValue ? $"{nodo.DataModifica:dd/MM/yyyy HH:mm} da {nodo.UtenteModifica}" : "-")</dd>
+        </dl>
+    </div>
+    <div class="pfw-panel-footer d-flex justify-content-between gap-2">
+        <a asp-page="../Dettaglio" asp-route-idArticolo="@nodo.IdArticolo" class="pfw-btn pfw-btn-secondary">Torna alla distinta</a>
+        <form method="post" asp-page-handler="@(nodo.Attivo ? "Disattiva" : "Attiva")"><input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(nodo.VersioneRiga)" /><button type="submit" class="pfw-btn pfw-btn-secondary">@(nodo.Attivo ? "Disattiva" : "Riattiva")</button></form>
+    </div>
+</section>
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Nodi figli</h2><div class="pfw-panel-subtitle">Componenti direttamente dipendenti</div></div></div>
+    @if (Model.Figli.Count == 0) { <div class="pfw-panel-body"><div class="pfw-secondary-text">Nessun nodo figlio.</div></div> }
+    else { <div class="table-responsive"><table class="table pfw-table align-middle mb-0"><thead><tr><th>Codice</th><th>Descrizione</th><th>Tipo</th><th>Quantita</th><th class="text-end">Azioni</th></tr></thead><tbody>@foreach (var figlio in Model.Figli) { <tr><td>@(figlio.CodiceNodo ?? "-")</td><td>@figlio.DescrizioneNodo</td><td>@figlio.TipoNodo</td><td>@figlio.QuantitaBase.ToString("N4")</td><td class="text-end"><a asp-page="./Dettaglio" asp-route-id="@figlio.IdNodoDistinta" class="pfw-btn pfw-btn-secondary">Apri</a></td></tr> }</tbody></table></div> }
+</section>
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Materiali</h2><div class="pfw-panel-subtitle">Materiali associati esclusivamente al nodo</div></div>@if (nodo.Attivo) { <a asp-page="../Materiali/Nuovo" asp-route-idNodo="@nodo.IdNodoDistinta" class="pfw-btn pfw-btn-primary">Nuovo materiale</a> }</div>
+    @if (Model.Materiali.Count == 0) { <div class="pfw-panel-body"><div class="pfw-secondary-text">Nessun materiale associato.</div></div> }
+    else { <div class="table-responsive"><table class="table pfw-table align-middle mb-0"><thead><tr><th>Materiale</th><th>Quantita</th><th>Scarto %</th><th>Costo unitario</th><th class="text-end">Azioni</th></tr></thead><tbody>@foreach (var materiale in Model.Materiali) { <tr><td>@materiale.CodiceMateriale - @materiale.DescrizioneMateriale</td><td>@materiale.Quantita.ToString("N4") @materiale.CodiceUM</td><td>@materiale.CoeffScartoPerc.ToString("N2")</td><td>@materiale.CostoUnitario.ToString("C4")</td><td class="text-end"><a asp-page="../Materiali/Modifica" asp-route-id="@materiale.IdDistintaMateriale" class="pfw-btn pfw-btn-secondary">Modifica</a> <a asp-page="../Materiali/Elimina" asp-route-id="@materiale.IdDistintaMateriale" class="pfw-btn pfw-btn-danger">Elimina</a></td></tr> }</tbody></table></div> }
+</section>
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Lavorazioni</h2><div class="pfw-panel-subtitle">Sequenza operativa del nodo</div></div>@if (nodo.Attivo) { <a asp-page="../Lavorazioni/Nuovo" asp-route-idNodo="@nodo.IdNodoDistinta" class="pfw-btn pfw-btn-primary">Nuova lavorazione</a> }</div>
+    @if (Model.Lavorazioni.Count == 0) { <div class="pfw-panel-body"><div class="pfw-secondary-text">Nessuna lavorazione associata.</div></div> }
+    else { <div class="table-responsive"><table class="table pfw-table align-middle mb-0"><thead><tr><th>Sequenza</th><th>Lavorazione</th><th>Setup</th><th>Tempo pezzo</th><th>Costo orario</th><th class="text-end">Azioni</th></tr></thead><tbody>@foreach (var lavorazione in Model.Lavorazioni) { <tr><td>@lavorazione.Sequenza</td><td>@lavorazione.CodiceLavorazione - @lavorazione.DescrizioneLavorazione</td><td>@lavorazione.TempoSetupMin.ToString("N2") min</td><td>@lavorazione.TempoPezzoMin.ToString("N4") min</td><td>@lavorazione.CostoOrario.ToString("C4")</td><td class="text-end"><a asp-page="../Lavorazioni/Modifica" asp-route-id="@lavorazione.IdDistintaLavorazione" class="pfw-btn pfw-btn-secondary">Modifica</a> <a asp-page="../Lavorazioni/Elimina" asp-route-id="@lavorazione.IdDistintaLavorazione" class="pfw-btn pfw-btn-danger">Elimina</a></td></tr> }</tbody></table></div> }
+</section>
+
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Allegati nodo</h2><div class="pfw-panel-subtitle">Documentazione tecnica associata al nodo distinta</div></div></div>
+    <div class="pfw-panel-body">
+        @await Html.PartialAsync("~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml", new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel { TestoNuovo = "Nuovo allegato", UrlNuovo = $"/Allegati/Nuovo?Entita={AllegatoEntita.DistintaBaseNodi}&IdEntita={nodo.IdNodoDistinta}&ReturnUrl={Uri.EscapeDataString(returnUrl)}", MostraNuovo = true, MostraAggiorna = false })
+        @if (Model.Allegati.Allegati.Count == 0) { <div class="pfw-secondary-text mt-3">Nessun allegato registrato.</div> } else { @await Html.PartialAsync("~/Pages/Shared/Allegati/_AllegatiGrid.cshtml", Model.Allegati) }
+    </div>
+</section>

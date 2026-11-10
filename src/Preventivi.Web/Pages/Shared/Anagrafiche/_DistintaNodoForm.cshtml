@@ -1,0 +1,67 @@
+@model global::Preventivi.Web.UI.Modules.Anagrafiche.DistintaNodoFormModel
+@using global::Preventivi.Core.Anagrafiche
+@{
+    var tipi = ViewData["TipiNodo"] as IReadOnlyList<TipoNodoDistintaLookupItem> ?? [];
+    var padri = ViewData["NodiPadre"] as IReadOnlyList<DistintaNodoItem> ?? [];
+    var consentiPadre = ViewData["ConsentiPadre"] as bool? ?? true;
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input asp-for="VersioneRigaBase64" type="hidden" />
+
+<div class="row g-3">
+    @if (consentiPadre)
+    {
+        <div class="col-12 col-lg-6">
+            <label asp-for="IdNodoPadre" class="form-label">Nodo padre</label>
+            <select asp-for="IdNodoPadre" class="form-select">
+                <option value="">Nodo radice</option>
+                @foreach (var nodo in padri)
+                {
+                    <option value="@nodo.IdNodoDistinta">@nodo.Display</option>
+                }
+            </select>
+            <span asp-validation-for="IdNodoPadre" class="text-danger"></span>
+        </div>
+    }
+    else
+    {
+        <input asp-for="IdNodoPadre" type="hidden" />
+    }
+    <div class="col-12 col-lg-6">
+        <label asp-for="IdTipoNodo" class="form-label">Tipo nodo *</label>
+        <select asp-for="IdTipoNodo" class="form-select pfw-required">
+            <option value="">Seleziona il tipo nodo</option>
+            @foreach (var tipo in tipi)
+            {
+                <option value="@tipo.IdTipoNodo">@tipo.Descrizione@(tipo.Attivo ? "" : " (non attivo)")</option>
+            }
+        </select>
+        <span asp-validation-for="IdTipoNodo" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="CodiceNodo" class="form-label">Codice nodo</label>
+        <input asp-for="CodiceNodo" class="form-control" maxlength="50" />
+        <span asp-validation-for="CodiceNodo" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-8">
+        <label asp-for="DescrizioneNodo" class="form-label">Descrizione nodo *</label>
+        <input asp-for="DescrizioneNodo" class="form-control pfw-required" maxlength="200" />
+        <span asp-validation-for="DescrizioneNodo" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="QuantitaBase" class="form-label">Quantita base *</label>
+        <input asp-for="QuantitaBase" class="form-control pfw-required" inputmode="decimal" />
+        <span asp-validation-for="QuantitaBase" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="OrdineVisualizzazione" class="form-label">Ordine di visualizzazione *</label>
+        <input asp-for="OrdineVisualizzazione" class="form-control pfw-required" inputmode="numeric" />
+        <span asp-validation-for="OrdineVisualizzazione" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Note" class="form-label">Note</label>
+        <textarea asp-for="Note" class="form-control" rows="4" maxlength="500"></textarea>
+        <span asp-validation-for="Note" class="text-danger"></span>
+    </div>
+</div>

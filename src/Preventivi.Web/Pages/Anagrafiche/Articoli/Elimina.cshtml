@@ -1,0 +1,17 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Articoli.EliminaModel
+@{ var articolo = Model.Articolo!; ViewData["Title"] = "Elimina articolo"; }
+
+<div class="mb-3"><div class="pfw-secondary-text mb-1"><a asp-page="./Dettaglio" asp-route-id="@articolo.IdArticolo">Dettaglio articolo</a></div><h1 class="h3 mb-0">Elimina articolo</h1></div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Conferma eliminazione</h2><div class="pfw-panel-subtitle">L'operazione e consentita soltanto per articoli mai utilizzati e senza allegati</div></div></div>
+    <form method="post">
+        <input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(articolo.VersioneRiga)" />
+        <div class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <p>Confermi l'eliminazione di <strong>@articolo.CodiceArticolo - @articolo.Descrizione</strong>?</p>
+            <p class="pfw-secondary-text mb-0">Gli articoli utilizzati devono essere disattivati. Gli allegati devono essere eliminati esplicitamente prima dell'articolo.</p>
+        </div>
+        <div class="pfw-panel-footer d-flex justify-content-end gap-2"><a asp-page="./Dettaglio" asp-route-id="@articolo.IdArticolo" class="pfw-btn pfw-btn-secondary">Annulla</a><button type="submit" class="pfw-btn pfw-btn-danger">Elimina</button></div>
+    </form>
+</section>

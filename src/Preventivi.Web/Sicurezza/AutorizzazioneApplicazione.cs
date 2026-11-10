@@ -112,6 +112,10 @@ public static class AutorizzazioneApplicazione
             AllegatoEntita.Campionature => PermessiApplicazione.Campionature,
             AllegatoEntita.CampionatureRilievi => PermessiApplicazione.Campionature,
             AllegatoEntita.CampionatureAdeguamenti => PermessiApplicazione.Campionature,
+            AllegatoEntita.Articoli => PermessiApplicazione.Anagrafiche,
+            AllegatoEntita.DistintaBaseNodi => PermessiApplicazione.Anagrafiche,
+            AllegatoEntita.DistintaMateriali => PermessiApplicazione.Anagrafiche,
+            AllegatoEntita.DistintaLavorazioni => PermessiApplicazione.Anagrafiche,
             _ => null
         };
 

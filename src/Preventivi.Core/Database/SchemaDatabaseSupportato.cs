@@ -2,6 +2,6 @@ namespace Preventivi.Core.Database;
 
 public static class SchemaDatabaseSupportato
 {
-    public const int Versione = 2026110302;
-    public const string CodiceIntervento = "TEC-016-MATERIALI-LAVORAZIONI";
+    public const int Versione = 2026110501;
+    public const string CodiceIntervento = "TEC-016-DISTINTE-BASE";
 }

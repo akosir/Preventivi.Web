@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="~/css/framework/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/framework/kpi.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/framework/empty-state.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/framework/tree.css" asp-append-version="true" />
 
     <link rel="stylesheet" href="~/css/pages/dashboard.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/pages/preventivi.css" asp-append-version="true" />
@@ -35,6 +36,34 @@
 
 
 <body>
+
+    @{
+        var paginaCorrente = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+        bool PaginaEsatta(string pagina) =>
+            paginaCorrente.Equals(pagina, StringComparison.OrdinalIgnoreCase);
+        bool PaginaInArea(string prefisso) =>
+            paginaCorrente.Equals(prefisso, StringComparison.OrdinalIgnoreCase) ||
+            paginaCorrente.StartsWith(prefisso + "/", StringComparison.OrdinalIgnoreCase);
+
+        var puoPreventivi = global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+            User,
+            global::Preventivi.Core.Sicurezza.PermessiApplicazione.Preventivi);
+        var puoRichieste = global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+            User,
+            global::Preventivi.Core.Sicurezza.PermessiApplicazione.RichiesteClienti);
+        var puoCampionature = global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+            User,
+            global::Preventivi.Core.Sicurezza.PermessiApplicazione.Campionature);
+        var puoClienti = global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+            User,
+            global::Preventivi.Core.Sicurezza.PermessiApplicazione.Clienti);
+        var puoAnagrafiche = global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+            User,
+            global::Preventivi.Core.Sicurezza.PermessiApplicazione.Anagrafiche);
+
+        var modelliPreventivoAttivi = PaginaInArea("/Preventivi/Modelli");
+        var preventiviAttivi = PaginaInArea("/Preventivi") && !modelliPreventivoAttivi;
+    }
 
     <div class="app-shell">
 
@@ -54,90 +83,100 @@
 
             <nav class="app-menu">
 
-                <a class="app-menu-item active"
+                <a class="app-menu-home @(PaginaEsatta("/Index") ? "active" : string.Empty)"
                    asp-page="/Index">
-                    Dashboard
+                    <span class="app-menu-home-icon" aria-hidden="true">⌂</span>
+                    <span class="app-menu-home-copy">Dashboard</span>
                 </a>
 
-                @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                    User,
-                    global::Preventivi.Core.Sicurezza.PermessiApplicazione.Preventivi))
+                @if (puoRichieste || puoCampionature || puoPreventivi)
                 {
                     <div class="app-menu-section">
-                        Preventivi
+                        Flusso preventivo
                     </div>
 
-                    <a class="app-menu-item"
-                       asp-page="/Preventivi/Index">
-                        Preventivi
-                    </a>
+                    <div class="app-process" aria-label="Fasi del ciclo preventivo">
+                        @if (puoRichieste)
+                        {
+                            <a class="app-process-step @(PaginaInArea("/RichiesteClienti") ? "active" : string.Empty)"
+                               asp-page="/RichiesteClienti/Index">
+                                <span class="app-process-number">1</span>
+                                <span class="app-process-copy">
+                                    <strong>Richiesta cliente</strong>
+                                    <small>Esigenza commerciale</small>
+                                </span>
+                                <span class="app-process-chevron" aria-hidden="true">›</span>
+                            </a>
+                        }
 
-                    <a class="app-menu-item"
+                        @if (puoCampionature)
+                        {
+                            <a class="app-process-step @(PaginaInArea("/Campionature") ? "active" : string.Empty)"
+                               asp-page="/Campionature/Index">
+                                <span class="app-process-number">2</span>
+                                <span class="app-process-copy">
+                                    <strong>Campionatura</strong>
+                                    <small>Verifica del campione</small>
+                                </span>
+                                <span class="app-process-chevron" aria-hidden="true">›</span>
+                            </a>
+                        }
+
+                        @if (puoPreventivi)
+                        {
+                            <a class="app-process-step @(preventiviAttivi ? "active" : string.Empty)"
+                               asp-page="/Preventivi/Index">
+                                <span class="app-process-number">3</span>
+                                <span class="app-process-copy">
+                                    <strong>Preventivo</strong>
+                                    <small>Offerta economica</small>
+                                </span>
+                                <span class="app-process-chevron" aria-hidden="true">›</span>
+                            </a>
+                        }
+
+                        <div class="app-process-step is-disabled"
+                             aria-disabled="true"
+                             title="Gestione non ancora disponibile">
+                            <span class="app-process-number">4</span>
+                            <span class="app-process-copy">
+                                <strong>Ordini fornitori</strong>
+                                <small>Approvvigionamento</small>
+                            </span>
+                            <span class="app-process-status">Da attivare</span>
+                        </div>
+                    </div>
+                }
+
+                @if (puoPreventivi)
+                {
+                    <div class="app-menu-section">Strumenti</div>
+                    <a class="app-menu-item @(modelliPreventivoAttivi ? "active" : string.Empty)"
                        asp-page="/Preventivi/Modelli/Index">
-                        Modelli preventivo
+                        <span class="app-menu-item-symbol" aria-hidden="true">M</span>
+                        <span>Modelli preventivo</span>
                     </a>
                 }
 
-                @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                         User,
-                         global::Preventivi.Core.Sicurezza.PermessiApplicazione.RichiesteClienti) ||
-                     global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                         User,
-                         global::Preventivi.Core.Sicurezza.PermessiApplicazione.Campionature))
+                @if (puoClienti || puoAnagrafiche)
                 {
-                    <div class="app-menu-section">
-                        Commerciale
-                    </div>
+                    <div class="app-menu-section">Dati di base</div>
 
-                    @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                        User,
-                        global::Preventivi.Core.Sicurezza.PermessiApplicazione.RichiesteClienti))
+                    @if (puoClienti)
                     {
-                        <a class="app-menu-item"
-                           asp-page="/RichiesteClienti/Index">
-                            Richieste clienti
-                        </a>
-                    }
-
-                    @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                        User,
-                        global::Preventivi.Core.Sicurezza.PermessiApplicazione.Campionature))
-                    {
-                        <a class="app-menu-item"
-                           asp-page="/Campionature/Index">
-                            Campionature
-                        </a>
-                    }
-                }
-
-                @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                         User,
-                         global::Preventivi.Core.Sicurezza.PermessiApplicazione.Clienti) ||
-                     global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                         User,
-                         global::Preventivi.Core.Sicurezza.PermessiApplicazione.Anagrafiche))
-                {
-                    <div class="app-menu-section">
-                        Anagrafiche
-                    </div>
-
-                    @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                        User,
-                        global::Preventivi.Core.Sicurezza.PermessiApplicazione.Clienti))
-                    {
-                        <a class="app-menu-item"
+                        <a class="app-menu-item @(PaginaInArea("/Clienti") ? "active" : string.Empty)"
                            asp-page="/Clienti/Index">
-                            Clienti
+                            <span class="app-menu-item-symbol" aria-hidden="true">C</span>
+                            <span>Clienti</span>
                         </a>
                     }
 
-                    @if (global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
-                        User,
-                        global::Preventivi.Core.Sicurezza.PermessiApplicazione.Anagrafiche))
+                    @if (puoAnagrafiche)
                     {
-                        <a class="app-menu-item"
+                        <a class="app-menu-item @(PaginaInArea("/Anagrafiche") ? "active" : string.Empty)"
                            asp-page="/Anagrafiche/Index">
-                            Gestione anagrafiche
+                            <span class="app-menu-item-symbol" aria-hidden="true">A</span>
+                            <span>Anagrafiche</span>
                         </a>
                     }
                 }

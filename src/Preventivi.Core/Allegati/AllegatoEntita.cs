@@ -8,6 +8,10 @@ public static class AllegatoEntita
     public const string Campionature = "Campionature";
     public const string CampionatureRilievi = "CampionatureRilievi";
     public const string CampionatureAdeguamenti = "CampionatureAdeguamenti";
+    public const string Articoli = "Articoli";
+    public const string DistintaBaseNodi = "DistintaBaseNodi";
+    public const string DistintaMateriali = "DistintaMateriali";
+    public const string DistintaLavorazioni = "DistintaLavorazioni";
     public const string PreventiviRigheComponenti = "PreventiviRigheComponenti";
     public const string PreventiviRigheMateriali = "PreventiviRigheMateriali";
     public const string PreventiviRigheLavorazioni = "PreventiviRigheLavorazioni";
@@ -20,6 +24,10 @@ public static class AllegatoEntita
         Campionature,
         CampionatureRilievi,
         CampionatureAdeguamenti,
+        Articoli,
+        DistintaBaseNodi,
+        DistintaMateriali,
+        DistintaLavorazioni,
         PreventiviRigheComponenti,
         PreventiviRigheMateriali,
         PreventiviRigheLavorazioni

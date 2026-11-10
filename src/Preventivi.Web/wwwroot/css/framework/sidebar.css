@@ -164,6 +164,172 @@
 }
 
 
+/* ==========================================================================
+   APPLICATION PROCESS MENU
+   ========================================================================== */
+
+.app-menu-home {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    padding: 9px 11px;
+    border-radius: 7px;
+    color: rgba(255,255,255,.86);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color .12s ease, color .12s ease;
+}
+
+    .app-menu-home:hover {
+        background: rgba(255,255,255,.08);
+        color: #ffffff;
+    }
+
+    .app-menu-home.active {
+        background: rgba(31,111,178,.35);
+        color: #ffffff;
+    }
+
+.app-menu-home-icon,
+.app-menu-item-symbol {
+    width: 25px;
+    height: 25px;
+    flex: 0 0 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 6px;
+    background: rgba(255,255,255,.07);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.app-process {
+    position: relative;
+    margin: 2px 0 8px;
+}
+
+    .app-process::before {
+        content: "";
+        position: absolute;
+        top: 24px;
+        bottom: 24px;
+        left: 24px;
+        border-left: 1px solid rgba(255,255,255,.18);
+    }
+
+.app-process-step {
+    position: relative;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 3px 0;
+    padding: 7px 9px 7px 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: rgba(255,255,255,.82);
+    text-decoration: none;
+    transition: background-color .12s ease, border-color .12s ease, color .12s ease, transform .12s ease;
+}
+
+    a.app-process-step:hover {
+        background: rgba(255,255,255,.08);
+        color: #ffffff;
+        transform: translateX(2px);
+    }
+
+    .app-process-step.active {
+        border-color: rgba(94,174,236,.42);
+        background: linear-gradient(90deg, rgba(31,111,178,.55), rgba(31,111,178,.22));
+        color: #ffffff;
+        box-shadow: inset 3px 0 0 #62b1ec;
+    }
+
+    .app-process-step.is-disabled {
+        opacity: .48;
+        cursor: not-allowed;
+    }
+
+.app-process-number {
+    position: relative;
+    z-index: 1;
+    width: 29px;
+    height: 29px;
+    flex: 0 0 29px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 50%;
+    background: var(--app-sidebar);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+    .app-process-step.active .app-process-number {
+        border-color: #8ac8f5;
+        background: #ffffff;
+        color: var(--app-primary);
+    }
+
+.app-process-copy {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+    .app-process-copy strong {
+        overflow: hidden;
+        font-size: 12px;
+        font-weight: 650;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .app-process-copy small {
+        margin-top: 3px;
+        color: rgba(255,255,255,.5);
+        font-size: 10px;
+    }
+
+.app-process-chevron {
+    color: rgba(255,255,255,.45);
+    font-size: 19px;
+    line-height: 1;
+}
+
+.app-process-status {
+    padding: 3px 6px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 10px;
+    color: rgba(255,255,255,.65);
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.app-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+    .app-menu-item.active .app-menu-item-symbol {
+        border-color: rgba(255,255,255,.35);
+        background: rgba(255,255,255,.16);
+    }
+
+
 /* Responsive */
 
 @media (max-width: 991px) {
@@ -186,5 +352,39 @@
 
     .pfw-sidebar-body {
         max-height: 320px;
+    }
+
+    .app-menu-home {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .app-menu-home-copy,
+    .app-process-copy,
+    .app-process-chevron,
+    .app-process-status,
+    .app-menu-item > span:last-child {
+        display: none;
+    }
+
+    .app-process::before {
+        display: none;
+    }
+
+    .app-process-step {
+        justify-content: center;
+        min-height: 44px;
+        padding: 6px 0;
+    }
+
+        a.app-process-step:hover {
+            transform: none;
+        }
+
+    .app-menu-item {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
     }
 }

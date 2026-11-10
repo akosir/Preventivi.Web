@@ -129,6 +129,31 @@ public class EliminaModel : PageModel
                 });
         }
 
+        if (allegato.Entita == AllegatoEntita.Articoli)
+        {
+            return RedirectToPage(
+                "/Anagrafiche/Articoli/Dettaglio",
+                new
+                {
+                    id = allegato.IdEntita
+                });
+        }
+
+        if (allegato.Entita == AllegatoEntita.DistintaBaseNodi)
+        {
+            return RedirectToPage("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id = allegato.IdEntita });
+        }
+
+        if (allegato.Entita == AllegatoEntita.DistintaMateriali)
+        {
+            return RedirectToPage("/Anagrafiche/Distinte/Materiali/Modifica", new { id = allegato.IdEntita });
+        }
+
+        if (allegato.Entita == AllegatoEntita.DistintaLavorazioni)
+        {
+            return RedirectToPage("/Anagrafiche/Distinte/Lavorazioni/Modifica", new { id = allegato.IdEntita });
+        }
+
         if (IsLocalReturnUrl(ReturnUrl))
         {
             return LocalRedirect(ReturnUrl!);

@@ -1,0 +1,42 @@
+@model global::Preventivi.Web.UI.Modules.Anagrafiche.ArticoloFormModel
+@using global::Preventivi.Core.Anagrafiche
+@{
+    var clienti = ViewData["Clienti"] as IReadOnlyList<ClienteAnagraficaLookupItem> ?? [];
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input asp-for="VersioneRigaBase64" type="hidden" />
+
+<div class="row g-3">
+    <div class="col-12 col-md-4">
+        <label asp-for="CodiceArticolo" class="form-label">Codice articolo *</label>
+        <input asp-for="CodiceArticolo" class="form-control pfw-required" maxlength="50" />
+        <span asp-validation-for="CodiceArticolo" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-8">
+        <label asp-for="Descrizione" class="form-label">Descrizione *</label>
+        <input asp-for="Descrizione" class="form-control pfw-required" maxlength="200" />
+        <span asp-validation-for="Descrizione" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-4">
+        <label asp-for="Versione" class="form-label">Versione articolo</label>
+        <input asp-for="Versione" class="form-control" maxlength="20" />
+        <span asp-validation-for="Versione" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-8">
+        <label asp-for="IdCliente" class="form-label">Cliente associato</label>
+        <select asp-for="IdCliente" class="form-select">
+            <option value="">Nessun cliente associato</option>
+            @foreach (var cliente in clienti)
+            {
+                <option value="@cliente.IdCliente">@cliente.Display@(cliente.Attivo ? "" : " (non attivo)")</option>
+            }
+        </select>
+        <span asp-validation-for="IdCliente" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="NoteTecniche" class="form-label">Note tecniche</label>
+        <textarea asp-for="NoteTecniche" class="form-control" rows="6"></textarea>
+        <span asp-validation-for="NoteTecniche" class="text-danger"></span>
+    </div>
+</div>

@@ -1608,11 +1608,114 @@ stato ed eliminazione per entrambe le anagrafiche. Lo script incrementale
 richiede `2026110301`, aggiunge audit e `rowversion` e installa lookup e
 procedure operative. L'utente ha riferito di aver applicato lo script al
 database di test senza errori il 3 novembre 2026; non e stata eseguita una
-query indipendente al registro `VersioniSchema`. Il comportamento runtime non
-e stato collaudato dall'utente con esito positivo per entrambe le anagrafiche:
+query indipendente al registro `VersioniSchema`. Il comportamento runtime e
+stato collaudato dall'utente con esito positivo per entrambe le anagrafiche:
 caricamento e filtri, creazione, modifica, audit, disattivazione,
 riattivazione, eliminazione dei record non utilizzati e blocco dei record
 referenziati.
+
+Il terzo pacchetto approvato stabilisce:
+
+- **316:** gestire l'anagrafica `Articoli` comprensiva dei relativi allegati;
+  nodi, materiali e lavorazioni della distinta base restano fuori dal
+  pacchetto e saranno affrontati successivamente;
+- **317:** gestire per gli articoli codice univoco, descrizione, versione,
+  cliente opzionale, stato attivo e note tecniche, aggiungendo audit e
+  controllo di concorrenza tramite `rowversion`. Le modifiche anagrafiche non
+  devono aggiornare retroattivamente preventivi, modelli o componenti gia
+  esistenti;
+- **318:** selezionare il cliente tramite lookup. In creazione o sostituzione
+  il cliente deve essere attivo; un cliente disattivato successivamente deve
+  restare visibile e conservabile sull'articolo esistente;
+- **319:** consentire l'eliminazione fisica di un articolo soltanto in assenza
+  di riferimenti da distinte, preventivi, modelli preventivo, componenti e
+  allegati. Non sono ammesse cancellazioni implicite a cascata; un articolo
+  referenziato deve essere disattivato;
+- **320:** integrare gli allegati mediante il modulo MB-01 con chiave tecnica
+  `Articoli` e permesso dell'area Anagrafiche, mantenendo upload, apertura,
+  download ed eliminazione esplicita. Gli allegati devono essere rimossi
+  esplicitamente prima dell'eventuale eliminazione fisica dell'articolo.
+
+**Riscontri [C] del terzo pacchetto al 4 novembre 2026**
+
+Nel repository sono predisposti i modelli e il contratto Core, il repository
+ADO.NET, i form e le pagine Razor di ricerca, dettaglio, creazione, modifica,
+stato ed eliminazione controllata dell'anagrafica articoli. La pagina di
+dettaglio integra il modulo generico MB-01 con chiave tecnica `Articoli` e
+permesso dell'area Anagrafiche. L'upload verifica inoltre l'esistenza
+dell'articolo sul server; apertura, download ed eliminazione verificano il
+permesso tramite i metadati dell'allegato.
+
+Lo script incrementale `TEC-016_03_Articoli_Allegati.sql` dichiara la versione
+`2026110401`, richiede `2026110302`, aggiunge audit e `rowversion` e installa
+lookup e procedure operative. L'utente ha riferito di aver applicato lo script
+al database di test il 4 novembre 2026; non e stata eseguita una verifica
+indipendente del registro `VersioniSchema`.
+
+Il collaudo runtime guidato e stato completato con esito positivo per apertura
+dell'elenco, creazione, modifica e audit, disattivazione e riattivazione,
+upload, apertura, download ed eliminazione degli allegati, eliminazione di un
+articolo privo di riferimenti e blocco dell'eliminazione di un articolo
+referenziato.
+
+Il quarto pacchetto approvato stabilisce:
+
+- **321:** gestire per ogni articolo una distinta base costituita da un albero
+  di nodi. Nel modello corrente l'articolo svolge il ruolo di testata; il
+  pacchetto non introduce una tabella testata distinta ne un versionamento
+  autonomo della distinta;
+- **322:** ammettere un solo nodo radice attivo per articolo e garantire che
+  tutti i discendenti appartengano allo stesso articolo. Devono essere vietati
+  cicli, auto-associazioni e collegamenti a discendenti; il livello deve essere
+  calcolato dal sistema, mentre quantita base e ordinamento devono essere
+  validati. Le modifiche non aggiornano retroattivamente i preventivi
+  esistenti;
+- **323:** associare materiali e lavorazioni a uno specifico nodo, scegliendoli
+  dalle rispettive anagrafiche attive. Quantita, scarto, tempi e costi devono
+  essere non negativi e vengono copiati nella distinta come valori
+  modificabili, senza aggiornamento automatico successivo. Sullo stesso nodo
+  non sono ammessi materiali duplicati; una lavorazione puo ripetersi soltanto
+  con una sequenza distinta;
+- **324:** applicare audit e controllo di concorrenza tramite `rowversion` a
+  nodi, materiali e lavorazioni della distinta. Non sono ammesse cancellazioni
+  a cascata implicite. Un nodo puo essere eliminato fisicamente soltanto se
+  privo di figli, materiali, lavorazioni, allegati e riferimenti operativi; non
+  possono esistere figli attivi sotto un padre disattivato;
+- **325:** realizzare la gestione mediante un albero navigabile con dettaglio
+  del nodo e schede Materiali, Lavorazioni e Allegati, rispettando i componenti
+  PFW. Il modulo MB-01 deve essere esteso con le chiavi tecniche
+  `DistintaBaseNodi`, `DistintaMateriali` e `DistintaLavorazioni`, protette dal
+  permesso Anagrafiche. Gli allegati devono essere rimossi esplicitamente prima
+  dell'eliminazione fisica dell'elemento associato.
+
+Duplicazione completa della distinta, revisioni autonome, importazione massiva
+e propagazione automatica sui preventivi restano fuori dal quarto pacchetto.
+
+**Stato del quarto pacchetto al 6 novembre 2026**
+
+Le decisioni 321–325 sono approvate. Nel repository sono predisposti il
+contratto Core, il repository ADO.NET, le pagine Razor per elenco articoli,
+albero distinta, nodi, materiali e lavorazioni, e l'estensione MB-01 per le
+tre entita approvate. Lo script incrementale
+`TEC-016_04_Distinte_Base.sql` dichiara la versione `2026110501`, richiede
+`2026110401`, aggiunge audit, `rowversion`, costo unitario dei materiali e
+procedure operative con controlli gerarchici.
+
+L'utente ha riferito di aver applicato lo script al database di test senza
+errori il 6 novembre 2026; non e stata eseguita una verifica indipendente del
+registro `VersioniSchema`.
+
+Il collaudo runtime guidato e stato completato con esito positivo per apertura
+e navigazione della distinta, creazione e modifica della gerarchia, materiali
+e lavorazioni, valori proposti, ordinamento e vincoli di duplicazione. Sono
+stati inoltre verificati i vincoli su radice unica, cicli e stati padre-figlio,
+le eliminazioni controllate e la gestione completa degli allegati distinti per
+nodo, materiale e lavorazione.
+
+Il 10 novembre 2026 l'utente ha completato con esito positivo il collaudo
+runtime della nuova visualizzazione ad albero della distinta, del menu
+organizzato secondo il flusso operativo e del report PDF scaricabile con i
+dati del database di test.
 
 ## 6. Implementazioni e proposte non promosse a decisioni
 

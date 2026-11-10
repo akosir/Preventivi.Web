@@ -297,6 +297,23 @@ e allegati.
 [P] Conservare queste possibilità quando si interviene sui flussi,
 senza aggiungere nuovi significati funzionali non documentati.
 
+### Distinte base anagrafiche
+
+[D] Nel modello corrente l'articolo svolge il ruolo di testata della
+distinta. Ogni articolo puo avere un solo nodo radice attivo; tutti i nodi
+discendenti devono appartenere allo stesso articolo e il livello e calcolato
+dal sistema.
+
+[D] Vietare cicli, auto-associazioni e figli attivi sotto un padre non attivo.
+Materiali e lavorazioni della distinta appartengono esclusivamente al nodo.
+I valori economici e temporali sono copie modificabili e non devono essere
+aggiornati retroattivamente dalle anagrafiche o propagati ai preventivi.
+
+[D] Nodi, materiali e lavorazioni della distinta utilizzano audit e
+`rowversion`. Non sono ammesse cancellazioni a cascata implicite. Prima
+dell'eliminazione fisica devono essere rimossi riferimenti, contenuti figli e
+allegati secondo le regole approvate.
+
 ### Limite tecnico da rispettare
 
 [C] Materiali e lavorazioni utilizzano IdRigaPreventivo
@@ -324,6 +341,10 @@ Conservare i contratti esistenti e segnalare le decisioni mancanti.
 
 [C] Tra le chiavi utilizzate figurano:
 - Clienti;
+- Articoli;
+- DistintaBaseNodi;
+- DistintaMateriali;
+- DistintaLavorazioni;
 - Preventivi;
 - RichiesteClienti;
 - Campionature;

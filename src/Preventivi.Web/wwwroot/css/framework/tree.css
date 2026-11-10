@@ -1,0 +1,210 @@
+/* =========================================================
+   PFW TREE GRID
+   Gerarchie navigabili con metadati allineati
+   ========================================================= */
+
+.pfw-tree-grid {
+    overflow-x: auto;
+}
+
+.pfw-tree-grid-header,
+.pfw-tree-grid-row {
+    min-width: 900px;
+    display: grid;
+    grid-template-columns: minmax(320px, 2.4fr) minmax(150px, 1fr) minmax(120px, .75fr) minmax(80px, .45fr) minmax(100px, .6fr) auto;
+    gap: 16px;
+    align-items: center;
+}
+
+.pfw-tree-grid-header {
+    padding: 11px 16px;
+    background: #fafbfc;
+    border-bottom: 1px solid var(--app-border);
+    color: var(--app-text-muted);
+    font-size: 11px;
+    font-weight: 650;
+    text-transform: uppercase;
+}
+
+.pfw-tree-grid-row {
+    min-height: 72px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #edf0f3;
+    transition: background-color .12s ease;
+}
+
+    .pfw-tree-grid-row:last-child {
+        border-bottom: 0;
+    }
+
+    .pfw-tree-grid-row:hover {
+        background: #fafcff;
+    }
+
+    .pfw-tree-grid-row.is-inactive .pfw-tree-node-title {
+        color: var(--app-text-muted);
+    }
+
+.pfw-tree-grid-structure {
+    min-width: 0;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+}
+
+.pfw-tree-guides {
+    align-self: stretch;
+    display: flex;
+    flex: 0 0 auto;
+}
+
+.pfw-tree-guide {
+    position: relative;
+    width: 24px;
+    min-width: 24px;
+}
+
+    .pfw-tree-guide::before {
+        content: "";
+        position: absolute;
+        top: -13px;
+        bottom: -13px;
+        left: 10px;
+        border-left: 1px solid #cbd5df;
+    }
+
+    .pfw-tree-guide.is-branch::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        width: 14px;
+        border-top: 1px solid #cbd5df;
+    }
+
+.pfw-tree-node-marker {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 10px;
+    margin: 0 10px 0 2px;
+    border: 2px solid var(--app-primary);
+    border-radius: 50%;
+    background: var(--app-surface);
+}
+
+    .pfw-tree-node-marker.is-root {
+        width: 14px;
+        height: 14px;
+        flex-basis: 14px;
+        margin-left: 0;
+        background: var(--app-primary);
+        box-shadow: 0 0 0 4px #eaf3fb;
+    }
+
+.pfw-tree-node-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.pfw-tree-node-title {
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    color: var(--app-text);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.pfw-tree-level {
+    width: fit-content;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: #eef3f7;
+    color: var(--app-text-muted);
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.pfw-tree-grid-cell {
+    min-width: 0;
+    color: var(--app-text);
+    font-size: 13px;
+}
+
+.pfw-tree-grid-label {
+    display: none;
+    color: var(--app-text-muted);
+    font-size: 10px;
+    font-weight: 650;
+    text-transform: uppercase;
+}
+
+.pfw-tree-grid-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+    .pfw-tree-grid {
+        overflow-x: visible;
+    }
+
+    .pfw-tree-grid-header {
+        display: none;
+    }
+
+    .pfw-tree-grid-row {
+        min-width: 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px 18px;
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    .pfw-tree-grid-structure {
+        grid-column: 1 / -1;
+    }
+
+    .pfw-tree-grid-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .pfw-tree-grid-label {
+        display: block;
+    }
+
+    .pfw-tree-grid-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+    .pfw-tree-grid-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pfw-tree-grid-structure,
+    .pfw-tree-grid-actions {
+        grid-column: 1;
+    }
+
+    .pfw-tree-guide {
+        width: 18px;
+        min-width: 18px;
+    }
+
+        .pfw-tree-guide::before,
+        .pfw-tree-guide.is-branch::after {
+            left: 7px;
+        }
+
+        .pfw-tree-guide.is-branch::after {
+            width: 11px;
+        }
+}

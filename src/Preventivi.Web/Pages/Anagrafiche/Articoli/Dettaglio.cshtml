@@ -1,0 +1,74 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Articoli.DettaglioModel
+@using global::Preventivi.Core.Allegati
+
+@{
+    var articolo = Model.Articolo!;
+    var returnUrl = Url.Page("/Anagrafiche/Articoli/Dettaglio", new { id = articolo.IdArticolo })!;
+    ViewData["Title"] = "Dettaglio articolo";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="./Index">Articoli</a></div>
+        <h1 class="h3 mb-0">@articolo.CodiceArticolo - @articolo.Descrizione</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-page="../Distinte/Dettaglio" asp-route-idArticolo="@articolo.IdArticolo" class="pfw-btn pfw-btn-secondary">Distinta base</a>
+        <a asp-page="./Modifica" asp-route-id="@articolo.IdArticolo" class="pfw-btn pfw-btn-primary">Modifica</a>
+        <a asp-page="./Elimina" asp-route-id="@articolo.IdArticolo" class="pfw-btn pfw-btn-danger">Elimina</a>
+    </div>
+</div>
+
+@if (TempData["MessaggioSuccesso"] is string messaggio)
+{
+    <div class="alert alert-success" role="alert">@messaggio</div>
+}
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati articolo</h2><div class="pfw-panel-subtitle">Valori correnti dell'anagrafica</div></div></div>
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <dl class="row mb-0">
+            <dt class="col-sm-4 col-lg-3">Codice articolo</dt><dd class="col-sm-8 col-lg-9">@articolo.CodiceArticolo</dd>
+            <dt class="col-sm-4 col-lg-3">Descrizione</dt><dd class="col-sm-8 col-lg-9">@articolo.Descrizione</dd>
+            <dt class="col-sm-4 col-lg-3">Versione articolo</dt><dd class="col-sm-8 col-lg-9">@(articolo.Versione ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Cliente associato</dt><dd class="col-sm-8 col-lg-9">@(articolo.Cliente ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Stato</dt><dd class="col-sm-8 col-lg-9"><span class="pfw-badge @(articolo.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(articolo.Attivo ? "Attivo" : "Non attivo")</span></dd>
+            <dt class="col-sm-4 col-lg-3">Note tecniche</dt><dd class="col-sm-8 col-lg-9">@(articolo.NoteTecniche ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Creato il</dt><dd class="col-sm-8 col-lg-9">@articolo.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @articolo.UtenteCreazione</dd>
+            <dt class="col-sm-4 col-lg-3">Ultima modifica</dt><dd class="col-sm-8 col-lg-9">@(articolo.DataModifica.HasValue ? $"{articolo.DataModifica:dd/MM/yyyy HH:mm} da {articolo.UtenteModifica}" : "-")</dd>
+        </dl>
+    </div>
+    <div class="pfw-panel-footer d-flex justify-content-between gap-2">
+        <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Torna all'elenco</a>
+        <form method="post" asp-page-handler="@(articolo.Attivo ? "Disattiva" : "Attiva")">
+            <input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(articolo.VersioneRiga)" />
+            <button type="submit" class="pfw-btn pfw-btn-secondary">@(articolo.Attivo ? "Disattiva" : "Riattiva")</button>
+        </form>
+    </div>
+</section>
+
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Allegati articolo</h2><div class="pfw-panel-subtitle">Disegni, schede tecniche e documenti associati</div></div></div>
+    <div class="pfw-panel-body">
+        @await Html.PartialAsync(
+            "~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml",
+            new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+            {
+                TestoNuovo = "Nuovo allegato",
+                UrlNuovo = $"/Allegati/Nuovo?Entita={AllegatoEntita.Articoli}&IdEntita={articolo.IdArticolo}&ReturnUrl={Uri.EscapeDataString(returnUrl)}",
+                MostraNuovo = true,
+                MostraAggiorna = false
+            })
+
+        @if (Model.Allegati.Allegati.Count == 0)
+        {
+            <div class="pfw-secondary-text mt-3">Nessun allegato registrato.</div>
+        }
+        else
+        {
+            @await Html.PartialAsync("~/Pages/Shared/Allegati/_AllegatiGrid.cshtml", Model.Allegati)
+        }
+    </div>
+</section>

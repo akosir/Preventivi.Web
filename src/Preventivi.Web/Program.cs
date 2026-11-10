@@ -21,6 +21,7 @@ using Preventivi.Data.Preventivi;
 using Preventivi.Data.RichiesteClienti;
 using Preventivi.Data.Sicurezza;
 using Preventivi.Web.Database;
+using Preventivi.Web.Services;
 using Preventivi.Web.Sicurezza;
 using Preventivi.Web.UI.ModelBinding;
 
@@ -83,6 +84,19 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IAnagraficheProduttiveRepository,
     AnagraficheProduttiveRepository>();
+
+builder.Services.AddScoped<
+    IArticoloRepository,
+    ArticoloRepository>();
+
+builder.Services.AddScoped<
+    IDistintaBaseRepository,
+    DistintaBaseRepository>();
+
+builder.Services.AddScoped<
+    IDistintaBaseReportService,
+    DistintaBaseReportService>();
+builder.Services.AddSingleton<DistintaBasePdfGenerator>();
 
 builder.Services.AddScoped<
     IPreventivoRepository,

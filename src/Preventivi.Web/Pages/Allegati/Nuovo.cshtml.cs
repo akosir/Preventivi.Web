@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Allegati;
 using Preventivi.Core.Allegati.Application;
 using Preventivi.Core.Allegati.Storage;
+using Preventivi.Core.Anagrafiche;
 using Preventivi.Core.Campionature;
 using Preventivi.Web.Sicurezza;
 using Preventivi.Web.UI.Modules.Allegati;
@@ -15,17 +16,23 @@ public class NuovoModel : PageModel
     private readonly IAllegatoRepository _allegatoRepository;
     private readonly IAllegatoApplicationService _applicationService;
     private readonly ICampionaturaRepository _campionaturaRepository;
+    private readonly IArticoloRepository _articoloRepository;
+    private readonly IDistintaBaseRepository _distintaBaseRepository;
     private readonly ILogger<NuovoModel> _logger;
 
     public NuovoModel(
         IAllegatoRepository allegatoRepository,
         IAllegatoApplicationService applicationService,
         ICampionaturaRepository campionaturaRepository,
+        IArticoloRepository articoloRepository,
+        IDistintaBaseRepository distintaBaseRepository,
         ILogger<NuovoModel> logger)
     {
         _allegatoRepository = allegatoRepository;
         _applicationService = applicationService;
         _campionaturaRepository = campionaturaRepository;
+        _articoloRepository = articoloRepository;
+        _distintaBaseRepository = distintaBaseRepository;
         _logger = logger;
     }
 
@@ -193,6 +200,31 @@ public class NuovoModel : PageModel
                     });
             }
 
+            if (Entita == AllegatoEntita.Articoli)
+            {
+                return RedirectToPage(
+                    "/Anagrafiche/Articoli/Dettaglio",
+                    new
+                    {
+                        id = IdEntita
+                    });
+            }
+
+            if (Entita == AllegatoEntita.DistintaBaseNodi)
+            {
+                return RedirectToPage("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id = IdEntita });
+            }
+
+            if (Entita == AllegatoEntita.DistintaMateriali)
+            {
+                return RedirectToPage("/Anagrafiche/Distinte/Materiali/Modifica", new { id = IdEntita });
+            }
+
+            if (Entita == AllegatoEntita.DistintaLavorazioni)
+            {
+                return RedirectToPage("/Anagrafiche/Distinte/Lavorazioni/Modifica", new { id = IdEntita });
+            }
+
             if (IsLocalReturnUrl(ReturnUrl))
             {
                 return LocalRedirect(ReturnUrl!);
@@ -256,6 +288,14 @@ public class NuovoModel : PageModel
                 await _campionaturaRepository.GetRilievoAsync(IdEntita, cancellationToken) is not null,
             AllegatoEntita.CampionatureAdeguamenti =>
                 await _campionaturaRepository.GetAdeguamentoAsync(IdEntita, cancellationToken) is not null,
+            AllegatoEntita.Articoli =>
+                await _articoloRepository.GetDettaglioAsync(IdEntita, cancellationToken) is not null,
+            AllegatoEntita.DistintaBaseNodi =>
+                await _distintaBaseRepository.GetNodoAsync(IdEntita, cancellationToken) is not null,
+            AllegatoEntita.DistintaMateriali =>
+                await _distintaBaseRepository.GetMaterialeAsync(IdEntita, cancellationToken) is not null,
+            AllegatoEntita.DistintaLavorazioni =>
+                await _distintaBaseRepository.GetLavorazioneAsync(IdEntita, cancellationToken) is not null,
             _ => true
         };
     }
