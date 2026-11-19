@@ -185,4 +185,75 @@ public sealed class AllegatoApplicationService
                 exception);
         }
     }
+
+    public async Task<int> DuplicaAsync(
+        int idAllegatoSorgente,
+        string entitaDestinazione,
+        int idEntitaDestinazione,
+        string utente,
+        CancellationToken cancellationToken = default)
+    {
+        var allegato = await _allegatoRepository.GetByIdAsync(
+            idAllegatoSorgente,
+            cancellationToken)
+            ?? throw new KeyNotFoundException(
+                $"Allegato {idAllegatoSorgente} non trovato.");
+
+        var file = await _storageService.ApriAsync(
+            new StorageOpenRequest
+            {
+                PercorsoRelativo = allegato.PercorsoFile,
+                NomeFileArchiviato = allegato.NomeFileArchiviato,
+                NomeFileOriginale = allegato.NomeFileOriginale
+            },
+            cancellationToken);
+        await using var streamSorgente = file.Stream;
+
+        var fileTemporaneo = Path.Combine(
+            Path.GetTempPath(),
+            $"pfw-duplica-{Guid.NewGuid():N}.tmp");
+
+        try
+        {
+            await using (var destinazione = new FileStream(
+                fileTemporaneo,
+                FileMode.CreateNew,
+                FileAccess.Write,
+                FileShare.None,
+                81920,
+                useAsync: true))
+            {
+                await streamSorgente.CopyToAsync(destinazione, cancellationToken);
+            }
+
+            return await CreaAsync(
+                new AllegatoUploadRequest
+                {
+                    Entita = entitaDestinazione,
+                    IdEntita = idEntitaDestinazione,
+                    TipoAllegato = allegato.TipoAllegato,
+                    Descrizione = allegato.Descrizione,
+                    FileTemporaneo = fileTemporaneo,
+                    NomeFileOriginale = allegato.NomeFileOriginale,
+                    DataAllegato = allegato.DataAllegato,
+                    UtenteInserimento = utente,
+                    Note = allegato.Note
+                },
+                cancellationToken);
+        }
+        finally
+        {
+            try
+            {
+                File.Delete(fileTemporaneo);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogWarning(
+                    exception,
+                    "Rimozione del file temporaneo fallita durante la duplicazione dell'allegato {IdAllegato}.",
+                    idAllegatoSorgente);
+            }
+        }
+    }
 }

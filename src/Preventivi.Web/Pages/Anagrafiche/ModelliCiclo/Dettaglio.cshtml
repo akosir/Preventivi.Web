@@ -1,0 +1,32 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.ModelliCiclo.DettaglioModel
+@using global::Preventivi.Core.Allegati
+@{ var ciclo = Model.ModelloCiclo!; var returnUrl = Url.Page("/Anagrafiche/ModelliCiclo/Dettaglio", new { id = ciclo.IdModelloCiclo })!; ViewData["Title"] = "Dettaglio modello ciclo"; }
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div><div class="pfw-secondary-text mb-1"><a asp-page="./Index">Modelli ciclo</a></div><h1 class="h3 mb-0">@ciclo.CodiceModelloCiclo - @ciclo.Descrizione</h1></div>
+    <div class="d-flex gap-2"><a asp-page="./Modifica" asp-route-id="@ciclo.IdModelloCiclo" class="pfw-btn pfw-btn-primary">Modifica</a><a asp-page="./Elimina" asp-route-id="@ciclo.IdModelloCiclo" class="pfw-btn pfw-btn-danger">Elimina</a></div>
+</div>
+@if (TempData["MessaggioSuccesso"] is string messaggio) { <div class="alert alert-success" role="alert">@messaggio</div> }
+<section class="pfw-panel mb-3"><div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati modello ciclo</h2><div class="pfw-panel-subtitle">Valori correnti dell'anagrafica</div></div></div><div class="pfw-panel-body">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div><dl class="row mb-0">
+        <dt class="col-sm-4 col-lg-3">Codice modello ciclo</dt><dd class="col-sm-8 col-lg-9">@ciclo.CodiceModelloCiclo</dd>
+        <dt class="col-sm-4 col-lg-3">Descrizione</dt><dd class="col-sm-8 col-lg-9">@ciclo.Descrizione</dd>
+        <dt class="col-sm-4 col-lg-3">Stato</dt><dd class="col-sm-8 col-lg-9"><span class="pfw-badge @(ciclo.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(ciclo.Attivo ? "Attivo" : "Non attivo")</span></dd>
+        <dt class="col-sm-4 col-lg-3">Note</dt><dd class="col-sm-8 col-lg-9">@(ciclo.Note ?? "-")</dd>
+        <dt class="col-sm-4 col-lg-3">Creato il</dt><dd class="col-sm-8 col-lg-9">@ciclo.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @ciclo.UtenteCreazione</dd>
+        <dt class="col-sm-4 col-lg-3">Ultima modifica</dt><dd class="col-sm-8 col-lg-9">@(ciclo.DataModifica.HasValue ? $"{ciclo.DataModifica:dd/MM/yyyy HH:mm} da {ciclo.UtenteModifica}" : "-")</dd>
+    </dl>
+</div><div class="pfw-panel-footer d-flex justify-content-between gap-2"><a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Torna all'elenco</a><form method="post" asp-page-handler="@(ciclo.Attivo ? "Disattiva" : "Attiva")"><input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(ciclo.VersioneRiga)" /><button type="submit" class="pfw-btn pfw-btn-secondary">@(ciclo.Attivo ? "Disattiva" : "Riattiva")</button></form></div></section>
+
+<section class="pfw-panel mb-3"><div class="pfw-panel-header d-flex justify-content-between align-items-center"><div><h2 class="pfw-panel-title">Righe ciclo</h2><div class="pfw-panel-subtitle">Lavorazioni, sequenza, tempi e costi copiati</div></div>@if(ciclo.Attivo){<a asp-page="./Righe/Nuova" asp-route-idModelloCiclo="@ciclo.IdModelloCiclo" class="pfw-btn pfw-btn-primary">Nuova riga</a>}</div>
+@if (Model.Righe.Count == 0) { <div class="pfw-panel-body"><div class="pfw-secondary-text">Nessuna lavorazione registrata.</div></div> }
+else { <div class="table-responsive"><table class="table pfw-table align-middle mb-0"><thead><tr><th>Riga</th><th>Sequenza</th><th>Lavorazione</th><th>Setup</th><th>Tempo pezzo</th><th>Costo orario</th><th>Costo fisso</th><th class="text-end">Azioni</th></tr></thead><tbody>
+@foreach(var riga in Model.Righe){<tr><td>@riga.RigaNr</td><td>@riga.Sequenza</td><td><span class="fw-semibold">@riga.CodiceLavorazione</span><br /><span class="pfw-secondary-text">@riga.DescrizioneLavorazione</span></td><td>@riga.TempoSetupMin.ToString("N2") min</td><td>@riga.TempoPezzoMin.ToString("N4") min</td><td>@riga.CostoOrario.ToString("C4")</td><td>@riga.CostoFisso.ToString("C4")</td><td class="text-end"><a asp-page="./Righe/Modifica" asp-route-idModelloCiclo="@ciclo.IdModelloCiclo" asp-route-id="@riga.IdRigaModelloCiclo" class="pfw-btn pfw-btn-secondary">Modifica</a></td></tr>}
+</tbody></table></div> }
+</section>
+
+<section class="pfw-panel"><div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Allegati modello ciclo</h2><div class="pfw-panel-subtitle">Istruzioni, schede e documenti riferiti all'intero ciclo</div></div></div><div class="pfw-panel-body">
+@await Html.PartialAsync("~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml", new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel { TestoNuovo = "Nuovo allegato", UrlNuovo = $"/Allegati/Nuovo?Entita={AllegatoEntita.ModelliCiclo}&IdEntita={ciclo.IdModelloCiclo}&ReturnUrl={Uri.EscapeDataString(returnUrl)}", MostraNuovo = true, MostraAggiorna = false })
+@if(Model.Allegati.Allegati.Count == 0){<div class="pfw-secondary-text mt-3">Nessun allegato registrato.</div>}else{@await Html.PartialAsync("~/Pages/Shared/Allegati/_AllegatiGrid.cshtml", Model.Allegati)}
+</div></section>

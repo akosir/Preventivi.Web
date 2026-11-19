@@ -41,6 +41,13 @@
                 </div>
             </div>
             <div class="preventivi-actions">
+                @if (Model.Riga.IdArticolo.HasValue && !Model.RigaLibera
+                    && Model.Preventivo.Stato is ("Bozza" or "Da Verificare" or "Pronto da Inviare"))
+                {
+                    <a class="pfw-btn pfw-btn-secondary" asp-page="./AnteprimaDistinta"
+                       asp-route-idPreventivo="@Model.Riga.IdPreventivo"
+                       asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo">Controlla distinta</a>
+                }
                 <a class="pfw-btn pfw-btn-primary"
                    asp-page="/Preventivi/Riga/Modifica"
                    asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
@@ -57,6 +64,11 @@
         </div>
 
     </div>
+
+    @if (TempData["MessaggioSuccesso"] is string messaggio)
+    {
+        <div class="alert alert-success" role="status">@messaggio</div>
+    }
 
     <section class="pfw-panel">
 

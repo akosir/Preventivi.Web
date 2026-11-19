@@ -17,6 +17,7 @@ public class NuovoModel : PageModel
     private readonly IAllegatoApplicationService _applicationService;
     private readonly ICampionaturaRepository _campionaturaRepository;
     private readonly IArticoloRepository _articoloRepository;
+    private readonly IModelloCicloRepository _modelloCicloRepository;
     private readonly IDistintaBaseRepository _distintaBaseRepository;
     private readonly ILogger<NuovoModel> _logger;
 
@@ -25,6 +26,7 @@ public class NuovoModel : PageModel
         IAllegatoApplicationService applicationService,
         ICampionaturaRepository campionaturaRepository,
         IArticoloRepository articoloRepository,
+        IModelloCicloRepository modelloCicloRepository,
         IDistintaBaseRepository distintaBaseRepository,
         ILogger<NuovoModel> logger)
     {
@@ -32,6 +34,7 @@ public class NuovoModel : PageModel
         _applicationService = applicationService;
         _campionaturaRepository = campionaturaRepository;
         _articoloRepository = articoloRepository;
+        _modelloCicloRepository = modelloCicloRepository;
         _distintaBaseRepository = distintaBaseRepository;
         _logger = logger;
     }
@@ -72,6 +75,11 @@ public class NuovoModel : PageModel
             return NotFound();
         }
 
+        if (!await EntitaModificabileAsync(cancellationToken))
+        {
+            return Forbid();
+        }
+
         Form.TipiAllegato =
     await _allegatoRepository.GetTipiAsync(
         cancellationToken);
@@ -104,6 +112,10 @@ public class NuovoModel : PageModel
             ModelState.AddModelError(
                 string.Empty,
                 "L'elemento indicato non esiste.");
+        }
+        else if (!await EntitaModificabileAsync(cancellationToken))
+        {
+            return Forbid();
         }
 
         if (string.IsNullOrWhiteSpace(Form.TipoAllegato))
@@ -210,6 +222,11 @@ public class NuovoModel : PageModel
                     });
             }
 
+            if (Entita == AllegatoEntita.ModelliCiclo)
+            {
+                return RedirectToPage("/Anagrafiche/ModelliCiclo/Dettaglio", new { id = IdEntita });
+            }
+
             if (Entita == AllegatoEntita.DistintaBaseNodi)
             {
                 return RedirectToPage("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id = IdEntita });
@@ -290,6 +307,8 @@ public class NuovoModel : PageModel
                 await _campionaturaRepository.GetAdeguamentoAsync(IdEntita, cancellationToken) is not null,
             AllegatoEntita.Articoli =>
                 await _articoloRepository.GetDettaglioAsync(IdEntita, cancellationToken) is not null,
+            AllegatoEntita.ModelliCiclo =>
+                await _modelloCicloRepository.GetDettaglioAsync(IdEntita, cancellationToken) is not null,
             AllegatoEntita.DistintaBaseNodi =>
                 await _distintaBaseRepository.GetNodoAsync(IdEntita, cancellationToken) is not null,
             AllegatoEntita.DistintaMateriali =>
@@ -298,5 +317,47 @@ public class NuovoModel : PageModel
                 await _distintaBaseRepository.GetLavorazioneAsync(IdEntita, cancellationToken) is not null,
             _ => true
         };
+    }
+
+    private async Task<bool> EntitaModificabileAsync(CancellationToken cancellationToken)
+    {
+        DistintaNodoDettaglio? nodo = Entita switch
+        {
+            AllegatoEntita.DistintaBaseNodi =>
+                await _distintaBaseRepository.GetNodoAsync(IdEntita, cancellationToken),
+            AllegatoEntita.DistintaMateriali =>
+                await GetNodoMaterialeAsync(cancellationToken),
+            AllegatoEntita.DistintaLavorazioni =>
+                await GetNodoLavorazioneAsync(cancellationToken),
+            _ => null
+        };
+
+        return nodo?.RevisioneModificabile ?? true;
+    }
+
+    private async Task<DistintaNodoDettaglio?> GetNodoMaterialeAsync(
+        CancellationToken cancellationToken)
+    {
+        var materiale = await _distintaBaseRepository.GetMaterialeAsync(
+            IdEntita,
+            cancellationToken);
+        return materiale is null
+            ? null
+            : await _distintaBaseRepository.GetNodoAsync(
+                materiale.IdNodoDistinta,
+                cancellationToken);
+    }
+
+    private async Task<DistintaNodoDettaglio?> GetNodoLavorazioneAsync(
+        CancellationToken cancellationToken)
+    {
+        var lavorazione = await _distintaBaseRepository.GetLavorazioneAsync(
+            IdEntita,
+            cancellationToken);
+        return lavorazione is null
+            ? null
+            : await _distintaBaseRepository.GetNodoAsync(
+                lavorazione.IdNodoDistinta,
+                cancellationToken);
     }
 }

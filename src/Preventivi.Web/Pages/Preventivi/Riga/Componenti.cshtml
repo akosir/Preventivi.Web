@@ -84,7 +84,8 @@
                                 <label class="form-label" for="IdArticoloSelezionato">Articolo</label>
                                 <select class="form-select"
                                         id="IdArticoloSelezionato"
-                                        name="IdArticoloSelezionato">
+                                        name="IdArticoloSelezionato"
+                                        onchange="this.form.querySelector('[name=IdNodoDistintaSelezionato]')?.remove(); this.form.requestSubmit();">
                                     <option value="">Seleziona...</option>
                                     @foreach (var articolo in Model.Articoli)
                                     {
@@ -109,7 +110,8 @@
                                     <label class="form-label" for="IdNodoDistintaSelezionato">Nodo distinta</label>
                                     <select class="form-select"
                                             id="IdNodoDistintaSelezionato"
-                                            name="IdNodoDistintaSelezionato">
+                                            name="IdNodoDistintaSelezionato"
+                                            onchange="this.form.requestSubmit();">
                                         <option value="">Seleziona nodo...</option>
                                         @foreach (var nodo in Model.NodiDistinta)
                                         {

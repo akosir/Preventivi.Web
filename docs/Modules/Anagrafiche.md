@@ -24,7 +24,12 @@ Il quarto pacchetto aggiunge:
 - allegati di nodi, materiali e lavorazioni della distinta;
 - report PDF scaricabile dell'esplosione della distinta.
 
-Entrambe le gestioni espongono ricerca per testo e stato, dettaglio, nuovo,
+Il quinto pacchetto aggiunge:
+
+- modelli ciclo e relative righe di lavorazione;
+- allegati della testata del modello ciclo mediante MB-01.
+
+Le gestioni espongono ricerca per testo e stato, dettaglio, nuovo,
 modifica, attivazione o disattivazione ed eliminazione controllata.
 
 ## Regole operative
@@ -68,6 +73,29 @@ modifica, attivazione o disattivazione ed eliminazione controllata.
 - Il report PDF della distinta espone gerarchia, quantita, materiali,
   lavorazioni e valori economici memorizzati. Non introduce formule di
   esplosione quantitativa o ricalcoli economici ulteriori.
+- Le righe dei modelli ciclo copiano lavorazione, tempi e costi come valori
+  modificabili. Le variazioni successive dell'anagrafica Lavorazioni non
+  aggiornano retroattivamente le righe gia presenti.
+- Un modello ciclo referenziato, contenente righe o allegati non puo essere
+  eliminato fisicamente e deve essere disattivato. Non sono previste
+  cancellazioni a cascata.
+- Gli allegati usano la chiave tecnica `ModelliCiclo` e appartengono alla sola
+  testata. Applicazione ai preventivi e importazione massiva restano escluse.
+- Il repository predispone una testata autonoma della distinta e revisioni
+  numerate negli stati `Bozza`, `Pubblicata` e `Superata`, con una sola
+  revisione pubblicata per distinta. L'attivazione richiede l'applicazione
+  dello script `TEC-016_06_Distinte_Revisioni.sql`.
+- La duplicazione completa rimappa la gerarchia e crea copie indipendenti di
+  nodi, materiali, lavorazioni e allegati in una nuova bozza.
+- L'importazione massiva opera tramite modello Excel, anteprima, validazione
+  per riga e applicazione transazionale su una revisione in bozza vuota. Il
+  database ripete le verifiche, usa `rowversion`, registra nome e SHA-256 del
+  file e impedisce di importare due volte lo stesso contenuto nella revisione.
+  Gli allegati sono esclusi dall'importazione.
+- L'applicazione ai nuovi preventivi dovra creare uno snapshot operativo della
+  revisione pubblicata basato su `IdRigaCompPrev`. Gli aggiornamenti di
+  preventivi esistenti non saranno automatici e richiederanno anteprima,
+  conferma e controlli sui riferimenti operativi.
 
 ## Sicurezza
 
@@ -100,6 +128,43 @@ Quarto aggiornamento:
 `database/06_Aggiornamenti/TEC-016_04_Distinte_Base.sql`
 
 Versione prevista: `2026110501` (`TEC-016-DISTINTE-BASE`).
+
+Quinto aggiornamento:
+
+`database/06_Aggiornamenti/TEC-016_05_Modelli_Ciclo.sql`
+
+Versione prevista: `2026111201` (`TEC-016-MODELLI-CICLO`).
+
+Sesto aggiornamento:
+
+`database/06_Aggiornamenti/TEC-016_06_Distinte_Revisioni.sql`
+
+Versione: `2026111202` (`TEC-016-DISTINTE-REVISIONI`). Introduce
+revisioni e duplicazione completa; non implementa importazione massiva o
+applicazione ai preventivi. Il 13 novembre 2026, dopo la correzione del batch
+di migrazione, l'utente ha riferito di aver applicato lo script senza errori
+sul database di test; non e stata eseguita una verifica indipendente del
+registro `VersioniSchema`. La verifica statica ha ottenuto compilazione con
+zero errori, 69 test Data e 67 test Web superati, validazione ScriptDom del
+batch esterno e dei 27 batch dinamici e corrispondenza dell'impronta SHA-256
+del payload. Il collaudo runtime comunicato dall'utente ha verificato
+migrazione, consultazione della revisione pubblicata, duplicazione completa in
+bozza, pubblicazione e superamento della revisione precedente, immutabilita,
+PDF revisionato e indipendenza degli allegati. Il blocco 331–333 risulta
+collaudato; l'applicazione ai preventivi resta esclusa.
+
+Settimo aggiornamento:
+
+`database/06_Aggiornamenti/TEC-016_07_Distinte_Importazione_Massiva.sql`
+
+Versione: `2026111203` (`TEC-016-DISTINTE-IMPORTAZIONE`). Predispone i tipi
+tabellari, il registro di audit e la procedura transazionale per il blocco
+334. Nel repository sono presenti download del modello Excel, caricamento,
+anteprima ed errori riferiti a foglio, riga e campo. La verifica statica ha
+ottenuto compilazione con zero errori, 69 test Data e 70 test Web superati,
+validazione ScriptDom del batch esterno e dei quattro batch dinamici e
+corrispondenza dell'impronta SHA-256 dichiarata. Lo script non risulta ancora
+applicato al database e il flusso non e stato collaudato a runtime.
 
 Lo script e stato applicato dall'utente sull'ambiente di test il 3 novembre
 2026 senza errori segnalati. Il collaudo applicativo e stato completato con
@@ -136,3 +201,17 @@ grafico. Il 10 novembre 2026 l'utente ha completato con esito positivo il
 collaudo runtime della nuova visualizzazione ad albero, del menu organizzato
 secondo il flusso operativo e del download PDF con i dati del database di
 test.
+
+Il quinto aggiornamento e stato applicato dall'utente al database di test il
+12 novembre 2026 senza errori segnalati. Non e stata eseguita una verifica
+indipendente del registro `VersioniSchema`. La soluzione compila con zero
+errori; sono stati superati 68 test Data e 67 test Web. ScriptDom ha validato
+lo script esterno e tutti i 23 batch dinamici; l'impronta SHA-256 dichiarata
+coincide con il payload normalizzato. Il collaudo runtime ha verificato con
+esito positivo disattivazione, riattivazione ed eliminazione controllata della
+testata. Sono state inoltre verificate creazione, modifica ed eliminazione
+delle righe, proposta dei valori dalla lavorazione e blocco del numero riga
+duplicato. Il collaudo conclusivo ha verificato upload, apertura, download ed eliminazione
+degli allegati della testata e il blocco dell'eliminazione del modello finche
+possiede allegati. Il quinto pacchetto risulta quindi collaudato per l'ambito
+approvato dalle decisioni 326–330.

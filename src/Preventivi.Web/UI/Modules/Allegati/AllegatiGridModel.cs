@@ -8,4 +8,6 @@ public sealed class AllegatiGridModel
         = Array.Empty<AllegatoListItem>();
 
     public string? ReturnUrl { get; init; }
+
+    public bool MostraElimina { get; init; } = true;
 }

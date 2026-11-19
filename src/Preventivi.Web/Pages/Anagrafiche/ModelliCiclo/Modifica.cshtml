@@ -1,0 +1,5 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.ModelliCiclo.ModificaModel
+@{ ViewData["Title"] = "Modifica modello ciclo"; }
+<div class="mb-3"><div class="pfw-secondary-text mb-1"><a asp-page="./Dettaglio" asp-route-id="@Model.IdModelloCiclo">Modello ciclo</a></div><h1 class="h3 mb-1">Modifica modello ciclo</h1></div>
+<section class="pfw-panel"><div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati modello</h2><div class="pfw-panel-subtitle">Aggiornamento soggetto a controllo di concorrenza</div></div></div><form method="post"><div class="pfw-panel-body">@await Html.PartialAsync("~/Pages/Shared/Anagrafiche/_ModelloCicloForm.cshtml", Model.Dati)</div><div class="pfw-panel-footer d-flex justify-content-end gap-2"><a asp-page="./Dettaglio" asp-route-id="@Model.IdModelloCiclo" class="pfw-btn pfw-btn-secondary">Annulla</a><button type="submit" class="pfw-btn pfw-btn-primary">Salva</button></div></form></section>

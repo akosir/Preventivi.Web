@@ -15,25 +15,27 @@ public sealed class NuovoModel : PageModel
 
     [BindProperty] public DistintaNodoFormModel Dati { get; set; } = new();
     public ArticoloDettaglio? Articolo { get; private set; }
+    public DistintaRevisioneDettaglio? Revisione { get; private set; }
     public DistintaNodoDettaglio? Padre { get; private set; }
 
-    public async Task<IActionResult> OnGetAsync(int idArticolo, int? idPadre, CancellationToken cancellationToken)
+    public async Task<IActionResult> OnGetAsync(int idArticolo, int idRevisione, int? idPadre, CancellationToken cancellationToken)
     {
-        if (!await CaricaAsync(idArticolo, idPadre, cancellationToken)) return NotFound();
+        if (!await CaricaAsync(idArticolo, idRevisione, idPadre, cancellationToken)) return NotFound();
         Dati.IdNodoPadre = idPadre;
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(int idArticolo, int? idPadre, CancellationToken cancellationToken)
+    public async Task<IActionResult> OnPostAsync(int idArticolo, int idRevisione, int? idPadre, CancellationToken cancellationToken)
     {
-        if (!await CaricaAsync(idArticolo, idPadre, cancellationToken)) return NotFound();
+        if (!await CaricaAsync(idArticolo, idRevisione, idPadre, cancellationToken)) return NotFound();
         Dati.IdNodoPadre = idPadre;
         if (!ModelState.IsValid) return Page();
         try
         {
             var id = await _repository.CreaNodoAsync(new DistintaNodoCreateModel
             {
-                IdArticolo = idArticolo, IdNodoPadre = idPadre, IdTipoNodo = Dati.IdTipoNodo!.Value,
+                IdArticolo = idArticolo, IdRevisioneDistinta = idRevisione,
+                IdNodoPadre = idPadre, IdTipoNodo = Dati.IdTipoNodo!.Value,
                 CodiceNodo = Dati.CodiceNodo, DescrizioneNodo = Dati.DescrizioneNodo,
                 QuantitaBase = Dati.QuantitaBase, OrdineVisualizzazione = Dati.OrdineVisualizzazione,
                 Note = Dati.Note, Utente = User.Identity?.Name ?? "Sistema"
@@ -49,15 +51,17 @@ public sealed class NuovoModel : PageModel
         }
     }
 
-    private async Task<bool> CaricaAsync(int idArticolo, int? idPadre, CancellationToken cancellationToken)
+    private async Task<bool> CaricaAsync(int idArticolo, int idRevisione, int? idPadre, CancellationToken cancellationToken)
     {
         if (idArticolo <= 0) return false;
         Articolo = await _articoli.GetDettaglioAsync(idArticolo, cancellationToken);
         if (Articolo is null) return false;
+        Revisione = await _repository.GetRevisioneAsync(idRevisione, cancellationToken);
+        if (Revisione is null || Revisione.IdArticolo != idArticolo || !Revisione.Modificabile) return false;
         if (idPadre is > 0)
         {
             Padre = await _repository.GetNodoAsync(idPadre.Value, cancellationToken);
-            if (Padre is null || Padre.IdArticolo != idArticolo) return false;
+            if (Padre is null || Padre.IdArticolo != idArticolo || Padre.IdRevisioneDistinta != idRevisione) return false;
         }
         ViewData["TipiNodo"] = await _repository.GetTipiNodoAsync(cancellationToken: cancellationToken);
         ViewData["ConsentiPadre"] = false;

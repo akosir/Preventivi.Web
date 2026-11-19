@@ -15,4 +15,11 @@ public interface IAllegatoApplicationService
     Task EliminaAsync(
         int idAllegato,
         CancellationToken cancellationToken = default);
+
+    Task<int> DuplicaAsync(
+        int idAllegatoSorgente,
+        string entitaDestinazione,
+        int idEntitaDestinazione,
+        string utente,
+        CancellationToken cancellationToken = default);
 }

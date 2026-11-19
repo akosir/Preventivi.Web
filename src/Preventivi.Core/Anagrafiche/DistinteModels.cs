@@ -9,6 +9,116 @@ public sealed class DistintaArticoloListItem
     public bool Attivo { get; set; }
     public int NumeroNodiAttivi { get; set; }
     public int NumeroNodiTotali { get; set; }
+    public int NumeroRevisioni { get; set; }
+    public int? IdRevisionePubblicata { get; set; }
+    public int? NumeroRevisionePubblicata { get; set; }
+    public int? IdRevisioneBozza { get; set; }
+    public int? NumeroRevisioneBozza { get; set; }
+}
+
+public static class DistintaRevisioneStati
+{
+    public const string Bozza = "Bozza";
+    public const string Pubblicata = "Pubblicata";
+    public const string Superata = "Superata";
+}
+
+public class DistintaRevisioneListItem
+{
+    public int IdRevisioneDistinta { get; set; }
+    public int IdDistintaBase { get; set; }
+    public int IdArticolo { get; set; }
+    public string CodiceArticolo { get; set; } = string.Empty;
+    public string DescrizioneArticolo { get; set; } = string.Empty;
+    public int NumeroRevisione { get; set; }
+    public string Stato { get; set; } = string.Empty;
+    public string? Note { get; set; }
+    public DateTime? DataPubblicazione { get; set; }
+    public int NumeroNodi { get; set; }
+    public bool Modificabile => string.Equals(Stato, DistintaRevisioneStati.Pubblicata, StringComparison.OrdinalIgnoreCase);
+}
+
+public sealed class DistintaRevisioneDettaglio : DistintaRevisioneListItem
+{
+    public DateTime DataCreazione { get; set; }
+    public DateTime? DataModifica { get; set; }
+    public string UtenteCreazione { get; set; } = string.Empty;
+    public string? UtenteModifica { get; set; }
+    public byte[] VersioneRiga { get; set; } = [];
+}
+
+public sealed class DistintaRevisioneCreateModel
+{
+    public int IdArticolo { get; init; }
+    public string? Note { get; init; }
+    public string Utente { get; init; } = string.Empty;
+}
+
+public sealed class DistintaRevisionePubblicaModel
+{
+    public int IdRevisioneDistinta { get; init; }
+    public string Motivazione { get; init; } = string.Empty;
+    public string Utente { get; init; } = string.Empty;
+    public byte[] VersioneRiga { get; init; } = [];
+}
+
+public sealed class DistintaRevisioneDuplicazioneRequest
+{
+    public int IdRevisioneSorgente { get; init; }
+    public int IdArticoloDestinazione { get; init; }
+    public string? Note { get; init; }
+    public string Utente { get; init; } = string.Empty;
+}
+
+public sealed class DistintaImportazioneNodo
+{
+    public int RigaExcel { get; init; }
+    public string ChiaveNodo { get; init; } = string.Empty;
+    public string? ChiavePadre { get; init; }
+    public string TipoNodo { get; init; } = string.Empty;
+    public string? CodiceNodo { get; init; }
+    public string DescrizioneNodo { get; init; } = string.Empty;
+    public decimal QuantitaBase { get; init; }
+    public int OrdineVisualizzazione { get; init; }
+    public bool Attivo { get; init; }
+    public string? Note { get; init; }
+}
+
+public sealed class DistintaImportazioneMateriale
+{
+    public int RigaExcel { get; init; }
+    public string ChiaveNodo { get; init; } = string.Empty;
+    public string CodiceMateriale { get; init; } = string.Empty;
+    public decimal Quantita { get; init; }
+    public decimal CoeffScartoPerc { get; init; }
+    public decimal CostoUnitario { get; init; }
+    public string? Note { get; init; }
+}
+
+public sealed class DistintaImportazioneLavorazione
+{
+    public int RigaExcel { get; init; }
+    public string ChiaveNodo { get; init; } = string.Empty;
+    public string CodiceLavorazione { get; init; } = string.Empty;
+    public int Sequenza { get; init; }
+    public decimal TempoSetupMin { get; init; }
+    public decimal TempoPezzoMin { get; init; }
+    public decimal CostoOrario { get; init; }
+    public decimal CostoFisso { get; init; }
+    public string? Note { get; init; }
+}
+
+public sealed class DistintaImportazioneRequest
+{
+    public Guid IdImportazione { get; init; }
+    public int IdRevisioneDistinta { get; init; }
+    public string NomeFile { get; init; } = string.Empty;
+    public string ImprontaSha256 { get; init; } = string.Empty;
+    public string Utente { get; init; } = string.Empty;
+    public byte[] VersioneRiga { get; init; } = [];
+    public IReadOnlyList<DistintaImportazioneNodo> Nodi { get; init; } = [];
+    public IReadOnlyList<DistintaImportazioneMateriale> Materiali { get; init; } = [];
+    public IReadOnlyList<DistintaImportazioneLavorazione> Lavorazioni { get; init; } = [];
 }
 
 public sealed class TipoNodoDistintaLookupItem
@@ -21,6 +131,9 @@ public sealed class TipoNodoDistintaLookupItem
 public class DistintaNodoItem
 {
     public int IdNodoDistinta { get; set; }
+    public int IdRevisioneDistinta { get; set; }
+    public int NumeroRevisione { get; set; }
+    public string StatoRevisione { get; set; } = string.Empty;
     public int IdArticolo { get; set; }
     public string CodiceArticolo { get; set; } = string.Empty;
     public string DescrizioneArticolo { get; set; } = string.Empty;
@@ -35,6 +148,7 @@ public class DistintaNodoItem
     public bool Attivo { get; set; }
     public string PercorsoCompleto { get; set; } = string.Empty;
     public string Display => $"{new string(' ', Livello * 2)}{(string.IsNullOrWhiteSpace(CodiceNodo) ? string.Empty : $"{CodiceNodo} - ")}{DescrizioneNodo}";
+    public bool RevisioneModificabile => string.Equals(StatoRevisione, DistintaRevisioneStati.Pubblicata, StringComparison.OrdinalIgnoreCase);
 }
 
 public sealed class DistintaNodoDettaglio : DistintaNodoItem
@@ -50,6 +164,7 @@ public sealed class DistintaNodoDettaglio : DistintaNodoItem
 public class DistintaNodoCreateModel
 {
     public int IdArticolo { get; init; }
+    public int IdRevisioneDistinta { get; init; }
     public int? IdNodoPadre { get; init; }
     public int IdTipoNodo { get; init; }
     public string? CodiceNodo { get; init; }
@@ -58,6 +173,8 @@ public class DistintaNodoCreateModel
     public int OrdineVisualizzazione { get; init; }
     public string? Note { get; init; }
     public string Utente { get; init; } = string.Empty;
+    public bool ConsentiTipoNodoNonAttivo { get; init; }
+    public int? IdNodoRevisioneOrigine { get; init; }
 }
 
 public sealed class DistintaNodoUpdateModel : DistintaNodoCreateModel
@@ -119,6 +236,7 @@ public class DistintaMaterialeCreateModel
     public decimal CostoUnitario { get; init; }
     public string? Note { get; init; }
     public string Utente { get; init; } = string.Empty;
+    public bool ConsentiAnagraficaNonAttiva { get; init; }
 }
 
 public sealed class DistintaMaterialeUpdateModel : DistintaMaterialeCreateModel
@@ -162,6 +280,7 @@ public sealed class DistintaLavorazioneDettaglio
 
 public class DistintaLavorazioneCreateModel
 {
+    public int? IdModelloCiclo { get; init; }
     public int IdNodoDistinta { get; init; }
     public int IdLavorazione { get; init; }
     public int Sequenza { get; init; }
@@ -171,6 +290,7 @@ public class DistintaLavorazioneCreateModel
     public decimal CostoFisso { get; init; }
     public string? Note { get; init; }
     public string Utente { get; init; } = string.Empty;
+    public bool ConsentiAnagraficaNonAttiva { get; init; }
 }
 
 public sealed class DistintaLavorazioneUpdateModel : DistintaLavorazioneCreateModel

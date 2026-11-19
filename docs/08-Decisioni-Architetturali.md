@@ -1717,6 +1717,208 @@ runtime della nuova visualizzazione ad albero della distinta, del menu
 organizzato secondo il flusso operativo e del report PDF scaricabile con i
 dati del database di test.
 
+Il quinto pacchetto, approvato il 12 novembre 2026, stabilisce:
+
+- **326:** realizzare nell'area Anagrafiche la gestione completa dei modelli
+  ciclo, con ricerca, dettaglio, nuovo, modifica, stato ed eliminazione
+  controllata, protetta dal permesso `frmAnagrafiche`;
+- **327:** gestire sulla testata codice univoco obbligatorio, descrizione
+  obbligatoria, note e stato attivo, aggiungendo audit e controllo di
+  concorrenza tramite `rowversion`;
+- **328:** comporre il modello mediante righe ordinate che selezionano una
+  lavorazione e copiano numero riga, sequenza, tempi e costi come valori non
+  negativi e modificabili, senza aggiornamenti retroattivi. Anche le righe
+  utilizzano audit e `rowversion`;
+- **329:** consentire l'eliminazione fisica soltanto in assenza di righe,
+  allegati e riferimenti da distinte, modelli preventivo e preventivi. Non sono
+  ammesse cancellazioni a cascata; i riferimenti storici inattivi restano
+  visibili e non sono selezionabili per nuovi inserimenti;
+- **330:** integrare MB-01 sulla sola testata con chiave tecnica
+  `ModelliCiclo`. Allegati sulle righe, applicazione automatica ai preventivi,
+  procedura storica `sp_ApplicaModelloCicloARigaPreventivo` e importazione
+  massiva restano fuori dal pacchetto.
+
+**Stato del quinto pacchetto al 12 novembre 2026**
+
+Le decisioni 326–330 sono approvate e la relativa implementazione e stata
+autorizzata. Nel repository sono predisposti contratto Core, repository
+ADO.NET, pagine Razor per testata e righe, integrazione allegati e script
+incrementale `TEC-016_05_Modelli_Ciclo.sql`, versione `2026111201`. L'utente ha
+riferito di aver applicato lo script al database di test senza errori il 12
+novembre 2026; non e stata eseguita una verifica indipendente del registro
+`VersioniSchema`. La soluzione compila con zero errori e sono stati superati
+68 test Data e 67 test Web. ScriptDom ha validato lo script esterno e tutti i
+23 batch dinamici; l'impronta SHA-256 dichiarata coincide con il payload
+normalizzato. Il collaudo runtime ha verificato con esito positivo
+disattivazione, riattivazione ed eliminazione controllata della testata. Il
+collaudo delle righe ha verificato creazione, valori proposti dalla
+lavorazione, modifica di tempi e costi, blocco del numero riga duplicato ed
+eliminazione. Il collaudo conclusivo ha verificato upload, apertura, download ed eliminazione
+degli allegati della testata e il blocco dell'eliminazione del modello in
+presenza di allegati. Il quinto pacchetto TEC-016 risulta quindi collaudato per
+l'ambito approvato dalle decisioni 326–330.
+
+Il sesto pacchetto, approvato il 12 novembre 2026, stabilisce:
+
+- **331:** introdurre una testata autonoma della distinta base, collegata
+  all'articolo, e revisioni numerate. Le distinte attuali devono essere migrate
+  senza perdita di dati come revisione iniziale; nodi, materiali e lavorazioni
+  devono appartenere alla specifica revisione. Per ogni distinta puo esistere
+  una sola revisione pubblicata utilizzabile nei nuovi preventivi;
+- **332:** gestire le revisioni negli stati `Bozza`, `Pubblicata` e `Superata`.
+  La bozza e modificabile, la revisione pubblicata e immutabile e la precedente
+  diventa superata nella stessa transazione quando viene pubblicata la nuova.
+  Il cambio di stato e riservato ad `ADMIN`, con motivazione e audit secondo la
+  regola generale approvata per gli stati procedurali;
+- **333:** consentire la duplicazione completa in una nuova revisione della
+  stessa distinta oppure nella distinta di un altro articolo. Devono essere
+  creati nuovi identificativi e rimappate le relazioni padre-figlio, copiando
+  albero, materiali, lavorazioni, valori tecnici ed economici e allegati come
+  file fisicamente indipendenti. Audit, `rowversion` e stato pubblicato non
+  vengono copiati e la destinazione nasce sempre in `Bozza`;
+- **334:** introdurre un'importazione massiva mediante modello Excel per nodi,
+  materiali e lavorazioni, con chiavi esplicite per la gerarchia. Sono
+  obbligatorie anteprima, validazione per riga, applicazione transazionale su
+  una revisione in bozza, audit del file e protezione dalla ripetizione dello
+  stesso contenuto. Gli allegati restano esclusi dall'importazione massiva;
+- **335:** alla creazione o selezione di una riga preventivo di tipo articolo,
+  applicare automaticamente uno snapshot della revisione pubblicata usando
+  `IdRigaCompPrev` e `IdRigaCompPrevPadre` come identita e gerarchia operative.
+  Materiali e lavorazioni devono appartenere esclusivamente al componente e
+  conservare i riferimenti alla distinta e revisione d'origine. I preventivi
+  esistenti non vengono aggiornati automaticamente: l'aggiornamento richiede
+  anteprima, conferma, conservazione degli elementi manuali e assenza di
+  vincoli operativi incompatibili. Le procedure storiche di esplosione e
+  rigenerazione non devono essere riutilizzate senza riscrittura coerente con
+  TEC-001.
+
+Per la decisione 335 è approvata la seguente regola. Se un componente
+importato non è più presente nella revisione di destinazione e contiene
+figli, materiali o lavorazioni inseriti manualmente, l'aggiornamento si
+blocca. L'anteprima indica il componente e gli elementi da ricollocare.
+L'operatore li ricolloca prima di richiedere una nuova anteprima.
+
+**Stato del sesto pacchetto al 13 novembre 2026**
+
+Le decisioni 331–335 sono approvate. Sono state autorizzate e predisposte nel
+repository le implementazioni del primo blocco, relativo alle decisioni
+331–333, e del blocco 334: testata autonoma, revisioni, pubblicazione
+amministrativa, immutabilita, duplicazione completa con copie indipendenti
+degli allegati e importazione massiva da Excel.
+Lo script incrementale e
+`database/06_Aggiornamenti/TEC-016_06_Distinte_Revisioni.sql`, versione
+`2026111202`, codice `TEC-016-DISTINTE-REVISIONI`. Dopo la correzione del
+riferimento alla nuova colonna nel batch di migrazione, l'utente ha riferito
+di aver applicato lo script senza errori sul database di test. Non e stata
+eseguita una verifica indipendente del registro `VersioniSchema`. La soluzione
+compila con zero errori; sono stati superati 69 test Data e 67 test Web.
+ScriptDom ha validato il batch esterno e tutti i 27 batch dinamici;
+l'impronta SHA-256 dichiarata coincide con il payload normalizzato. Il
+collaudo runtime comunicato dall'utente ha verificato: migrazione della
+distinta esistente in revisione iniziale pubblicata, consultazione senza
+azioni di modifica, duplicazione in nuova bozza con albero, materiali,
+lavorazioni e allegati, pubblicazione amministrativa, passaggio della
+precedente revisione a `Superata`, immutabilita della revisione pubblicata,
+PDF revisionato e indipendenza fisica degli allegati fra sorgente e copia. Il
+blocco relativo alle decisioni 331–333 risulta collaudato.
+
+Per la decisione 334 il repository contiene il modello Excel generato con i
+lookup correnti, la pagina di caricamento e anteprima, la validazione per
+foglio/riga/campo e l'applicazione transazionale limitata a una revisione
+`Bozza` vuota. Il file viene riletto e validato alla conferma; il database
+ricontrolla gerarchia, anagrafiche, duplicati e concorrenza, registra nome e
+SHA-256 del file e impedisce la ripetizione dello stesso contenuto nella
+revisione. Gli allegati restano esclusi. Lo script incrementale e
+`database/06_Aggiornamenti/TEC-016_07_Distinte_Importazione_Massiva.sql`,
+versione `2026111203`, codice `TEC-016-DISTINTE-IMPORTAZIONE`. La verifica
+statica ha ottenuto compilazione con zero errori, 69 test Data e 70 test Web
+superati, validazione ScriptDom del batch esterno e dei quattro batch dinamici
+e corrispondenza dell'impronta SHA-256. Lo script non risulta ancora applicato
+al database durante lo sviluppo. L'utente ha successivamente confermato
+il collaudo dell'importazione di due nodi, un materiale e una lavorazione.
+
+Per la decisione 335 lo script preparatorio
+`TEC-016_08_Continuita_Nodi.sql` assegna una chiave di continuità ai nodi.
+La copia verso una nuova revisione dello stesso articolo mantiene questa
+chiave. I nodi delle revisioni già presenti ricevono chiavi indipendenti,
+poiché manca una relazione di origine affidabile.
+
+Lo script `TEC-016_09_Snapshot_Iniziale.sql` predispone la copia iniziale
+della revisione pubblicata alla creazione della riga articolo o alla
+selezione di un nuovo articolo su una riga priva di contenuti operativi.
+Le copie conservano la provenienza e il calcolo iniziale avviene nella
+transazione della riga. Restano da verificare su SQL Server il flusso di
+salvataggio e i ricalcoli dopo modifiche alle quantità. L'aggiornamento
+di una riga con contenuti passa dalla conferma esplicita. Il comando «Controlla revisione distinta» mostra dalla riga
+articolo gli elementi manuali da ricollocare. La procedura di sola lettura
+è installata dallo script `TEC-016_10_Anteprima_Snapshot.sql`, versione
+`2026111303`. Lo script `TEC-016_11_Applica_Snapshot.sql`, versione
+`2026111601`, verifica nuovamente la revisione, conserva gli elementi
+manuali tramite la chiave di continuità e ricalcola i totali nella stessa
+transazione. L'applicazione richiede un preventivo in bozza e si arresta
+in presenza di ordini fornitori collegati o allegati sullo snapshot da
+sostituire. Resta da collaudare il percorso in applicazione su SQL Server.
+
+### 5.20 Distinta corrente e aggiornamento del preventivo
+
+**Classificazione:** [D]. **Stato:** impostazione approvata, implementazione autorizzata.
+
+Le decisioni 331–335 restano nello storico. Le decisioni seguenti superano
+il flusso di creazione, duplicazione e pubblicazione delle revisioni per le
+modifiche ordinarie alla distinta dello stesso articolo.
+
+- **336 — Distinta corrente.** Ogni articolo ha una sola distinta corrente,
+  modificabile direttamente. Un indicatore tecnico distingue le versioni
+  dei dati ai fini del confronto con le copie salvate nel preventivo.
+- **337 — Avviso e scelta.** All'apertura in modifica di un preventivo in
+  `Bozza`, `Da Verificare` o `Pronto da Inviare`, l'applicazione segnala
+  le righe articolo interessate da modifiche alla distinta, incluse le righe
+  delle varianti. Per ciascuna l'operatore può aggiornare la distinta o
+  mantenere i dati correnti del preventivo. Gli altri stati sono esclusi
+  dall'aggiornamento della distinta.
+- **338 — Effetti economici.** La conferma applica la distinta corrente e
+  ricalcola nella stessa transazione quantità, costi, vendita e margini
+  della riga e i riepiloghi della variante e della testata interessati.
+  Il prezzo unitario manuale è preservato. Mantenere i dati attuali
+  conserva struttura e importi.
+- **339 — Elementi manuali.** Gli elementi inseriti nel preventivo vengono
+  conservati. Se un componente rimosso contiene figli, materiali o
+  lavorazioni aggiunti manualmente, l'avviso indica cosa ricollocare e
+  l'aggiornamento della riga resta bloccato.
+- **340 — Passaggio al nuovo modello.** La revisione pubblicata diventa
+  la distinta corrente. Le bozze esistenti richiedono una gestione
+  esplicita prima di ritirare il flusso di revisione. Le copie operative
+  dei preventivi esistenti vengono preservate.
+
+Il database di test consente di chiudere il flusso delle bozze di distinta
+senza recuperarle o fonderle. L'installazione finale da zero deve comprendere
+lo schema definitivo e soltanto i dati iniziali espressamente previsti negli
+script approvati, come materiali e lavorazioni già inclusi. I dati di prova
+non fanno parte dell'installazione.
+
+**Avanzamento dell'implementazione.** Gli script `TEC-016_13` e
+`TEC-016_14` introducono l'indicatore di modifica e la gestione diretta
+della distinta corrente. La struttura storica resta nel database per
+mantenere i riferimenti dei preventivi. Le bozze residue vengono archiviate
+come superate. Lo script `TEC-016_15` registra la versione usata dalle
+nuove copie della distinta e alimenta l'avviso nella modifica del preventivo.
+Per le copie storiche di cui non è nota la versione applicata, l'avviso
+richiede una verifica.
+
+**[C] Consolidamento del 19 novembre 2026.** Gli script `TEC-016_16` e
+`TEC-016_17` completano la conferma transazionale della distinta corrente
+e il ripristino della duplicazione su altro articolo, con allegati
+indipendenti. La versione richiesta dal codice è `2026111901`.
+Compilazione locale riuscita e 139 test automatici superati. Gli script
+nuovi sono stati verificati sintatticamente con ScriptDom.
+
+L'utente ha dichiarato applicati gli script e confermato i collaudi di
+mantenimento dei dati, aggiornamento con ricalcolo, blocco degli elementi
+manuali da ricollocare, aggiornamento dopo riattivazione del nodo,
+duplicazione e indipendenza degli allegati. Questi esiti runtime sono
+riferiti dall'utente. Il codice aggiorna anche la selezione del nodo in
+Nuovo componente e la combo Tipo materiale in Nuovo materiale libero.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

@@ -23,13 +23,15 @@ public sealed class DistintaBasePdfGenerator
 
     public byte[] Genera(
         ArticoloDettaglio articolo,
+        DistintaRevisioneDettaglio revisione,
         IReadOnlyList<DistintaBaseReportNodo> nodi,
         DateTimeOffset generatoIl)
     {
         ArgumentNullException.ThrowIfNull(articolo);
+        ArgumentNullException.ThrowIfNull(revisione);
         ArgumentNullException.ThrowIfNull(nodi);
 
-        var report = new ReportLayout(articolo, generatoIl);
+        var report = new ReportLayout(articolo, revisione, generatoIl);
         report.DisegnaTestataArticolo(nodi);
 
         if (nodi.Count == 0)
@@ -50,6 +52,7 @@ public sealed class DistintaBasePdfGenerator
     private sealed class ReportLayout
     {
         private readonly ArticoloDettaglio _articolo;
+        private readonly DistintaRevisioneDettaglio _revisione;
         private readonly DateTimeOffset _generatoIl;
         private readonly List<PdfPageCanvas> _pagine = [];
         private PdfPageCanvas _pagina = null!;
@@ -57,9 +60,11 @@ public sealed class DistintaBasePdfGenerator
 
         public ReportLayout(
             ArticoloDettaglio articolo,
+            DistintaRevisioneDettaglio revisione,
             DateTimeOffset generatoIl)
         {
             _articolo = articolo;
+            _revisione = revisione;
             _generatoIl = generatoIl;
             NuovaPagina();
         }
@@ -87,7 +92,7 @@ public sealed class DistintaBasePdfGenerator
             _pagina.Text(
                 Margin + 16f,
                 _y + 53f,
-                $"Versione: {versione}    Cliente: {Abbrevia(cliente, 42)}",
+                $"Versione articolo: {versione}    Revisione distinta: {_revisione.NumeroRevisione} ({_revisione.Stato})    Cliente: {Abbrevia(cliente, 24)}",
                 9f,
                 false,
                 Muted);
@@ -206,7 +211,7 @@ public sealed class DistintaBasePdfGenerator
                 pagina.Text(
                     Margin,
                     817f,
-                    $"Distinta base {_articolo.CodiceArticolo}",
+                    $"Distinta base {_articolo.CodiceArticolo} - Rev. {_revisione.NumeroRevisione}",
                     7f,
                     false,
                     Muted);

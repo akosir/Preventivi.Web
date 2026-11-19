@@ -60,9 +60,18 @@ public sealed class DistintaBasePdfGeneratorTests
                     }
                 ])
         };
+        var revisione = new DistintaRevisioneDettaglio
+        {
+            IdRevisioneDistinta = 20,
+            IdDistintaBase = 5,
+            IdArticolo = 2,
+            NumeroRevisione = 3,
+            Stato = DistintaRevisioneStati.Pubblicata
+        };
 
         var pdf = generatore.Genera(
             articolo,
+            revisione,
             nodi,
             new DateTimeOffset(2026, 11, 6, 12, 0, 0, TimeSpan.FromHours(1)));
 
@@ -70,6 +79,7 @@ public sealed class DistintaBasePdfGeneratorTests
         Assert.Equal("%PDF-1.4", Encoding.Latin1.GetString(pdf, 0, 8));
         var contenuto = Encoding.Latin1.GetString(pdf);
         Assert.Contains("Esplosione distinta base", contenuto);
+        Assert.Contains(@"Revisione distinta: 3 \(Pubblicata\)", contenuto);
         Assert.Contains("ESP_COMPLETO", contenuto);
         Assert.Contains("CARTA-01", contenuto);
         Assert.Contains("STAMPA", contenuto);

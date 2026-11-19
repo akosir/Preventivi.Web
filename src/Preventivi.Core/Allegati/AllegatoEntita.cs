@@ -9,6 +9,7 @@ public static class AllegatoEntita
     public const string CampionatureRilievi = "CampionatureRilievi";
     public const string CampionatureAdeguamenti = "CampionatureAdeguamenti";
     public const string Articoli = "Articoli";
+    public const string ModelliCiclo = "ModelliCiclo";
     public const string DistintaBaseNodi = "DistintaBaseNodi";
     public const string DistintaMateriali = "DistintaMateriali";
     public const string DistintaLavorazioni = "DistintaLavorazioni";
@@ -25,6 +26,7 @@ public static class AllegatoEntita
         CampionatureRilievi,
         CampionatureAdeguamenti,
         Articoli,
+        ModelliCiclo,
         DistintaBaseNodi,
         DistintaMateriali,
         DistintaLavorazioni,

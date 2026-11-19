@@ -19,6 +19,26 @@
         <h1 class="workspace-title">Modifica preventivo @Model.Preventivo.NumeroCompleto</h1>
     </div>
 
+    @if (Model.DistinteDaVerificare.Count > 0)
+    {
+        <section class="alert alert-warning" aria-labelledby="distinte-da-verificare">
+            <h2 id="distinte-da-verificare" class="h5">Distinte da verificare</h2>
+            <ul class="mb-0">
+                @foreach (var riga in Model.DistinteDaVerificare)
+                {
+                    <li>
+                        Riga @riga.RigaNr (@(riga.CodiceVariante is null ? "Preventivo base" : $"Variante {riga.CodiceVariante}"))
+                        · @riga.CodiceArticolo · @riga.DescrizioneVoce
+                        <a class="pfw-btn pfw-btn-secondary" asp-page="/Preventivi/Riga/AnteprimaDistinta"
+                           asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
+                           asp-route-idRigaPreventivo="@riga.IdRigaPreventivo">Controlla distinta</a>
+                        · @(riga.VersioneNota ? "Distinta modificata" : "Versione della copia da verificare")
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
     <section class="pfw-panel">
         <div class="pfw-panel-header">
             <div>

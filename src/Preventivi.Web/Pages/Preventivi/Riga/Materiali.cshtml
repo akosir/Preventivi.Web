@@ -146,10 +146,27 @@
                             <span asp-validation-for="NuovoMateriale.DescrizioneMateriale" class="text-danger"></span>
                         </div>
                         <div class="col-12 col-md-4">
-                            <label asp-for="NuovoMateriale.TipoMateriale" class="form-label"></label>
-                            <input asp-for="NuovoMateriale.TipoMateriale"
-                                   class="form-control"
-                                   readonly="@(Model.Origine != MaterialiModel.OrigineLibero)" />
+                            <label asp-for="NuovoMateriale.TipoMateriale" class="form-label">Tipo materiale</label>
+                            @if (Model.Origine == MaterialiModel.OrigineLibero)
+                            {
+                                <select asp-for="NuovoMateriale.TipoMateriale" class="form-select">
+                                    <option value="">Non specificato</option>
+                                    <option value="MateriaPrima">Materia prima</option>
+                                    <option value="Accessorio">Accessorio</option>
+                                    <option value="Semilavorato">Semilavorato</option>
+                                    @if (Model.NuovoMateriale.TipoMateriale is string tipoSalvato &&
+                                         !string.IsNullOrWhiteSpace(tipoSalvato) &&
+                                         tipoSalvato is not ("MateriaPrima" or "Accessorio" or "Semilavorato"))
+                                    {
+                                        <option value="@tipoSalvato">@tipoSalvato (valore precedente)</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <input asp-for="NuovoMateriale.TipoMateriale" class="form-control" readonly />
+                            }
+                            <span asp-validation-for="NuovoMateriale.TipoMateriale" class="text-danger"></span>
                         </div>
                         <div class="col-12 col-md-4">
                             <label asp-for="NuovoMateriale.Quantita" class="form-label"></label>

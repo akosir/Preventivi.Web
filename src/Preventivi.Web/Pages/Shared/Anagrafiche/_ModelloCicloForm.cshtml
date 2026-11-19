@@ -1,0 +1,21 @@
+@model global::Preventivi.Web.UI.Modules.Anagrafiche.ModelloCicloFormModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input asp-for="VersioneRigaBase64" type="hidden" />
+<div class="row g-3">
+    <div class="col-12 col-md-4">
+        <label asp-for="CodiceModelloCiclo" class="form-label">Codice modello ciclo *</label>
+        <input asp-for="CodiceModelloCiclo" class="form-control pfw-required" maxlength="50" />
+        <span asp-validation-for="CodiceModelloCiclo" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-8">
+        <label asp-for="Descrizione" class="form-label">Descrizione *</label>
+        <input asp-for="Descrizione" class="form-control pfw-required" maxlength="150" />
+        <span asp-validation-for="Descrizione" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Note" class="form-label">Note</label>
+        <textarea asp-for="Note" class="form-control" rows="5" maxlength="500"></textarea>
+        <span asp-validation-for="Note" class="text-danger"></span>
+    </div>
+</div>

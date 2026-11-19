@@ -17,6 +17,7 @@ public sealed class ModificaModel : PageModel
     public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
     {
         if (!await CaricaAsync(id, cancellationToken)) return NotFound();
+        if (!Nodo!.RevisioneModificabile) return Forbid();
         Dati = new DistintaNodoFormModel
         {
             IdNodoPadre = Nodo!.IdNodoPadre, IdTipoNodo = Nodo.IdTipoNodo, CodiceNodo = Nodo.CodiceNodo,
@@ -30,13 +31,15 @@ public sealed class ModificaModel : PageModel
     public async Task<IActionResult> OnPostAsync(int id, CancellationToken cancellationToken)
     {
         if (!await CaricaAsync(id, cancellationToken)) return NotFound();
+        if (!Nodo!.RevisioneModificabile) return Forbid();
         var versione = LeggiVersione();
         if (!ModelState.IsValid) return Page();
         try
         {
             await _repository.AggiornaNodoAsync(new DistintaNodoUpdateModel
             {
-                IdNodoDistinta = id, IdArticolo = Nodo!.IdArticolo, IdNodoPadre = Dati.IdNodoPadre,
+                IdNodoDistinta = id, IdArticolo = Nodo!.IdArticolo,
+                IdRevisioneDistinta = Nodo.IdRevisioneDistinta, IdNodoPadre = Dati.IdNodoPadre,
                 IdTipoNodo = Dati.IdTipoNodo!.Value, CodiceNodo = Dati.CodiceNodo,
                 DescrizioneNodo = Dati.DescrizioneNodo, QuantitaBase = Dati.QuantitaBase,
                 OrdineVisualizzazione = Dati.OrdineVisualizzazione, Note = Dati.Note,
@@ -59,7 +62,7 @@ public sealed class ModificaModel : PageModel
         Nodo = await _repository.GetNodoAsync(id, cancellationToken);
         if (Nodo is null) return false;
         ViewData["TipiNodo"] = await _repository.GetTipiNodoAsync(Nodo.IdTipoNodo, cancellationToken);
-        ViewData["NodiPadre"] = (await _repository.GetNodiAsync(Nodo.IdArticolo, cancellationToken)).Where(n => n.IdNodoDistinta != id && n.Attivo).ToArray();
+        ViewData["NodiPadre"] = (await _repository.GetNodiAsync(Nodo.IdRevisioneDistinta, cancellationToken)).Where(n => n.IdNodoDistinta != id && n.Attivo).ToArray();
         ViewData["ConsentiPadre"] = true;
         return true;
     }

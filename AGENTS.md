@@ -314,6 +314,61 @@ aggiornati retroattivamente dalle anagrafiche o propagati ai preventivi.
 dell'eliminazione fisica devono essere rimossi riferimenti, contenuti figli e
 allegati secondo le regole approvate.
 
+[D] E approvata l'evoluzione verso una testata autonoma della distinta con
+revisioni numerate negli stati `Bozza`, `Pubblicata` e `Superata`. Una sola
+revisione pubblicata per distinta puo alimentare i nuovi preventivi; le
+revisioni pubblicate sono immutabili e i cambi di stato sono riservati ad
+`ADMIN`, con motivazione e audit.
+
+[C] Il repository contiene l'implementazione applicativa e lo script
+incrementale delle decisioni 331–333 per testata, revisioni e duplicazione
+completa. L'utente ha riferito di avere applicato e collaudato il pacchetto
+nel database di test; il registro `VersioniSchema` non e stato verificato
+indipendentemente.
+
+[D] La duplicazione completa deve generare nuovi identificativi e rimappare la
+gerarchia, copiando nodi, materiali, lavorazioni, valori e allegati come file
+indipendenti in una nuova bozza. L'importazione massiva deve usare un modello
+Excel, anteprima e validazione per riga, applicazione transazionale e controllo
+dei duplicati; gli allegati non fanno parte dell'importazione massiva.
+
+[D] L'applicazione della distinta a una nuova riga articolo crea uno snapshot
+operativo basato su `IdRigaCompPrev` e `IdRigaCompPrevPadre`, con materiali e
+lavorazioni assegnati esclusivamente al componente. I preventivi esistenti non
+sono aggiornati automaticamente; ogni aggiornamento richiede anteprima,
+conferma e controlli sui vincoli operativi. Le procedure storiche di esplosione
+e rigenerazione non sono considerate compatibili senza riscrittura conforme a
+TEC-001.
+
+[C] Il repository predispone la decisione 334 con modello Excel, anteprima,
+validazione per riga e applicazione transazionale. Per evitare semantiche
+implicite di merge o cancellazione, l'importazione e ammessa soltanto su una
+revisione `Bozza` priva di nodi; il database ripete tutte le verifiche, usa
+`rowversion`, registra nome e SHA-256 del file e rifiuta il medesimo contenuto
+nella stessa revisione. Gli allegati non vengono importati. Lo script
+`TEC-016_07_Distinte_Importazione_Massiva.sql`, versione `2026111203`, non e
+ancora dichiarato applicato o collaudato a runtime.
+
+[C] L'applicazione della revisione ai preventivi prevista dalla decisione 335
+non e implementata.
+
+### Modelli ciclo
+
+[D] Un modello ciclo e una testata attiva o non attiva composta da righe
+ordinate di lavorazione. Codice e descrizione sono obbligatori; testata e righe
+utilizzano audit e `rowversion`.
+
+[D] Ogni riga copia dalla lavorazione tempi e costo orario come valori
+modificabili. Le modifiche successive dell'anagrafica Lavorazioni non
+aggiornano retroattivamente il modello ciclo.
+
+[D] Gli allegati del modello ciclo appartengono esclusivamente alla testata e
+usano la chiave tecnica `ModelliCiclo`. Le righe non hanno allegati autonomi.
+
+[D] La gestione anagrafica non applica automaticamente il modello ciclo ai
+preventivi e non abilita la procedura storica di applicazione o l'importazione
+massiva senza ulteriori decisioni.
+
 ### Limite tecnico da rispettare
 
 [C] Materiali e lavorazioni utilizzano IdRigaPreventivo
@@ -345,6 +400,7 @@ Conservare i contratti esistenti e segnalare le decisioni mancanti.
 - DistintaBaseNodi;
 - DistintaMateriali;
 - DistintaLavorazioni;
+- ModelliCiclo;
 - Preventivi;
 - RichiesteClienti;
 - Campionature;

@@ -17,10 +17,12 @@ public sealed class ModificaModel : PageModel
     [BindProperty] public DistintaMaterialeFormModel Dati { get; set; } = new();
     public DistintaMaterialeDettaglio? Materiale { get; private set; }
     public DistintaNodoDettaglio? Nodo { get; private set; }
+    public bool Modificabile => Nodo?.RevisioneModificabile == true;
     public AllegatiGridModel Allegati { get; private set; } = new();
     public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
     {
         if (!await CaricaAsync(id, cancellationToken)) return NotFound();
+        if (!Modificabile) return Forbid();
         Dati = new DistintaMaterialeFormModel { IdMateriale = Materiale!.IdMateriale, Quantita = Materiale.Quantita, CoeffScartoPerc = Materiale.CoeffScartoPerc, CostoUnitario = Materiale.CostoUnitario, Note = Materiale.Note, VersioneRigaBase64 = Convert.ToBase64String(Materiale.VersioneRiga) };
         return Page();
     }
@@ -41,7 +43,7 @@ public sealed class ModificaModel : PageModel
     {
         if (id <= 0) return false; Materiale = await _repository.GetMaterialeAsync(id, cancellationToken); if (Materiale is null) return false; Nodo = await _repository.GetNodoAsync(Materiale.IdNodoDistinta, cancellationToken); if (Nodo is null) return false;
         ViewData["MaterialiLookup"] = await _repository.GetMaterialiLookupAsync(Materiale.IdMateriale, cancellationToken);
-        Allegati = new AllegatiGridModel { Allegati = await _allegati.GetElencoAsync(AllegatoEntita.DistintaMateriali, id, cancellationToken), ReturnUrl = Url.Page("/Anagrafiche/Distinte/Materiali/Modifica", new { id }) };
+        Allegati = new AllegatiGridModel { Allegati = await _allegati.GetElencoAsync(AllegatoEntita.DistintaMateriali, id, cancellationToken), ReturnUrl = Url.Page("/Anagrafiche/Distinte/Materiali/Modifica", new { id }), MostraElimina = Modificabile };
         return true;
     }
     private byte[] LeggiVersione() { try { return Convert.FromBase64String(Dati.VersioneRigaBase64 ?? string.Empty); } catch (FormatException) { ModelState.AddModelError(string.Empty, "La versione dei dati non e valida. Ricaricare la pagina."); return []; } }

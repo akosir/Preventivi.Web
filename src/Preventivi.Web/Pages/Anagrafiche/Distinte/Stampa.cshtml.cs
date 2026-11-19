@@ -15,10 +15,12 @@ public sealed class StampaModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(
         int idArticolo,
+        int idRevisione,
         CancellationToken cancellationToken)
     {
         var risultato = await _report.GeneraPdfAsync(
             idArticolo,
+            idRevisione,
             cancellationToken);
         if (risultato is null)
         {

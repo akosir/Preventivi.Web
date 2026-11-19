@@ -34,7 +34,7 @@
     {
         <div class="table-responsive">
             <table class="table pfw-table align-middle mb-0">
-                <thead><tr><th>Codice</th><th>Descrizione</th><th>Versione</th><th>Nodi attivi</th><th>Stato articolo</th><th class="text-end">Azioni</th></tr></thead>
+                <thead><tr><th>Codice</th><th>Descrizione</th><th>Versione articolo</th><th>Distinta</th><th>Nodi attivi</th><th>Stato articolo</th><th class="text-end">Azioni</th></tr></thead>
                 <tbody>
                 @foreach (var articolo in Model.Articoli)
                 {
@@ -42,9 +42,19 @@
                         <td class="fw-semibold">@articolo.CodiceArticolo</td>
                         <td>@articolo.Descrizione</td>
                         <td>@(articolo.Versione ?? "-")</td>
+                        <td>
+                            @if (articolo.IdRevisionePubblicata.HasValue)
+                            {
+                                <span class="pfw-badge pfw-badge-success">Corrente</span>
+                            }
+                            else
+                            {
+                                <span class="pfw-secondary-text">Non presente</span>
+                            }
+                        </td>
                         <td>@articolo.NumeroNodiAttivi / @articolo.NumeroNodiTotali</td>
                         <td><span class="pfw-badge @(articolo.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(articolo.Attivo ? "Attivo" : "Non attivo")</span></td>
-                        <td class="text-end"><a asp-page="./Dettaglio" asp-route-idArticolo="@articolo.IdArticolo" class="pfw-btn pfw-btn-secondary">Apri</a></td>
+                        <td class="text-end"><a asp-page="./Dettaglio" asp-route-idArticolo="@articolo.IdArticolo" asp-route-idRevisione="@articolo.IdRevisionePubblicata" class="pfw-btn pfw-btn-secondary">Apri</a></td>
                     </tr>
                 }
                 </tbody>

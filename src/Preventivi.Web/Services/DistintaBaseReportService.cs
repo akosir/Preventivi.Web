@@ -21,9 +21,10 @@ public sealed class DistintaBaseReportService : IDistintaBaseReportService
 
     public async Task<DistintaBasePdfResult?> GeneraPdfAsync(
         int idArticolo,
+        int idRevisioneDistinta,
         CancellationToken cancellationToken = default)
     {
-        if (idArticolo <= 0)
+        if (idArticolo <= 0 || idRevisioneDistinta <= 0)
         {
             return null;
         }
@@ -36,8 +37,16 @@ public sealed class DistintaBaseReportService : IDistintaBaseReportService
             return null;
         }
 
+        var revisione = await _distinte.GetRevisioneAsync(
+            idRevisioneDistinta,
+            cancellationToken);
+        if (revisione is null || revisione.IdArticolo != idArticolo)
+        {
+            return null;
+        }
+
         var nodi = await _distinte.GetNodiAsync(
-            idArticolo,
+            idRevisioneDistinta,
             cancellationToken);
         var contenuti = new List<DistintaBaseReportNodo>(nodi.Count);
 
@@ -64,9 +73,10 @@ public sealed class DistintaBaseReportService : IDistintaBaseReportService
         }
 
         return new DistintaBasePdfResult(
-            $"DistintaBase_{nomeSicuro}.pdf",
+            $"DistintaBase_{nomeSicuro}_Rev{revisione.NumeroRevisione}.pdf",
             _generatore.Genera(
                 articolo,
+                revisione,
                 contenuti,
                 DateTimeOffset.Now));
     }

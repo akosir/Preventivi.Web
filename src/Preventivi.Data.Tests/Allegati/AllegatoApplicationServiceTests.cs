@@ -119,6 +119,31 @@ public sealed class AllegatoApplicationServiceTests
         Assert.True(storage.EliminaQuarantenaChiamato);
     }
 
+    [Fact]
+    public async Task DuplicaAsync_CreaFileEMetadatiIndipendentiSullaDestinazione()
+    {
+        var repository = new RepositoryFinto
+        {
+            Allegato = CreaAllegato()
+        };
+        var storage = new StorageFinto();
+        var servizio = CreaServizio(repository, storage);
+
+        var idCreato = await servizio.DuplicaAsync(
+            7,
+            AllegatoEntita.DistintaBaseNodi,
+            44,
+            "admin");
+
+        Assert.Equal(1, idCreato);
+        Assert.True(storage.ApriChiamato);
+        Assert.NotNull(repository.AllegatoCreato);
+        Assert.Equal(AllegatoEntita.DistintaBaseNodi, repository.AllegatoCreato.Entita);
+        Assert.Equal(44, repository.AllegatoCreato.IdEntita);
+        Assert.Equal("prova.txt", repository.AllegatoCreato.NomeFileOriginale);
+        Assert.Equal("admin", repository.AllegatoCreato.UtenteInserimento);
+    }
+
     private static AllegatoApplicationService CreaServizio(
         RepositoryFinto repository,
         StorageFinto storage)
@@ -164,10 +189,13 @@ public sealed class AllegatoApplicationServiceTests
 
         public bool EliminaChiamato { get; private set; }
 
+        public AllegatoCreateModel? AllegatoCreato { get; private set; }
+
         public Task<int> CreaAsync(
             AllegatoCreateModel allegato,
             CancellationToken cancellationToken = default)
         {
+            AllegatoCreato = allegato;
             return ErroreCreazione is null
                 ? Task.FromResult(1)
                 : Task.FromException<int>(ErroreCreazione);
@@ -228,6 +256,8 @@ public sealed class AllegatoApplicationServiceTests
 
         public bool EliminaQuarantenaChiamato { get; private set; }
 
+        public bool ApriChiamato { get; private set; }
+
         public Task<StorageSaveResult> SalvaAsync(
             StorageSaveRequest request,
             CancellationToken cancellationToken = default)
@@ -285,7 +315,14 @@ public sealed class AllegatoApplicationServiceTests
             StorageOpenRequest request,
             CancellationToken cancellationToken = default)
         {
-            throw new NotSupportedException();
+            ApriChiamato = true;
+            return Task.FromResult(new StorageFileResult
+            {
+                Stream = new MemoryStream("contenuto allegato"u8.ToArray()),
+                NomeFileOriginale = request.NomeFileOriginale,
+                Estensione = ".txt",
+                DimensioneFile = 18
+            });
         }
     }
 }

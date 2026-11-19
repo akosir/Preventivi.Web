@@ -51,7 +51,65 @@ la baseline TEC-002, che incorpora gia lo stato risultante al 16 ottobre
 La baseline non contiene `USE` e non crea il database: la destinazione resta
 una scelta esplicita dell'operatore.
 
+## Gestione anagrafiche TEC-016
+
+Gli aggiornamenti devono essere applicati in ordine di versione. Dopo
+`TEC-016_04_Distinte_Base.sql` (`2026110501`), la gestione Modelli ciclo
+richiede:
+
+1. `06_Aggiornamenti/TEC-016_05_Modelli_Ciclo.sql` (`2026111201`).
+2. `06_Aggiornamenti/TEC-016_06_Distinte_Revisioni.sql` (`2026111202`).
+3. `06_Aggiornamenti/TEC-016_07_Distinte_Importazione_Massiva.sql`
+   (`2026111203`).
+
+Lo script aggiunge audit e controllo di concorrenza a testata e righe,
+installa le procedure operative e abilita gli allegati della testata. Non
+applica automaticamente i modelli ciclo ai preventivi e non abilita
+l'importazione massiva.
+
+Il secondo script introduce testata e revisioni autonome delle distinte,
+migra le distinte esistenti come revisione iniziale pubblicata, rende
+immutabili le revisioni pubblicate e abilita la duplicazione completa in una
+nuova bozza. Lo script disabilita esplicitamente le procedure storiche di
+esplosione e rigenerazione, che non rispettano ancora il modello TEC-001.
+L'applicazione delle revisioni ai preventivi resta fuori da questo
+aggiornamento.
+
+Il terzo script introduce i tipi tabellari, l'audit delle importazioni e la
+procedura transazionale per importare nodi, materiali e lavorazioni da Excel.
+L'operazione e ammessa soltanto su una revisione in bozza priva di nodi,
+ricontrolla gerarchia, anagrafiche, duplicati e `rowversion` nel database e
+rifiuta lo stesso SHA-256 nella medesima revisione. Gli allegati non vengono
+importati.
+
 ## Gestione modifiche Preventivi MB-02
+
+Per la decisione 335, dopo la versione `2026111203`, applicare in ordine
+`TEC-016_08_Continuita_Nodi.sql`, `TEC-016_09_Snapshot_Iniziale.sql`,
+`TEC-016_10_Anteprima_Snapshot.sql`, `TEC-016_11_Applica_Snapshot.sql` e
+`TEC-016_12_Stato_Snapshot.sql` dalla cartella `06_Aggiornamenti`.
+La versione finale è `2026111602`.
+
+Per le decisioni 336–340, applicare sul database di test, nell'ordine:
+
+1. `06_Aggiornamenti/TEC-016_13_Versione_Contenuto_Distinta.sql`.
+2. `06_Aggiornamenti/TEC-016_14_Distinta_Corrente.sql`.
+3. `06_Aggiornamenti/TEC-016_15_Avvisi_Distinta.sql`.
+4. `06_Aggiornamenti/TEC-016_16_Aggiorna_Distinta.sql`.
+
+La versione installata da questo gruppo di script è `2026111802`
+(`TEC-016-AGGIORNA-DISTINTA`). Il passaggio archivia le vecchie bozze
+di distinta e rende editabile la distinta corrente. Il collaudo deve
+verificare il mantenimento dei dati, l'aggiornamento con ricalcolo su
+preventivo e variante e il blocco in presenza di elementi da ricollocare.
+
+Per ripristinare la duplicazione su altro articolo, applicare successivamente
+`06_Aggiornamenti/TEC-016_17_Duplica_Distinta_Corrente.sql`.
+La versione richiesta dall'applicazione è `2026111901`
+(`TEC-016-DUPLICA-CORRENTE`). Lo script aggiunge la procedura di
+compensazione delle copie incomplete. La destinazione deve essere un
+articolo attivo senza distinta corrente. Il collaudo deve verificare
+gerarchia, materiali, lavorazioni, stati e indipendenza degli allegati.
 
 Per abilitare le pagine di modifica di preventivo, riga, componente,
 materiale e lavorazione su un database esistente, eseguire:

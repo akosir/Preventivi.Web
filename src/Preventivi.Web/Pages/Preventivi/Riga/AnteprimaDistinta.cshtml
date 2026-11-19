@@ -1,0 +1,55 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Riga.AnteprimaDistintaModel
+@{ var riga = Model.Riga!; var revisione = Model.Risultato.FirstOrDefault(); ViewData["Title"] = "Controlla distinta"; }
+
+<h1 class="h3 mb-3">Controlla distinta · Riga @riga.RigaNr</h1>
+<section class="pfw-panel">
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        @if (revisione is null)
+        {
+            <p class="mb-0">Per l’articolo non è disponibile una distinta corrente.</p>
+        }
+        else
+        {
+            <h2 class="h5">Distinta corrente</h2>
+            var elementi = Model.Risultato.Where(x => !string.IsNullOrEmpty(x.Tipo)).ToList();
+            if (revisione.RevisioneGiaApplicata)
+            {
+                <p class="alert alert-info mb-0" role="status">La distinta corrente è già applicata a questa riga.</p>
+            }
+            else if (elementi.Count == 0)
+            {
+                <p class="mb-0">Il controllo non ha rilevato elementi manuali da ricollocare.</p>
+                <form method="post" class="mt-3">
+                    <input type="hidden" name="idPreventivo" value="@riga.IdPreventivo" />
+                    <input type="hidden" name="idRigaPreventivo" value="@riga.IdRigaPreventivo" />
+                    <input type="hidden" name="idRevisione" value="@revisione.IdRevisione" />
+                    <input type="hidden" name="versioneContenuto" value="@revisione.VersioneContenuto" />
+                    <button type="submit" class="pfw-btn pfw-btn-primary">Aggiorna distinta e totali</button>
+                    <a class="pfw-btn pfw-btn-secondary" asp-page="/Preventivi/Modifica"
+                       asp-route-id="@riga.IdPreventivo">Mantieni i dati attuali</a>
+                </form>
+            }
+            else
+            {
+                <p class="alert alert-warning">Ricolloca questi elementi prima di aggiornare la distinta.</p>
+                <div class="table-responsive">
+                    <table class="table pfw-table">
+                        <thead><tr><th>Componente rimosso</th><th>Tipo elemento</th><th>Elemento da ricollocare</th></tr></thead>
+                        <tbody>
+                        @foreach (var elemento in elementi)
+                        {
+                            <tr><td>@elemento.Componente</td><td>@elemento.Tipo</td><td>@elemento.Elemento</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+    <div class="pfw-panel-footer">
+        <a class="pfw-btn pfw-btn-secondary" asp-page="./Workspace"
+           asp-route-idPreventivo="@riga.IdPreventivo" asp-route-idRigaPreventivo="@riga.IdRigaPreventivo">Torna alla riga</a>
+    </div>
+</section>

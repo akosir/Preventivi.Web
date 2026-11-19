@@ -28,7 +28,19 @@
                     <input asp-for="Dati.DescrizioneMateriale" class="form-control" />
                     <span asp-validation-for="Dati.DescrizioneMateriale" class="text-danger"></span></div>
                 <div class="col-12 col-md-4"><label asp-for="Dati.TipoMateriale" class="form-label">Tipo materiale</label>
-                    <input asp-for="Dati.TipoMateriale" class="form-control" /></div>
+                    <select asp-for="Dati.TipoMateriale" class="form-select">
+                        <option value="">Non specificato</option>
+                        <option value="MateriaPrima">Materia prima</option>
+                        <option value="Accessorio">Accessorio</option>
+                        <option value="Semilavorato">Semilavorato</option>
+                        @if (Model.Materiale?.TipoMateriale is string tipoSalvato &&
+                             !string.IsNullOrWhiteSpace(tipoSalvato) &&
+                             tipoSalvato is not ("MateriaPrima" or "Accessorio" or "Semilavorato"))
+                        {
+                            <option value="@tipoSalvato">@tipoSalvato (valore precedente)</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Dati.TipoMateriale" class="text-danger"></span></div>
                 <div class="col-12 col-md-2"><label asp-for="Dati.UM" class="form-label">Unita di misura</label>
                     <input asp-for="Dati.UM" class="form-control" /></div>
                 <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Dati.Quantita" class="form-label">Quantita</label>

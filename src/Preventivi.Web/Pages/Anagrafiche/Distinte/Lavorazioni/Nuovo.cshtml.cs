@@ -11,10 +11,16 @@ public sealed class NuovoModel : PageModel
     private readonly IDistintaBaseRepository _repository; private readonly ILogger<NuovoModel> _logger;
     public NuovoModel(IDistintaBaseRepository repository, ILogger<NuovoModel> logger) { _repository = repository; _logger = logger; }
     [BindProperty] public DistintaLavorazioneFormModel Dati { get; set; } = new(); public DistintaNodoDettaglio? Nodo { get; private set; }
-    public async Task<IActionResult> OnGetAsync(int idNodo, CancellationToken cancellationToken) => await CaricaAsync(idNodo, cancellationToken) ? Page() : NotFound();
+    public async Task<IActionResult> OnGetAsync(int idNodo, CancellationToken cancellationToken)
+    {
+        if (!await CaricaAsync(idNodo, cancellationToken)) return NotFound();
+        return Nodo!.RevisioneModificabile ? Page() : Forbid();
+    }
     public async Task<IActionResult> OnPostAsync(int idNodo, CancellationToken cancellationToken)
     {
-        if (!await CaricaAsync(idNodo, cancellationToken)) return NotFound(); if (!ModelState.IsValid) return Page();
+        if (!await CaricaAsync(idNodo, cancellationToken)) return NotFound();
+        if (!Nodo!.RevisioneModificabile) return Forbid();
+        if (!ModelState.IsValid) return Page();
         try { var id = await _repository.CreaLavorazioneAsync(new DistintaLavorazioneCreateModel { IdNodoDistinta = idNodo, IdLavorazione = Dati.IdLavorazione!.Value, Sequenza = Dati.Sequenza, TempoSetupMin = Dati.TempoSetupMin, TempoPezzoMin = Dati.TempoPezzoMin, CostoOrario = Dati.CostoOrario, CostoFisso = Dati.CostoFisso, Note = Dati.Note, Utente = User.Identity?.Name ?? "Sistema" }, cancellationToken); TempData["MessaggioSuccesso"] = "Lavorazione aggiunta alla distinta."; return RedirectToPage("./Modifica", new { id }); }
         catch (SqlException exception) when (DistinteSqlErrori.Gestito(exception.Number)) { _logger.LogWarning(exception, "Inserimento lavorazione distinta rifiutato"); ModelState.AddModelError(string.Empty, DistinteSqlErrori.Messaggio(exception.Number)); return Page(); }
     }

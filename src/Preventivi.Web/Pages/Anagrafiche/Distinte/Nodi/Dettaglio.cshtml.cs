@@ -50,14 +50,15 @@ public sealed class DettaglioModel : PageModel
         if (id <= 0) return false;
         Nodo = await _repository.GetNodoAsync(id, cancellationToken);
         if (Nodo is null) return false;
-        var nodi = await _repository.GetNodiAsync(Nodo.IdArticolo, cancellationToken);
+        var nodi = await _repository.GetNodiAsync(Nodo.IdRevisioneDistinta, cancellationToken);
         Figli = nodi.Where(n => n.IdNodoPadre == id).ToArray();
         Materiali = await _repository.GetMaterialiAsync(id, cancellationToken);
         Lavorazioni = await _repository.GetLavorazioniAsync(id, cancellationToken);
         Allegati = new AllegatiGridModel
         {
             Allegati = await _allegati.GetElencoAsync(AllegatoEntita.DistintaBaseNodi, id, cancellationToken),
-            ReturnUrl = Url.Page("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id })
+            ReturnUrl = Url.Page("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id }),
+            MostraElimina = Nodo.RevisioneModificabile
         };
         return true;
     }

@@ -104,6 +104,7 @@ public class ComponentiModel : PageModel
 
         if (IsNuovo(modo))
         {
+            ModelState.ClearValidationState(nameof(NuovoComponente));
             await PreparaNuovoComponenteAsync(
                 idRigaPreventivo,
                 cancellationToken);
@@ -270,6 +271,12 @@ public class ComponentiModel : PageModel
         }
 
         NuovoComponente.TipoOrigineComponente = Origine;
+
+        if ((Origine == OrigineDistinta && NodoDistintaSelezionato is not null) ||
+            (Origine == OrigineArticolo && ArticoloSelezionato is not null))
+        {
+            ModelState.Remove($"{nameof(NuovoComponente)}.{nameof(NuovoComponente.DescrizioneNodo)}");
+        }
 
         if (NuovoComponente.IdRigaCompPrevPadre is > 0 &&
             ComponentiDisponibili.All(

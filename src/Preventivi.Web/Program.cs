@@ -90,13 +90,22 @@ builder.Services.AddScoped<
     ArticoloRepository>();
 
 builder.Services.AddScoped<
+    IModelloCicloRepository,
+    ModelloCicloRepository>();
+
+builder.Services.AddScoped<
     IDistintaBaseRepository,
     DistintaBaseRepository>();
+
+builder.Services.AddScoped<
+    IDistintaBaseApplicationService,
+    DistintaBaseApplicationService>();
 
 builder.Services.AddScoped<
     IDistintaBaseReportService,
     DistintaBaseReportService>();
 builder.Services.AddSingleton<DistintaBasePdfGenerator>();
+builder.Services.AddSingleton<DistintaBaseExcelService>();
 
 builder.Services.AddScoped<
     IPreventivoRepository,

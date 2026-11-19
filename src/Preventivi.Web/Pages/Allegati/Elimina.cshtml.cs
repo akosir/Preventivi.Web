@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Allegati;
 using Preventivi.Core.Allegati.Application;
 using Preventivi.Core.Allegati.Storage;
+using Preventivi.Core.Anagrafiche;
 using Preventivi.Web.Sicurezza;
 
 
@@ -13,15 +14,18 @@ public class EliminaModel : PageModel
 
     private readonly IAllegatoApplicationService _applicationService;
     private readonly IAllegatoRepository _allegatoRepository;
+    private readonly IDistintaBaseRepository _distintaBaseRepository;
     private readonly ILogger<EliminaModel> _logger;
 
     public EliminaModel(
         IAllegatoApplicationService applicationService,
         IAllegatoRepository allegatoRepository,
+        IDistintaBaseRepository distintaBaseRepository,
         ILogger<EliminaModel> logger)
     {
         _applicationService = applicationService;
         _allegatoRepository = allegatoRepository;
+        _distintaBaseRepository = distintaBaseRepository;
         _logger = logger;
     }
 
@@ -58,6 +62,11 @@ public class EliminaModel : PageModel
             return Forbid();
         }
 
+        if (!await EntitaModificabileAsync(allegato, cancellationToken))
+        {
+            return Forbid();
+        }
+
         NomeFileOriginale =
             allegato.NomeFileOriginale;
 
@@ -80,6 +89,11 @@ public class EliminaModel : PageModel
         if (!AutorizzazioneApplicazione.PuoAccedereAllEntitaAllegato(
             User,
             allegato.Entita))
+        {
+            return Forbid();
+        }
+
+        if (!await EntitaModificabileAsync(allegato, cancellationToken))
         {
             return Forbid();
         }
@@ -139,6 +153,11 @@ public class EliminaModel : PageModel
                 });
         }
 
+        if (allegato.Entita == AllegatoEntita.ModelliCiclo)
+        {
+            return RedirectToPage("/Anagrafiche/ModelliCiclo/Dettaglio", new { id = allegato.IdEntita });
+        }
+
         if (allegato.Entita == AllegatoEntita.DistintaBaseNodi)
         {
             return RedirectToPage("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id = allegato.IdEntita });
@@ -167,5 +186,53 @@ public class EliminaModel : PageModel
         return !string.IsNullOrWhiteSpace(returnUrl) &&
             returnUrl.StartsWith("/", StringComparison.Ordinal) &&
             !returnUrl.StartsWith("//", StringComparison.Ordinal);
+    }
+
+    private async Task<bool> EntitaModificabileAsync(
+        AllegatoDettaglio allegato,
+        CancellationToken cancellationToken)
+    {
+        DistintaNodoDettaglio? nodo = allegato.Entita switch
+        {
+            AllegatoEntita.DistintaBaseNodi =>
+                await _distintaBaseRepository.GetNodoAsync(
+                    allegato.IdEntita,
+                    cancellationToken),
+            AllegatoEntita.DistintaMateriali =>
+                await GetNodoMaterialeAsync(allegato.IdEntita, cancellationToken),
+            AllegatoEntita.DistintaLavorazioni =>
+                await GetNodoLavorazioneAsync(allegato.IdEntita, cancellationToken),
+            _ => null
+        };
+
+        return nodo?.RevisioneModificabile ?? true;
+    }
+
+    private async Task<DistintaNodoDettaglio?> GetNodoMaterialeAsync(
+        int idMateriale,
+        CancellationToken cancellationToken)
+    {
+        var materiale = await _distintaBaseRepository.GetMaterialeAsync(
+            idMateriale,
+            cancellationToken);
+        return materiale is null
+            ? null
+            : await _distintaBaseRepository.GetNodoAsync(
+                materiale.IdNodoDistinta,
+                cancellationToken);
+    }
+
+    private async Task<DistintaNodoDettaglio?> GetNodoLavorazioneAsync(
+        int idLavorazione,
+        CancellationToken cancellationToken)
+    {
+        var lavorazione = await _distintaBaseRepository.GetLavorazioneAsync(
+            idLavorazione,
+            cancellationToken);
+        return lavorazione is null
+            ? null
+            : await _distintaBaseRepository.GetNodoAsync(
+                lavorazione.IdNodoDistinta,
+                cancellationToken);
     }
 }

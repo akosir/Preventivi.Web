@@ -7,6 +7,38 @@ namespace Preventivi.Web.Tests.UI.Modules.Anagrafiche;
 public sealed class AnagraficheProduttiveFormTests
 {
     [Fact]
+    public void ModelloCiclo_CampiObbligatoriMancanti_NonEValido()
+    {
+        var risultati = Valida(new ModelloCicloFormModel());
+
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloFormModel.CodiceModelloCiclo)));
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloFormModel.Descrizione)));
+    }
+
+    [Fact]
+    public void RigaModelloCiclo_ValoriNonValidi_NonEValida()
+    {
+        var risultati = Valida(new ModelloCicloRigaFormModel
+        {
+            RigaNr = 0,
+            Sequenza = 0,
+            IdLavorazione = 0,
+            TempoSetupMin = -1,
+            TempoPezzoMin = -1,
+            CostoOrario = -1,
+            CostoFisso = -1
+        });
+
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloRigaFormModel.RigaNr)));
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloRigaFormModel.Sequenza)));
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloRigaFormModel.IdLavorazione)));
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloRigaFormModel.TempoSetupMin)));
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloRigaFormModel.TempoPezzoMin)));
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloRigaFormModel.CostoOrario)));
+        Assert.Contains(risultati, errore => errore.MemberNames.Contains(nameof(ModelloCicloRigaFormModel.CostoFisso)));
+    }
+
+    [Fact]
     public void DistintaNodo_CampiObbligatoriMancanti_NonEValido()
     {
         var risultati = Valida(new DistintaNodoFormModel());

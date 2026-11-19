@@ -1,19 +1,35 @@
 @page
 @model global::Preventivi.Web.Pages.Anagrafiche.Distinte.DettaglioModel
-@{ var articolo = Model.Articolo!; ViewData["Title"] = "Dettaglio distinta base"; }
+@using global::Preventivi.Core.Anagrafiche
+@{ var articolo = Model.Articolo!; var revisione = Model.Revisione; ViewData["Title"] = "Dettaglio distinta base"; }
 
 <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
     <div>
         <div class="pfw-secondary-text mb-1"><a asp-page="./Index">Distinte base</a></div>
         <h1 class="h3 mb-1">@articolo.CodiceArticolo - @articolo.Descrizione</h1>
-        <p class="pfw-secondary-text mb-0">Struttura produttiva dell'articolo</p>
+        <p class="pfw-secondary-text mb-0">Struttura produttiva corrente dell'articolo</p>
     </div>
     <div class="d-flex gap-2">
-        <a asp-page="./Stampa" asp-route-idArticolo="@articolo.IdArticolo" class="pfw-btn pfw-btn-primary">Scarica PDF</a>
-        <a asp-page="../Articoli/Dettaglio" asp-route-id="@articolo.IdArticolo" class="pfw-btn pfw-btn-secondary">Articolo</a>
-        @if (!Model.Nodi.Any(n => n.IdNodoPadre is null && n.Attivo))
+        @if (revisione is not null)
         {
-            <a asp-page="./Nodi/Nuovo" asp-route-idArticolo="@articolo.IdArticolo" class="pfw-btn pfw-btn-primary">Nuovo nodo radice</a>
+            <a asp-page="./Stampa" asp-route-idArticolo="@articolo.IdArticolo" asp-route-idRevisione="@revisione.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Scarica PDF</a>
+            @if (revisione.Modificabile && Model.Nodi.Count > 0)
+            {
+                <a asp-page="./Revisioni/Duplica" asp-route-idSorgente="@revisione.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Duplica su altro articolo</a>
+            }
+            @if (revisione.Modificabile && Model.Nodi.Count == 0)
+            {
+                <a asp-page="./Revisioni/Importa" asp-route-id="@revisione.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Importa Excel</a>
+            }
+        }
+        else
+        {
+            <a asp-page="./Revisioni/Nuova" asp-route-idArticolo="@articolo.IdArticolo" class="pfw-btn pfw-btn-primary">Crea distinta</a>
+        }
+        <a asp-page="../Articoli/Dettaglio" asp-route-id="@articolo.IdArticolo" class="pfw-btn pfw-btn-secondary">Articolo</a>
+        @if (revisione?.Modificabile == true && !Model.Nodi.Any(n => n.IdNodoPadre is null && n.Attivo))
+        {
+            <a asp-page="./Nodi/Nuovo" asp-route-idArticolo="@articolo.IdArticolo" asp-route-idRevisione="@revisione.IdRevisioneDistinta" class="pfw-btn pfw-btn-primary">Nuovo nodo radice</a>
         }
     </div>
 </div>
@@ -30,9 +46,13 @@
             <div class="pfw-panel-subtitle">La struttura mostra i rapporti padre-figlio e i livelli calcolati dal sistema</div>
         </div>
     </div>
-    @if (Model.Nodi.Count == 0)
+    @if (revisione is null)
     {
-        <div class="pfw-panel-body"><div class="pfw-secondary-text">Nessun nodo presente. Creare il nodo radice per iniziare la distinta.</div></div>
+        <div class="pfw-panel-body"><div class="pfw-secondary-text">Crea la distinta per inserire i componenti.</div></div>
+    }
+    else if (Model.Nodi.Count == 0)
+    {
+        <div class="pfw-panel-body"><div class="pfw-secondary-text">Nessun nodo presente. Creare il nodo radice oppure importare la struttura dal modello Excel.</div></div>
     }
     else
     {

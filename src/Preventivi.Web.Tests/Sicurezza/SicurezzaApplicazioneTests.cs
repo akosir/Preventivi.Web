@@ -177,6 +177,7 @@ public sealed class SicurezzaApplicazioneTests
     [InlineData(AllegatoEntita.CampionatureRilievi, PermessiApplicazione.Campionature)]
     [InlineData(AllegatoEntita.CampionatureAdeguamenti, PermessiApplicazione.Campionature)]
     [InlineData(AllegatoEntita.Articoli, PermessiApplicazione.Anagrafiche)]
+    [InlineData(AllegatoEntita.ModelliCiclo, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.DistintaBaseNodi, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.DistintaMateriali, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.DistintaLavorazioni, PermessiApplicazione.Anagrafiche)]

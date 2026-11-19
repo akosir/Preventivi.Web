@@ -3,8 +3,14 @@ namespace Preventivi.Core.Anagrafiche;
 public interface IDistintaBaseRepository
 {
     Task<IReadOnlyList<DistintaArticoloListItem>> GetArticoliAsync(string? ricerca = null, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<DistintaRevisioneListItem>> GetRevisioniAsync(int idArticolo, CancellationToken cancellationToken = default);
+    Task<DistintaRevisioneDettaglio?> GetRevisioneAsync(int idRevisioneDistinta, CancellationToken cancellationToken = default);
+    Task<int> CreaBozzaAsync(DistintaRevisioneCreateModel modello, CancellationToken cancellationToken = default);
+    Task PubblicaAsync(DistintaRevisionePubblicaModel modello, CancellationToken cancellationToken = default);
+    Task CompensaDuplicazioneAsync(int idRevisioneDistinta, CancellationToken cancellationToken = default);
+    Task ImportaAsync(DistintaImportazioneRequest richiesta, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<TipoNodoDistintaLookupItem>> GetTipiNodoAsync(int? idCorrente = null, CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<DistintaNodoItem>> GetNodiAsync(int idArticolo, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<DistintaNodoItem>> GetNodiAsync(int idRevisioneDistinta, CancellationToken cancellationToken = default);
     Task<DistintaNodoDettaglio?> GetNodoAsync(int idNodoDistinta, CancellationToken cancellationToken = default);
     Task<int> CreaNodoAsync(DistintaNodoCreateModel modello, CancellationToken cancellationToken = default);
     Task AggiornaNodoAsync(DistintaNodoUpdateModel modello, CancellationToken cancellationToken = default);

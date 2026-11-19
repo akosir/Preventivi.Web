@@ -13,10 +13,15 @@ public sealed class NuovoModel : PageModel
     public NuovoModel(IDistintaBaseRepository repository, ILogger<NuovoModel> logger) { _repository = repository; _logger = logger; }
     [BindProperty] public DistintaMaterialeFormModel Dati { get; set; } = new();
     public DistintaNodoDettaglio? Nodo { get; private set; }
-    public async Task<IActionResult> OnGetAsync(int idNodo, CancellationToken cancellationToken) => await CaricaAsync(idNodo, cancellationToken) ? Page() : NotFound();
+    public async Task<IActionResult> OnGetAsync(int idNodo, CancellationToken cancellationToken)
+    {
+        if (!await CaricaAsync(idNodo, cancellationToken)) return NotFound();
+        return Nodo!.RevisioneModificabile ? Page() : Forbid();
+    }
     public async Task<IActionResult> OnPostAsync(int idNodo, CancellationToken cancellationToken)
     {
         if (!await CaricaAsync(idNodo, cancellationToken)) return NotFound();
+        if (!Nodo!.RevisioneModificabile) return Forbid();
         if (!ModelState.IsValid) return Page();
         try
         {

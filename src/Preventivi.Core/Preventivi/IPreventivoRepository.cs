@@ -2,6 +2,15 @@
 
 public interface IPreventivoRepository
 {
+    Task<IReadOnlyList<PreventivoRigaDistintaDaVerificare>> GetDistinteDaVerificareAsync(
+        int idPreventivo, CancellationToken cancellationToken = default);
+
+Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, int idRevisione, long versioneContenuto,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<DistintaSnapshotAnteprimaItem>> GetAnteprimaSnapshotAsync(
+        int idPreventivo, int idRigaPreventivo, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<PreventivoListItem>> GetElencoAsync(
         CancellationToken cancellationToken = default);
 

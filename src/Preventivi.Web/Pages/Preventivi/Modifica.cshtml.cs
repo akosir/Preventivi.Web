@@ -33,6 +33,8 @@ public class ModificaModel : PageModel
 
     public PreventivoDettaglio? Preventivo { get; private set; }
 
+    public IReadOnlyList<PreventivoRigaDistintaDaVerificare> DistinteDaVerificare { get; private set; } = [];
+
     public IReadOnlyList<ClienteListItem> Clienti { get; private set; }
         = Array.Empty<ClienteListItem>();
 
@@ -116,10 +118,14 @@ public class ModificaModel : PageModel
         }
 
         Preventivo = await _preventivoRepository.GetDettaglioAsync(id, cancellationToken);
+        if (Preventivo is null)
+            return false;
+
+        DistinteDaVerificare = await _preventivoRepository.GetDistinteDaVerificareAsync(id, cancellationToken);
         Clienti = await _clienteRepository.GetElencoAsync(
             soloAttivi: null,
             cancellationToken: cancellationToken);
 
-        return Preventivo is not null;
+        return true;
     }
 }

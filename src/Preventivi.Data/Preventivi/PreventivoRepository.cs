@@ -9,6 +9,26 @@ public sealed class PreventivoRepository : IPreventivoRepository
 {
     private readonly DatabaseExecutor _db;
 
+    public Task<IReadOnlyList<PreventivoRigaDistintaDaVerificare>> GetDistinteDaVerificareAsync(
+        int idPreventivo, CancellationToken cancellationToken = default) =>
+        _db.QueryAsync<PreventivoRigaDistintaDaVerificare>("dbo.Preventivi_Righe_DistintaDaVerificare",
+            [new SqlParameter("@IdPreventivo", idPreventivo)], cancellationToken);
+
+public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, int idRevisione, long versioneContenuto,
+        CancellationToken cancellationToken = default) =>
+        await _db.ExecuteAsync("dbo.Preventivi_Righe_SnapshotApplica",
+            [new SqlParameter("@IdPreventivo", idPreventivo),
+             new SqlParameter("@IdRigaPreventivo", idRigaPreventivo),
+             new SqlParameter("@IdRevisione", idRevisione),
+             new SqlParameter("@VersioneContenuto", versioneContenuto)], cancellationToken);
+
+    public Task<IReadOnlyList<DistintaSnapshotAnteprimaItem>> GetAnteprimaSnapshotAsync(
+        int idPreventivo, int idRigaPreventivo, CancellationToken cancellationToken = default) =>
+        _db.QueryAsync<DistintaSnapshotAnteprimaItem>(
+            "dbo.Preventivi_Righe_SnapshotAnteprima",
+            [new SqlParameter("@IdPreventivo", idPreventivo), new SqlParameter("@IdRigaPreventivo", idRigaPreventivo)],
+            cancellationToken);
+
     public PreventivoRepository(DatabaseExecutor db)
     {
         _db = db;
