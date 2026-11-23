@@ -1,0 +1,25 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Fornitori.EliminaModel
+@{ var fornitore = Model.Fornitore!; ViewData["Title"] = "Elimina fornitore"; }
+
+<div class="mb-3"><div class="pfw-secondary-text mb-1"><a asp-page="./Dettaglio" asp-route-id="@fornitore.IdFornitore">Dettaglio fornitore</a></div><h1 class="h3 mb-0">Elimina fornitore</h1></div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Conferma eliminazione</h2><div class="pfw-panel-subtitle">L'operazione è consentita soltanto per fornitori privi di riferimenti e allegati</div></div></div>
+    <form method="post">
+        <input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(fornitore.VersioneRiga)" />
+        <div class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            @if (Model.Dipendenze.Count > 0)
+            {
+                <partial name="Shared/Anagrafiche/_FornitoreDipendenze" model="Model.Dipendenze" />
+                <p>Puoi disattivare il fornitore dalla scheda di dettaglio con un profilo amministratore.</p>
+            }
+            @if (Model.Dipendenze.Count == 0)
+            {
+                <p>Confermi l'eliminazione di <strong>@fornitore.CodiceFornitore - @fornitore.RagioneSociale</strong>?</p>
+            }
+            <p class="pfw-secondary-text mb-0">I fornitori con riferimenti possono essere disattivati. Gli allegati devono essere eliminati esplicitamente prima del fornitore.</p>
+        </div>
+        <div class="pfw-panel-footer d-flex justify-content-end gap-2"><a asp-page="./Dettaglio" asp-route-id="@fornitore.IdFornitore" class="pfw-btn pfw-btn-secondary">Annulla</a>@if (Model.Dipendenze.Count == 0) { <button type="submit" class="pfw-btn pfw-btn-danger">Elimina</button> }</div>
+    </form>
+</section>

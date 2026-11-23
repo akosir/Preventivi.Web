@@ -2,6 +2,15 @@
 
 ## Ambito corrente
 
+TEC-017, decisioni 341–345, aggiunge l'anagrafica Fornitori con ricerca
+per codice, ragione sociale e dati fiscali, filtro stato e stampa dei
+risultati. Codice univoco e ragione sociale sono obbligatori. La scheda
+include i contatti e gli allegati MB-01, oltre ai riferimenti che
+impediscono l'eliminazione. Solo ADMIN può disattivare o riattivare un
+fornitore. Le operazioni usano rowversion e audit. Lo script predisposto
+`TEC-017_01_Anagrafica_Fornitori.sql` porta lo schema a `2026112301`.
+Applicazione al database e collaudo runtime sono da verificare.
+
 TEC-016 introduce l'area Anagrafiche e il primo pacchetto composto da:
 
 - unita di misura;

@@ -1,0 +1,79 @@
+@page
+@model global::Preventivi.Web.Pages.Anagrafiche.Fornitori.IndexModel
+@{ ViewData["Title"] = "Fornitori"; }
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="../Index">Anagrafiche</a></div>
+        <h1 class="h3 mb-1">Fornitori</h1>
+        <p class="pfw-secondary-text mb-0">Anagrafica fornitori e documenti collegati</p>
+    </div>
+    <div class="d-flex gap-2"><a asp-page="./Nuovo" class="pfw-btn pfw-btn-primary">Nuovo</a>
+    <a asp-page="./Stampa" asp-route-ricerca="@Model.Ricerca" asp-route-stato="@Model.Stato" class="pfw-btn pfw-btn-secondary">Stampa risultati</a></div>
+</div>
+
+@if (TempData["MessaggioSuccesso"] is string messaggio)
+{
+    <div class="alert alert-success" role="alert">@messaggio</div>
+}
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-12 col-xl-5">
+                <label asp-for="Ricerca" class="form-label">Codice, ragione sociale o dati fiscali</label>
+                <input asp-for="Ricerca" class="form-control" />
+            </div>
+            <div class="col-12 col-md-6 col-xl-2">
+                <label asp-for="Stato" class="form-label">Stato</label>
+                <select asp-for="Stato" class="form-select">
+                    <option value="attivi">Attivi</option>
+                    <option value="nonattivi">Non attivi</option>
+                    <option value="tutti">Tutti</option>
+                </select>
+            </div>
+            <div class="col-12 col-xl-2 d-flex gap-2">
+                <button type="submit" class="pfw-btn pfw-btn-primary flex-grow-1">Cerca</button>
+                <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Azzera</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="pfw-panel">
+    @if (Model.Fornitori.Count == 0)
+    {
+        <div class="pfw-panel-body">
+            @await Html.PartialAsync("Shared/PFW/EmptyState/_PFWEmptyState", new global::Preventivi.Web.UI.EmptyState.PFWEmptyStateModel
+            {
+                Titolo = "Nessun fornitore",
+                Messaggio = "Non sono presenti fornitori corrispondenti ai filtri selezionati."
+            })
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table pfw-table align-middle mb-0">
+                <thead><tr><th>Codice</th><th>Ragione sociale</th><th>Partita IVA</th><th>Città</th><th>Stato</th><th class="text-end">Azioni</th></tr></thead>
+                <tbody>
+                    @foreach (var fornitore in Model.Fornitori)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@fornitore.CodiceFornitore</td>
+                            <td>@fornitore.RagioneSociale</td>
+                            <td>@(fornitore.PartitaIVA ?? "-")</td>
+                            <td>@(fornitore.Citta ?? "-")</td>
+                            <td><span class="pfw-badge @(fornitore.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(fornitore.Attivo ? "Attivo" : "Non attivo")</span></td>
+                            <td class="text-end"><div class="d-flex gap-2">
+                                <a asp-page="./Dettaglio" asp-route-id="@fornitore.IdFornitore" class="pfw-btn pfw-btn-secondary">Apri</a>
+                                <a asp-page="./Modifica" asp-route-id="@fornitore.IdFornitore" class="pfw-btn pfw-btn-secondary">Modifica</a>
+                                <a asp-page="./Elimina" asp-route-id="@fornitore.IdFornitore" class="pfw-btn pfw-btn-danger">Elimina</a>
+                            </div></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

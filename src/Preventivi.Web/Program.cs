@@ -89,6 +89,8 @@ builder.Services.AddScoped<
     IArticoloRepository,
     ArticoloRepository>();
 
+builder.Services.AddScoped<IFornitoreRepository, FornitoreRepository>();
+
 builder.Services.AddScoped<
     IModelloCicloRepository,
     ModelloCicloRepository>();

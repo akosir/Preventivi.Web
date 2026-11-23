@@ -248,7 +248,10 @@
                         </div>
                         @if (Model.PuoVisualizzareAnagrafiche)
                         {
-                            <a asp-page="/Anagrafiche/Index" class="pfw-btn pfw-btn-secondary">Apri</a>
+                            <div class="d-flex gap-2">
+                                <a asp-page="/Anagrafiche/Index" class="pfw-btn pfw-btn-secondary">Apri</a>
+                                <a asp-page="/Anagrafiche/Fornitori/Index" class="pfw-btn pfw-btn-secondary">Fornitori</a>
+                            </div>
                         }
                         else
                         {

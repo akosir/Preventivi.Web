@@ -1,23 +1,45 @@
 @page
 @model global::Preventivi.Web.Pages.Anagrafiche.IndexModel
+@{ ViewData["Title"] = "Anagrafiche"; }
 
-@{
-    ViewData["Title"] = "Anagrafiche";
-}
-
-<div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-    <div>
-        <h1 class="h3 mb-1">Anagrafiche</h1>
-        <p class="pfw-secondary-text mb-0">Tabelle di base disponibili per la gestione operativa</p>
+<h1 class="h3 mb-4">Anagrafiche</h1>
+<section aria-labelledby="anagrafiche-commerciali" class="mb-4">
+    <h2 id="anagrafiche-commerciali" class="h5 mb-3">Clienti e fornitori</h2>
+    <div class="row g-3">
+        @if (Model.PuoClienti)
+        {
+            <div class="col-12 col-lg-6">
+                <section class="pfw-panel h-100">
+                    <div class="pfw-panel-header"><h3 class="pfw-panel-title">Clienti</h3></div>
+                    <div class="pfw-panel-body d-flex justify-content-end">
+                        <a asp-page="/Clienti/Index" class="pfw-btn pfw-btn-primary">Apri</a>
+                    </div>
+                </section>
+            </div>
+        }
+        @if (Model.PuoAnagrafiche)
+        {
+            <div class="col-12 col-lg-6">
+                <section class="pfw-panel h-100">
+                    <div class="pfw-panel-header"><h3 class="pfw-panel-title">Fornitori</h3></div>
+                    <div class="pfw-panel-body d-flex justify-content-end">
+                        <a asp-page="./Fornitori/Index" class="pfw-btn pfw-btn-primary">Apri</a>
+                    </div>
+                </section>
+            </div>
+        }
     </div>
-</div>
-
-<div class="row g-3">
+</section>
+@if (Model.PuoAnagrafiche)
+{
+<section aria-labelledby="anagrafiche-tecniche">
+    <h2 id="anagrafiche-tecniche" class="h5 mb-3">Anagrafiche tecniche</h2>
+    <div class="row g-3">
     <div class="col-12 col-lg-6">
         <section class="pfw-panel h-100">
             <div class="pfw-panel-header">
                 <div>
-                    <h2 class="pfw-panel-title">Articoli</h2>
+                    <h3 class="pfw-panel-title">Articoli</h3>
                     <div class="pfw-panel-subtitle">Prodotti, clienti associati e documentazione tecnica</div>
                 </div>
             </div>
@@ -30,7 +52,7 @@
         <section class="pfw-panel h-100">
             <div class="pfw-panel-header">
                 <div>
-                    <h2 class="pfw-panel-title">Modelli ciclo</h2>
+                    <h3 class="pfw-panel-title">Modelli ciclo</h3>
                     <div class="pfw-panel-subtitle">Sequenze standard di lavorazione, tempi e costi</div>
                 </div>
             </div>
@@ -43,7 +65,7 @@
         <section class="pfw-panel h-100">
             <div class="pfw-panel-header">
                 <div>
-                    <h2 class="pfw-panel-title">Distinte base</h2>
+                    <h3 class="pfw-panel-title">Distinte base</h3>
                     <div class="pfw-panel-subtitle">Struttura produttiva, materiali e lavorazioni degli articoli</div>
                 </div>
             </div>
@@ -56,7 +78,7 @@
         <section class="pfw-panel h-100">
             <div class="pfw-panel-header">
                 <div>
-                    <h2 class="pfw-panel-title">Materiali</h2>
+                    <h3 class="pfw-panel-title">Materiali</h3>
                     <div class="pfw-panel-subtitle">Costi, acquisto e classificazione dei materiali</div>
                 </div>
             </div>
@@ -69,7 +91,7 @@
         <section class="pfw-panel h-100">
             <div class="pfw-panel-header">
                 <div>
-                    <h2 class="pfw-panel-title">Lavorazioni</h2>
+                    <h3 class="pfw-panel-title">Lavorazioni</h3>
                     <div class="pfw-panel-subtitle">Tempi e costi standard delle lavorazioni</div>
                 </div>
             </div>
@@ -82,7 +104,7 @@
         <section class="pfw-panel h-100">
             <div class="pfw-panel-header">
                 <div>
-                    <h2 class="pfw-panel-title">Unita di misura</h2>
+                    <h3 class="pfw-panel-title">Unita di misura</h3>
                     <div class="pfw-panel-subtitle">Codici utilizzati dall'anagrafica materiali</div>
                 </div>
             </div>
@@ -95,7 +117,7 @@
         <section class="pfw-panel h-100">
             <div class="pfw-panel-header">
                 <div>
-                    <h2 class="pfw-panel-title">Tipi nodo distinta</h2>
+                    <h3 class="pfw-panel-title">Tipi nodo distinta</h3>
                     <div class="pfw-panel-subtitle">Classificazione dei nodi delle distinte base</div>
                 </div>
             </div>
@@ -105,3 +127,5 @@
         </section>
     </div>
 </div>
+</section>
+}

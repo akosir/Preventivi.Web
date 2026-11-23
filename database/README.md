@@ -5,6 +5,22 @@ versionati del progetto.
 
 ## Regole
 
+### Anagrafica Fornitori TEC-017
+
+Dopo la versione `2026111901`, eseguire nel database di test
+`06_Aggiornamenti/TEC-017_01_Anagrafica_Fornitori.sql`.
+Registra `2026112301`, codice `TEC-017-FORNITORI`, richiesto
+dall'applicazione aggiornata. Aggiunge audit e rowversion alla tabella
+Fornitori, lo storico delle operazioni in FornitoriAudit, le procedure
+di gestione e il controllo dell'esistenza del fornitore per gli allegati.
+Lo script preserva i dati esistenti e non inserisce fornitori di prova.
+
+Il collaudo deve coprire creazione, ricerca, modifica, concorrenza tra due
+sessioni, disattivazione e riattivazione amministrative, selezioni dei
+fornitori, eliminazione con e senza dipendenze, allegati e stampa filtrata.
+
+### Convenzioni SQL
+
 - Ogni modifica deve avere il relativo script SQL.
 - Gli script devono essere idempotenti quando possibile.
 - Nessuna modifica al database deve rimanere solo sul server SQL.

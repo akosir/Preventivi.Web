@@ -150,6 +150,25 @@ public sealed class SicurezzaApplicazioneTests
         Assert.True(risultato.Succeeded);
     }
 
+    [Theory]
+    [InlineData(PermessiApplicazione.Clienti, true, true, false)]
+    [InlineData(PermessiApplicazione.Anagrafiche, true, false, true)]
+    [InlineData("nessun-permesso", false, false, false)]
+    public async Task IndiceAnagrafiche_RispettaIPermessiDelleSingoleGestioni(
+        string permesso, bool indice, bool clienti, bool tecniche)
+    {
+        var service = CreaAuthorizationService(isDevelopment: false);
+        var principal = CreaPrincipal(new Claim(AutorizzazioneApplicazione.ClaimPermesso, permesso));
+
+        var accessoIndice = await service.AuthorizeAsync(principal, null, AutorizzazioneApplicazione.PolicyIndiceAnagrafiche);
+        var accessoClienti = await service.AuthorizeAsync(principal, null, AutorizzazioneApplicazione.PolicyClienti);
+        var accessoTecniche = await service.AuthorizeAsync(principal, null, AutorizzazioneApplicazione.PolicyAnagrafiche);
+
+        Assert.Equal(indice, accessoIndice.Succeeded);
+        Assert.Equal(clienti, accessoClienti.Succeeded);
+        Assert.Equal(tecniche, accessoTecniche.Succeeded);
+    }
+
     [Fact]
     public async Task PolicyModulo_AdminAutorizzaSenzaPermessoEsplicito()
     {
@@ -178,6 +197,7 @@ public sealed class SicurezzaApplicazioneTests
     [InlineData(AllegatoEntita.CampionatureAdeguamenti, PermessiApplicazione.Campionature)]
     [InlineData(AllegatoEntita.Articoli, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.ModelliCiclo, PermessiApplicazione.Anagrafiche)]
+    [InlineData(AllegatoEntita.Fornitori, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.DistintaBaseNodi, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.DistintaMateriali, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.DistintaLavorazioni, PermessiApplicazione.Anagrafiche)]

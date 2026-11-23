@@ -1,0 +1,12 @@
+@model IReadOnlyList<global::Preventivi.Core.Anagrafiche.FornitoreDipendenza>
+<div class="table-responsive">
+    <table class="table pfw-table">
+        <thead><tr><th>Riferimento</th><th>Numero</th></tr></thead>
+        <tbody>
+        @foreach (var dipendenza in Model)
+        {
+            <tr><td>@dipendenza.Tipo</td><td>@dipendenza.Numero</td></tr>
+        }
+        </tbody>
+    </table>
+</div>

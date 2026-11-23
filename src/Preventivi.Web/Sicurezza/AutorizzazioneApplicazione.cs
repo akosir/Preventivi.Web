@@ -20,6 +20,7 @@ public static class AutorizzazioneApplicazione
     public const string PolicyRichiesteClienti = "RichiesteClienti";
     public const string PolicyCampionature = "Campionature";
     public const string PolicyAnagrafiche = "Anagrafiche";
+    public const string PolicyIndiceAnagrafiche = "IndiceAnagrafiche";
 
     public static void ConfiguraCookie(
         CookieAuthenticationOptions options,
@@ -65,6 +66,10 @@ public static class AutorizzazioneApplicazione
             options,
             PolicyAnagrafiche,
             PermessiApplicazione.Anagrafiche);
+        options.AddPolicy(PolicyIndiceAnagrafiche, policy =>
+            policy.RequireAssertion(context =>
+                PuoAccedereAlPermesso(context.User, PermessiApplicazione.Clienti) ||
+                PuoAccedereAlPermesso(context.User, PermessiApplicazione.Anagrafiche)));
     }
 
     public static void ConfiguraPagine(RazorPagesOptions options)
@@ -78,7 +83,12 @@ public static class AutorizzazioneApplicazione
             "/RichiesteClienti",
             PolicyRichiesteClienti);
         options.Conventions.AuthorizeFolder("/Campionature", PolicyCampionature);
-        options.Conventions.AuthorizeFolder("/Anagrafiche", PolicyAnagrafiche);
+        options.Conventions.AddFolderApplicationModelConvention("/Anagrafiche", model =>
+        {
+            if (model.ViewEnginePath != "/Anagrafiche/Index")
+                model.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter(PolicyAnagrafiche));
+        });
+        options.Conventions.AuthorizePage("/Anagrafiche/Index", PolicyIndiceAnagrafiche);
         options.Conventions.AuthorizeFolder("/Dev", PolicyDevelopmentAdmin);
         options.Conventions.AuthorizePage("/TestDb", PolicyDevelopmentAdmin);
     }
@@ -113,6 +123,7 @@ public static class AutorizzazioneApplicazione
             AllegatoEntita.CampionatureRilievi => PermessiApplicazione.Campionature,
             AllegatoEntita.CampionatureAdeguamenti => PermessiApplicazione.Campionature,
             AllegatoEntita.Articoli => PermessiApplicazione.Anagrafiche,
+            AllegatoEntita.Fornitori => PermessiApplicazione.Anagrafiche,
             AllegatoEntita.ModelliCiclo => PermessiApplicazione.Anagrafiche,
             AllegatoEntita.DistintaBaseNodi => PermessiApplicazione.Anagrafiche,
             AllegatoEntita.DistintaMateriali => PermessiApplicazione.Anagrafiche,

@@ -1919,6 +1919,70 @@ duplicazione e indipendenza degli allegati. Questi esiti runtime sono
 riferiti dall'utente. Il codice aggiorna anche la selezione del nodo in
 Nuovo componente e la combo Tipo materiale in Nuovo materiale libero.
 
+### 5.21 Anagrafica Fornitori — decisioni 341–345
+
+**Classificazione:** [D]. **Stato:** decisioni approvate il 19 novembre 2026,
+implementazione autorizzata il 23 novembre 2026 con conferma esplicita
+dell'utente.
+**Fonte:** conferma esplicita dell'utente in questa sessione Work.
+
+- **341 — Dati del fornitore.** Codice univoco e ragione sociale obbligatori.
+  Partita IVA, codice fiscale, indirizzo, CAP, città, provincia, telefono,
+  email e referente facoltativi, utilizzando i campi già presenti.
+- **342 — Gestione e consultazione.** Elenco con ricerca per codice,
+  ragione sociale e dati fiscali, filtro attivi/non attivi e stampa dei
+  risultati. Pagine Nuovo, Dettaglio, Modifica ed Elimina conformi alla
+  UI del progetto. Collegamento nel menu Anagrafiche e nella dashboard.
+- **343 — Disattivazione e riattivazione.** Un fornitore disattivato resta
+  consultabile nei documenti e nelle associazioni esistenti e viene escluso
+  dalle nuove selezioni. Disattivazione e riattivazione riservate
+  all'amministratore.
+- **344 — Eliminazione controllata.** Eliminazione definitiva consentita
+  soltanto in assenza di riferimenti. In presenza di collegamenti, mostrare
+  le dipendenze che impediscono l'operazione e consentire la disattivazione.
+- **345 — Allegati, audit e concorrenza.** Allegati sulla scheda fornitore
+  tramite MB-01. Registrazione dell'utente e delle date delle operazioni,
+  con controllo rowversion per evitare sovrascritture concorrenti.
+
+La conferma delle decisioni precede la conferma dell'implementazione,
+secondo il metodo concordato per ciascun pacchetto.
+
+**[C] Implementazione predisposta.** Il pacchetto TEC-017 aggiunge le pagine
+Fornitori, ricerca e stampa, allegati MB-01, dipendenze per l'eliminazione e
+controllo amministrativo dei cambi di stato. Lo script
+`TEC-017_01_Anagrafica_Fornitori.sql` richiede `2026111901` e registra
+`2026112301`. Aggiunge audit e rowversion alla tabella esistente e una
+traccia delle operazioni in `FornitoriAudit`. Applicazione al database e
+collaudo runtime restano da eseguire.
+
+**[C] Verifiche locali del 23 novembre 2026.** Compilazione riuscita,
+142 test automatici superati, inclusi il rifiuto dei cambi di stato da
+parte di un operatore e la mappatura dei permessi degli allegati Fornitori.
+Verificati con ScriptDom i 13 blocchi SQL e verificata l'impronta del
+payload. Queste verifiche non attestano l'esecuzione sul database.
+
+**[C] Collaudo successivo riferito dall'utente.** L'utente ha confermato
+l'esecuzione dello script e l'esito positivo di creazione, modifica,
+ricerca, stampa, disattivazione e riattivazione, allegati, eliminazione
+con e senza dipendenze, concorrenza e permessi operatore. Questi
+riscontri runtime provengono dalle prove dell'utente.
+
+### 5.22 Organizzazione delle anagrafiche — decisione 346
+
+**[D] Decisione 346 approvata e implementazione autorizzata il 23 novembre
+2026 con conferma esplicita dell'utente.** Il menu laterale espone un'unica
+voce Anagrafiche. La pagina comune raccoglie Clienti e Fornitori nella
+sezione Clienti e fornitori e le altre gestioni nella sezione Anagrafiche
+tecniche. Entrambi gli elenchi commerciali espongono il ritorno ad
+Anagrafiche. I permessi delle singole gestioni continuano a determinare
+accesso e visibilità. L'indice comune è accessibile a chi dispone del
+permesso Clienti oppure Anagrafiche.
+
+**[C] Verifiche locali.** Compilazione riuscita e 145 test automatici
+superati, compresi i profili con il solo permesso Clienti, il solo permesso
+Anagrafiche e senza entrambi. La nuova navigazione resta da verificare
+a runtime nell'applicazione aggiornata.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

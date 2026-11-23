@@ -1,0 +1,29 @@
+@page
+@model global::Preventivi.Web.Pages.Anagrafiche.Fornitori.IndexModel
+@{ ViewData["Title"] = "Stampa fornitori"; }
+<div class="no-print d-flex gap-2 mb-3">
+    <a asp-page="./Index" asp-route-ricerca="@Model.Ricerca" asp-route-stato="@Model.Stato" class="pfw-btn pfw-btn-secondary">Torna ai risultati</a>
+    <button type="button" class="pfw-btn pfw-btn-primary" onclick="window.print()">Stampa</button>
+</div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><h1 class="pfw-panel-title">Fornitori</h1></div>
+    <div class="pfw-panel-body">
+        <p>Ricerca @(Model.Ricerca ?? "tutti") · Stato @(Model.Stato switch { "attivi" => "Attivi", "nonattivi" => "Non attivi", _ => "Tutti" }) · @Model.Fornitori.Count risultati</p>
+        <table class="table pfw-table">
+            <thead><tr><th>Codice</th><th>Ragione sociale</th><th>Dati fiscali</th><th>Indirizzo</th><th>Contatti</th><th>Stato</th></tr></thead>
+            <tbody>
+            @foreach (var fornitore in Model.Fornitori)
+            {
+                <tr>
+                    <td>@fornitore.CodiceFornitore</td>
+                    <td>@fornitore.RagioneSociale</td>
+                    <td>@fornitore.PartitaIVA<br />@fornitore.CodiceFiscale</td>
+                    <td>@fornitore.Indirizzo<br />@fornitore.CAP @fornitore.Citta @fornitore.Provincia</td>
+                    <td>@fornitore.Telefono<br />@fornitore.Email<br />@fornitore.Referente</td>
+                    <td>@(fornitore.Attivo ? "Attivo" : "Non attivo")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

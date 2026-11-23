@@ -1,0 +1,88 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Anagrafiche.Fornitori.DettaglioModel
+@using global::Preventivi.Core.Allegati
+
+@{
+    var fornitore = Model.Fornitore!;
+    var returnUrl = Url.Page("/Anagrafiche/Fornitori/Dettaglio", new { id = fornitore.IdFornitore })!;
+    ViewData["Title"] = "Dettaglio fornitore";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="./Index">Fornitori</a></div>
+        <h1 class="h3 mb-0">@fornitore.CodiceFornitore - @fornitore.RagioneSociale</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-page="./Nuovo" class="pfw-btn pfw-btn-secondary">Nuovo</a>
+        <a asp-page="./Modifica" asp-route-id="@fornitore.IdFornitore" class="pfw-btn pfw-btn-primary">Modifica</a>
+        <a asp-page="./Elimina" asp-route-id="@fornitore.IdFornitore" class="pfw-btn pfw-btn-danger">Elimina</a>
+    </div>
+</div>
+
+@if (TempData["MessaggioSuccesso"] is string messaggio)
+{
+    <div class="alert alert-success" role="alert">@messaggio</div>
+}
+
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Dati fornitore</h2><div class="pfw-panel-subtitle">Valori correnti dell'anagrafica</div></div></div>
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <dl class="row mb-0">
+            <dt class="col-sm-4 col-lg-3">Codice fornitore</dt><dd class="col-sm-8 col-lg-9">@fornitore.CodiceFornitore</dd>
+            <dt class="col-sm-4 col-lg-3">Ragione sociale</dt><dd class="col-sm-8 col-lg-9">@fornitore.RagioneSociale</dd>
+            <dt class="col-sm-4 col-lg-3">Partita IVA</dt><dd class="col-sm-8 col-lg-9">@(fornitore.PartitaIVA ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Codice fiscale</dt><dd class="col-sm-8 col-lg-9">@(fornitore.CodiceFiscale ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Indirizzo</dt><dd class="col-sm-8 col-lg-9">@(fornitore.Indirizzo ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">CAP</dt><dd class="col-sm-8 col-lg-9">@(fornitore.CAP ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Città</dt><dd class="col-sm-8 col-lg-9">@(fornitore.Citta ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Provincia</dt><dd class="col-sm-8 col-lg-9">@(fornitore.Provincia ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Telefono</dt><dd class="col-sm-8 col-lg-9">@(fornitore.Telefono ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Email</dt><dd class="col-sm-8 col-lg-9">@(fornitore.Email ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Referente</dt><dd class="col-sm-8 col-lg-9">@(fornitore.Referente ?? "-")</dd>
+            <dt class="col-sm-4 col-lg-3">Stato</dt><dd class="col-sm-8 col-lg-9"><span class="pfw-badge @(fornitore.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(fornitore.Attivo ? "Attivo" : "Non attivo")</span></dd>
+            <dt class="col-sm-4 col-lg-3">Creato il</dt><dd class="col-sm-8 col-lg-9">@fornitore.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @fornitore.UtenteCreazione</dd>
+            <dt class="col-sm-4 col-lg-3">Ultima modifica</dt><dd class="col-sm-8 col-lg-9">@(fornitore.DataModifica.HasValue ? $"{fornitore.DataModifica:dd/MM/yyyy HH:mm} da {fornitore.UtenteModifica}" : "-")</dd>
+        </dl>
+    </div>
+    <div class="pfw-panel-footer d-flex justify-content-between gap-2">
+        <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Torna all'elenco</a>
+        @if (Model.Amministratore)
+        {
+        <form method="post" asp-page-handler="@(fornitore.Attivo ? "Disattiva" : "Attiva")">
+            <input type="hidden" name="versioneRigaBase64" value="@Convert.ToBase64String(fornitore.VersioneRiga)" />
+            <button type="submit" class="pfw-btn pfw-btn-secondary">@(fornitore.Attivo ? "Disattiva" : "Riattiva")</button>
+        </form>
+        }
+    </div>
+</section>
+
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Allegati fornitore</h2><div class="pfw-panel-subtitle">Documenti associati al fornitore</div></div></div>
+    <div class="pfw-panel-body">
+        @await Html.PartialAsync(
+            "~/Pages/Shared/Allegati/_AllegatiToolbar.cshtml",
+            new global::Preventivi.Web.UI.Modules.Allegati.AllegatiToolbarModel
+            {
+                TestoNuovo = "Nuovo allegato",
+                UrlNuovo = $"/Allegati/Nuovo?Entita={AllegatoEntita.Fornitori}&IdEntita={fornitore.IdFornitore}&ReturnUrl={Uri.EscapeDataString(returnUrl)}",
+                MostraNuovo = true,
+                MostraAggiorna = false
+            })
+
+        @if (Model.Allegati.Allegati.Count == 0)
+        {
+            <div class="pfw-secondary-text mt-3">Nessun allegato registrato.</div>
+        }
+        else
+        {
+            @await Html.PartialAsync("~/Pages/Shared/Allegati/_AllegatiGrid.cshtml", Model.Allegati)
+        }
+    </div>
+</section>
+
+@if (Model.Dipendenze.Count > 0)
+{
+    <section class="pfw-panel mb-3"><div class="pfw-panel-header"><h2 class="pfw-panel-title">Riferimenti collegati</h2></div><div class="pfw-panel-body"><partial name="Shared/Anagrafiche/_FornitoreDipendenze" model="Model.Dipendenze" /></div></section>
+}

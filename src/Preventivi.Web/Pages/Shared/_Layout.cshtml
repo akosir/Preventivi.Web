@@ -162,23 +162,11 @@
                 {
                     <div class="app-menu-section">Dati di base</div>
 
-                    @if (puoClienti)
-                    {
-                        <a class="app-menu-item @(PaginaInArea("/Clienti") ? "active" : string.Empty)"
-                           asp-page="/Clienti/Index">
-                            <span class="app-menu-item-symbol" aria-hidden="true">C</span>
-                            <span>Clienti</span>
-                        </a>
-                    }
-
-                    @if (puoAnagrafiche)
-                    {
-                        <a class="app-menu-item @(PaginaInArea("/Anagrafiche") ? "active" : string.Empty)"
+                        <a class="app-menu-item @(PaginaInArea("/Anagrafiche") || PaginaInArea("/Clienti") ? "active" : string.Empty)"
                            asp-page="/Anagrafiche/Index">
                             <span class="app-menu-item-symbol" aria-hidden="true">A</span>
                             <span>Anagrafiche</span>
                         </a>
-                    }
                 }
 
             </nav>

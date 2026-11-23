@@ -1,0 +1,61 @@
+@model global::Preventivi.Web.UI.Modules.Anagrafiche.FornitoreFormModel
+@{ ViewData.TemplateInfo.HtmlFieldPrefix = "Dati"; }
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+<input asp-for="VersioneRigaBase64" type="hidden" />
+<div class="row g-3">
+    <div class="col-12 col-md-6 pfw-field-required">
+        <label asp-for="CodiceFornitore" class="form-label">Codice fornitore *</label>
+        <input asp-for="CodiceFornitore" class="form-control" maxlength="30" />
+        <span asp-validation-for="CodiceFornitore" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6 pfw-field-required">
+        <label asp-for="RagioneSociale" class="form-label">Ragione sociale *</label>
+        <input asp-for="RagioneSociale" class="form-control" maxlength="150" />
+        <span asp-validation-for="RagioneSociale" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="PartitaIVA" class="form-label">Partita IVA</label>
+        <input asp-for="PartitaIVA" class="form-control" maxlength="20" />
+        <span asp-validation-for="PartitaIVA" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="CodiceFiscale" class="form-label">Codice fiscale</label>
+        <input asp-for="CodiceFiscale" class="form-control" maxlength="20" />
+        <span asp-validation-for="CodiceFiscale" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="Indirizzo" class="form-label">Indirizzo</label>
+        <input asp-for="Indirizzo" class="form-control" maxlength="150" />
+        <span asp-validation-for="Indirizzo" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="CAP" class="form-label">CAP</label>
+        <input asp-for="CAP" class="form-control" maxlength="10" />
+        <span asp-validation-for="CAP" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="Citta" class="form-label">Città</label>
+        <input asp-for="Citta" class="form-control" maxlength="100" />
+        <span asp-validation-for="Citta" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="Provincia" class="form-label">Provincia</label>
+        <input asp-for="Provincia" class="form-control" maxlength="10" />
+        <span asp-validation-for="Provincia" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="Telefono" class="form-label">Telefono</label>
+        <input asp-for="Telefono" class="form-control" maxlength="50" />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" maxlength="150" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="col-12 col-md-6">
+        <label asp-for="Referente" class="form-label">Referente</label>
+        <input asp-for="Referente" class="form-control" maxlength="100" />
+        <span asp-validation-for="Referente" class="text-danger"></span>
+    </div>
+</div>
