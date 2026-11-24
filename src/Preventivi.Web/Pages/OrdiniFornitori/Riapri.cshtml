@@ -1,0 +1,26 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.OrdiniFornitori.RiapriModel
+@{ var ordine = Model.Ordine!; ViewData["Title"] = "Riapri ordine in Bozza"; }
+<div class="mb-3"><a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore">Ordine @ordine.NumeroCompleto</a><h1 class="h3 mt-2">Riapri in Bozza</h1></div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><h2 class="pfw-panel-title">Correzione amministrativa</h2></div>
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <p>La riapertura permette di correggere l’ordine @ordine.NumeroCompleto. Una successiva conferma genererà una nuova versione del documento inviato.</p>
+        @if (Model.HaRicezioni) { <p class="alert alert-warning">L’ordine contiene ricezioni e non può essere riaperto.</p> }
+        else if (string.Equals(ordine.Stato, "Inviato", StringComparison.OrdinalIgnoreCase))
+        {
+            <form method="post">
+                <input asp-for="Versione" type="hidden" />
+                <div class="pfw-field-required mb-3">
+                    <label asp-for="Motivazione" class="form-label">Motivazione amministrativa *</label>
+                    <textarea asp-for="Motivazione" class="form-control" rows="4" maxlength="500" required></textarea>
+                    <span asp-validation-for="Motivazione" class="text-danger"></span>
+                </div>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Conferma riapertura</button>
+            </form>
+        }
+    </div>
+    <div class="pfw-panel-footer"><a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-secondary">Annulla</a></div>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

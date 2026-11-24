@@ -2053,6 +2053,75 @@ Il collaudo runtime con profilo operatore resta pendente perché la
 gestione utenti non è ancora disponibile. I controlli dei permessi sono
 coperti dai test automatici locali.
 
+### 5.24 TEC-018 — Invio ordini, decisioni 352–356
+
+**Classificazione:** [D]. **Stato:** decisioni approvate il 24 novembre
+2026, implementazione autorizzata dalla successiva conferma esplicita
+dell'utente nella stessa sessione.
+**Fonte:** conferma esplicita dell'utente in questa sessione Work.
+
+- **352 — Conferma dell'ordine.** Passaggio da Bozza a Inviato mediante
+  azione esplicita. Registrazione di data e utente della conferma.
+- **353 — Controlli prima dell'invio.** Fornitore attivo, almeno una riga
+  Materiale o Lavorazione, quantità positive e totali ricalcolati. Le righe
+  Nota possono accompagnare l'ordine.
+- **354 — Documento inviato.** Alla conferma vengono conservati i dati
+  del fornitore e i contenuti dell'ordine, così la stampa successiva
+  riproduce quanto confermato.
+- **355 — Registrazione dell'invio.** Il pulsante Segna come inviato
+  registra l'invio effettuato dall'operatore. L'invio automatico tramite
+  email sarà oggetto di una decisione dedicata.
+- **356 — Correzione amministrativa.** Un amministratore può riportare
+  un ordine Inviato in Bozza, con motivazione obbligatoria e audit,
+  purché sia privo di ricezioni. La successiva conferma conserva anche
+  lo storico del documento precedente.
+
+Generazione dai preventivi e ricezioni seguiranno nei pacchetti successivi.
+La conferma delle decisioni precede la conferma separata
+dell'implementazione secondo il metodo concordato.
+
+**[C] Implementazione predisposta.** Lo script
+`TEC-018_02_Invio_Documenti_Storici.sql` richiede `2026112302` e registra
+`2026112401` (`TEC-018-INVIO`). La conferma verifica la versione
+dell'ordine, lo stato Bozza, il fornitore attivo e le righe. Ricalcolo,
+passaggio a Inviato, copia JSON di testata/fornitore/righe e audit
+avvengono nella stessa transazione. I documenti sono numerati per ordine,
+immutabili e consultabili dal dettaglio.
+
+La stampa di un ordine inviato usa l'ultima copia storica. Ogni copia
+precedente è apribile esplicitamente anche dopo la riapertura. Per gli
+ordini preesistenti senza copia storica, la stampa segnala l'uso dei dati
+attuali. La riapertura è riservata ad ADMIN e richiede motivazione,
+versione coerente, stato Inviato e assenza di quantità ricevute. L'audit
+registra stato precedente, nuovo stato, motivazione, data e utente.
+Lo storico dei documenti impedisce l'eliminazione dell'ordine anche
+dopo la riapertura in Bozza.
+
+L'applicazione dello script e il successivo collaudo riferito dall'utente
+sono documentati sotto.
+
+**[C] Verifiche locali del 24 novembre 2026.** Compilazione riuscita,
+166 test automatici superati. I nuovi casi coprono la riapertura negata
+all'operatore, motivazione mancante e ricezioni presenti, la lettura delle
+copie storiche con date, decimali e rowversion, il documento richiesto
+assente e la segnalazione degli ordini precedenti senza copia.
+Verificati con ScriptDom i 13 blocchi SQL. Questi controlli non
+attestano l'applicazione dello script o il collaudo sul database.
+
+**[C] Collaudo riferito dall'utente il 24 novembre 2026.** L'utente ha
+confermato l'esecuzione dello script e l'esito positivo di invio valido,
+registrazione di data/utente, blocco delle modifiche dopo invio,
+conservazione della stampa storica dopo modifica dell'anagrafica
+fornitore, riapertura amministrativa e seconda conferma con entrambe
+le versioni consultabili. Confermati i blocchi per ordine vuoto, sole
+note, fornitore disattivato e motivazione di riapertura mancante, oltre
+alle prove concorrenti di doppia conferma e doppia riapertura. Questi
+riscontri runtime provengono dalle prove dell'utente.
+
+Restano pendenti i collaudi runtime con profilo operatore e con ricezioni
+presenti, fino alla disponibilità delle relative gestioni. I blocchi
+corrispondenti sono coperti dai test automatici locali.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

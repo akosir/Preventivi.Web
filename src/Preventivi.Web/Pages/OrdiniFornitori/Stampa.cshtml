@@ -8,6 +8,14 @@
 <section class="pfw-panel">
     <div class="pfw-panel-header"><h1 class="pfw-panel-title">Ordine fornitore @ordine.NumeroCompleto</h1><span class="pfw-badge pfw-badge-secondary">@ordine.Stato</span></div>
     <div class="pfw-panel-body">
+        @if (Model.Documento is not null)
+        {
+            <p>Documento inviato · Versione @Model.Documento.NumeroVersione · Confermato il @Model.Documento.ConfermatoIl.ToString("dd/MM/yyyy HH:mm") da @Model.Documento.ConfermatoDa</p>
+        }
+        @if (Model.CopiaStoricaAssente)
+        {
+            <p class="alert alert-warning">Per questo ordine manca una copia storica. La stampa riporta i dati attuali.</p>
+        }
         <div class="row mb-4">
             <div class="col-6"><h2 class="h5">@ordine.RagioneSociale</h2><p>@ordine.Indirizzo<br />@ordine.CAP @ordine.Citta @ordine.Provincia<br />@ordine.PartitaIVA<br />@ordine.Email</p></div>
             <div class="col-6"><p>Data ordine @ordine.DataOrdine.ToString("dd/MM/yyyy")<br />Consegna prevista @(ordine.DataConsegnaPrevista?.ToString("dd/MM/yyyy") ?? "-")</p></div>

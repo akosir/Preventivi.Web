@@ -49,6 +49,22 @@ public sealed class OrdineFornitoreRepository(DatabaseExecutor db) : IOrdineForn
             [Numero("@IdOrdine", idOrdine), Numero("@IdRiga", idRiga), Versione("@VersioneOrdine", versioneOrdine),
              Versione("@VersioneRiga", versioneRiga), Testo("@Utente", utente, 256)], cancellationToken);
 
+    public Task<IReadOnlyList<OrdineFornitoreDocumento>> GetDocumentiAsync(int idOrdine, CancellationToken cancellationToken = default) =>
+        db.QueryAsync<OrdineFornitoreDocumento>("dbo.OrdiniFornitori_Documenti_Elenco", [Numero("@IdOrdine", idOrdine)], cancellationToken);
+
+    public Task<OrdineFornitoreDocumentoDettaglio?> GetDocumentoAsync(int idOrdine, int? idDocumento = null, CancellationToken cancellationToken = default) =>
+        db.QuerySingleAsync<OrdineFornitoreDocumentoDettaglio>("dbo.OrdiniFornitori_Documenti_Dettaglio",
+            [Numero("@IdOrdine", idOrdine), Numero("@IdDocumento", idDocumento)], cancellationToken);
+
+    public Task<int> ConfermaInvioAsync(int idOrdine, byte[] versioneOrdine, string utente, CancellationToken cancellationToken = default) =>
+        db.ExecuteScalarAsync<int>("dbo.OrdiniFornitori_ConfermaInvio",
+            [Numero("@IdOrdine", idOrdine), Versione("@VersioneOrdine", versioneOrdine), Testo("@Utente", utente, 256)], cancellationToken);
+
+    public async Task RiapriAsync(int idOrdine, byte[] versioneOrdine, string motivazione, string utente, CancellationToken cancellationToken = default) =>
+        await db.ExecuteAsync("dbo.OrdiniFornitori_Riapri",
+            [Numero("@IdOrdine", idOrdine), Versione("@VersioneOrdine", versioneOrdine),
+             Testo("@Motivazione", motivazione, 500), Testo("@Utente", utente, 256)], cancellationToken);
+
     private static SqlParameter Numero(string nome, int? valore) => new(nome, SqlDbType.Int) { Value = (object?)valore ?? DBNull.Value };
     private static SqlParameter Data(string nome, DateTime? valore) => new(nome, SqlDbType.Date) { Value = (object?)valore?.Date ?? DBNull.Value };
     private static SqlParameter Testo(string nome, string? valore, int lunghezza) =>

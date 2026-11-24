@@ -5,13 +5,18 @@
    var returnUrl = Url.Page("./Dettaglio", new { id = ordine.IdOrdineFornitore })!; }
 <div class="d-flex justify-content-between flex-wrap gap-3 mb-3">
     <div><a asp-page="./Index">Ordini fornitori</a><h1 class="h3 mt-2">Ordine @ordine.NumeroCompleto</h1></div>
-    <div class="d-flex gap-2 align-items-start">
+    <div class="d-flex flex-wrap gap-2 align-items-start">
         <a asp-page="./Modifica" class="pfw-btn pfw-btn-secondary">Nuovo</a>
         <a asp-page="./Stampa" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-secondary">Stampa ordine</a>
         @if (ordine.Modificabile)
         {
+            <a asp-page="./Invio" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-primary">Segna come inviato</a>
             <a asp-page="./Modifica" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-primary">Modifica</a>
             <a asp-page="./Elimina" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-danger">Elimina</a>
+        }
+        @if (Model.PuoRiaprire)
+        {
+            <a asp-page="./Riapri" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-secondary">Riapri in Bozza</a>
         }
     </div>
 </div>
@@ -26,6 +31,10 @@
             <dt class="col-sm-4">Consegna prevista</dt><dd class="col-sm-8">@(ordine.DataConsegnaPrevista?.ToString("dd/MM/yyyy") ?? "-")</dd>
             <dt class="col-sm-4">Note</dt><dd class="col-sm-8 text-break">@ordine.Note</dd>
             <dt class="col-sm-4">Totale ordine</dt><dd class="col-sm-8 fw-bold">@ordine.TotaleOrdine.ToString("C2")</dd>
+            @if (ordine.DataInvio.HasValue)
+            {
+                <dt class="col-sm-4">Invio confermato</dt><dd class="col-sm-8">@ordine.DataInvio.Value.ToString("dd/MM/yyyy HH:mm") da @ordine.UtenteInvio</dd>
+            }
             <dt class="col-sm-4">Creato il</dt><dd class="col-sm-8">@ordine.DataCreazione.ToString("dd/MM/yyyy HH:mm") da @ordine.UtenteCreazione</dd>
             <dt class="col-sm-4">Ultima modifica</dt><dd class="col-sm-8">@(ordine.DataModifica.HasValue ? $"{ordine.DataModifica:dd/MM/yyyy HH:mm} da {ordine.UtenteModifica}" : "-")</dd>
         </dl>
@@ -61,6 +70,24 @@
         </table></div>
     }
 </section>
+@if (Model.Documenti.Count > 0)
+{
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header"><h2 class="pfw-panel-title">Documenti inviati</h2></div>
+        <div class="table-responsive">
+            <table class="table pfw-table">
+                <thead><tr><th>Versione</th><th>Confermato il</th><th>Confermato da</th><th>Documento</th></tr></thead>
+                <tbody>
+                @foreach (var documento in Model.Documenti)
+                {
+                    <tr><td>@documento.NumeroVersione</td><td>@documento.ConfermatoIl.ToString("dd/MM/yyyy HH:mm")</td><td>@documento.ConfermatoDa</td>
+                        <td><a asp-page="./Stampa" asp-route-id="@ordine.IdOrdineFornitore" asp-route-idDocumento="@documento.IdDocumento" class="pfw-btn pfw-btn-secondary">Apri documento</a></td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
 <section class="pfw-panel">
     <div class="pfw-panel-header"><h2 class="pfw-panel-title">Allegati ordine</h2></div>
     <div class="pfw-panel-body">

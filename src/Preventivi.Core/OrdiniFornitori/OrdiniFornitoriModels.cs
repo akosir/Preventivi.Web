@@ -48,6 +48,8 @@ public sealed class OrdineFornitoreDettaglio : OrdineFornitoreSalvataggio
     public DateTime? DataModifica { get; set; }
     public string UtenteCreazione { get; set; } = string.Empty;
     public string? UtenteModifica { get; set; }
+    public DateTime? DataInvio { get; set; }
+    public string? UtenteInvio { get; set; }
     public bool Modificabile => string.Equals(Stato, "Bozza", StringComparison.OrdinalIgnoreCase);
     public string NumeroCompleto => $"{Anno}-{NumeroOrdine:00000}";
 }
@@ -81,4 +83,19 @@ public sealed class OrdineFornitoreDipendenza
 {
     public string Tipo { get; set; } = string.Empty;
     public long Numero { get; set; }
+}
+
+public class OrdineFornitoreDocumento
+{
+    public int IdDocumento { get; set; }
+    public int IdOrdineFornitore { get; set; }
+    public int NumeroVersione { get; set; }
+    public DateTime ConfermatoIl { get; set; }
+    public string ConfermatoDa { get; set; } = string.Empty;
+}
+
+public sealed class OrdineFornitoreDocumentoDettaglio : OrdineFornitoreDocumento
+{
+    public string TestataJson { get; set; } = string.Empty;
+    public string RigheJson { get; set; } = string.Empty;
 }

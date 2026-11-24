@@ -10,4 +10,8 @@ public interface IOrdineFornitoreRepository
     Task<int> SalvaRigaAsync(int idOrdine, int? idRiga, OrdineFornitoreRigaSalvataggio modello, CancellationToken cancellationToken = default);
     Task EliminaAsync(int id, byte[] versione, string utente, CancellationToken cancellationToken = default);
     Task EliminaRigaAsync(int idOrdine, int idRiga, byte[] versioneOrdine, byte[] versioneRiga, string utente, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<OrdineFornitoreDocumento>> GetDocumentiAsync(int idOrdine, CancellationToken cancellationToken = default);
+    Task<OrdineFornitoreDocumentoDettaglio?> GetDocumentoAsync(int idOrdine, int? idDocumento = null, CancellationToken cancellationToken = default);
+    Task<int> ConfermaInvioAsync(int idOrdine, byte[] versioneOrdine, string utente, CancellationToken cancellationToken = default);
+    Task RiapriAsync(int idOrdine, byte[] versioneOrdine, string motivazione, string utente, CancellationToken cancellationToken = default);
 }

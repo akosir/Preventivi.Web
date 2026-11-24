@@ -1,0 +1,24 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.OrdiniFornitori.InvioModel
+@{ var ordine = Model.Ordine!; ViewData["Title"] = "Segna ordine come inviato"; }
+<div class="mb-3"><a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore">Ordine @ordine.NumeroCompleto</a><h1 class="h3 mt-2">Segna come inviato</h1></div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><h2 class="pfw-panel-title">Conferma dell’invio</h2></div>
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <p>Ordine @ordine.NumeroCompleto · @ordine.RagioneSociale · Totale @ordine.TotaleOrdine.ToString("C2")</p>
+        <p>Conferma l’invio effettuato al fornitore. Verranno registrati data, utente e una copia del documento con i totali ricalcolati.</p>
+        @if (!Model.FornitoreAttivo) { <p class="alert alert-warning">Per confermare l’invio occorre un fornitore attivo.</p> }
+        @if (!Model.Righe.Any(x => x.TipoRiga is "Materiale" or "Lavorazione"))
+        { <p class="alert alert-warning">Inserire almeno una riga Materiale o Lavorazione.</p> }
+        <p>Dopo la conferma, la correzione dell’ordine richiederà una riapertura amministrativa.</p>
+        @if (ordine.Modificabile)
+        {
+            <form method="post">
+                <input asp-for="Versione" type="hidden" />
+                <button type="submit" class="pfw-btn pfw-btn-primary">Conferma invio effettuato</button>
+            </form>
+        }
+    </div>
+    <div class="pfw-panel-footer"><a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-secondary">Annulla</a></div>
+</section>

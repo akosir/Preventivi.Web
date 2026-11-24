@@ -5,6 +5,23 @@ versionati del progetto.
 
 ## Regole
 
+### Invio e storico ordini TEC-018, secondo pacchetto
+
+Dopo `2026112302`, eseguire nel database di test
+`06_Aggiornamenti/TEC-018_02_Invio_Documenti_Storici.sql`.
+Installa `2026112401`, codice `TEC-018-INVIO`, richiesto
+dall'applicazione aggiornata. Aggiunge DataInvio e UtenteInvio,
+motivazione e stati nell'audit e OrdiniFornitoriDocumenti con copie
+JSON immutabili. Le procedure confermano l'invio e riaprono in Bozza
+con controlli di stato, concorrenza e ricezioni.
+
+Il collaudo deve coprire ordine vuoto o con sole note, fornitore
+disattivato, invio valido e totali, blocco delle modifiche dopo invio,
+stampa dopo modifica dell'anagrafica del fornitore, riapertura
+amministrativa motivata, seconda conferma con conservazione della prima
+copia, concorrenza e permessi. Gli ordini precedenti privi di copia
+storica restano consultabili con avviso nella stampa.
+
 ### Ordini fornitori TEC-018, primo pacchetto
 
 Dopo la versione `2026112301`, eseguire sul database di test
