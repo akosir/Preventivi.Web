@@ -62,6 +62,8 @@
             global::Preventivi.Core.Sicurezza.PermessiApplicazione.Anagrafiche);
 
         var modelliPreventivoAttivi = PaginaInArea("/Preventivi/Modelli");
+        var puoOrdini = global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PuoAccedereAlPermesso(
+            User, global::Preventivi.Core.Sicurezza.PermessiApplicazione.OrdiniFornitori);
         var preventiviAttivi = PaginaInArea("/Preventivi") && !modelliPreventivoAttivi;
     }
 
@@ -89,7 +91,7 @@
                     <span class="app-menu-home-copy">Dashboard</span>
                 </a>
 
-                @if (puoRichieste || puoCampionature || puoPreventivi)
+                @if (puoRichieste || puoCampionature || puoPreventivi || puoOrdini)
                 {
                     <div class="app-menu-section">
                         Flusso preventivo
@@ -135,16 +137,18 @@
                             </a>
                         }
 
-                        <div class="app-process-step is-disabled"
-                             aria-disabled="true"
-                             title="Gestione non ancora disponibile">
+                        @if (puoOrdini)
+                        {
+                        <a class="app-process-step @(PaginaInArea("/OrdiniFornitori") ? "active" : string.Empty)"
+                           asp-page="/OrdiniFornitori/Index">
                             <span class="app-process-number">4</span>
                             <span class="app-process-copy">
                                 <strong>Ordini fornitori</strong>
                                 <small>Approvvigionamento</small>
                             </span>
-                            <span class="app-process-status">Da attivare</span>
-                        </div>
+                            <span class="app-process-chevron" aria-hidden="true">›</span>
+                        </a>
+                        }
                     </div>
                 }
 

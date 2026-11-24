@@ -1,0 +1,110 @@
+@page
+@model global::Preventivi.Web.Pages.OrdiniFornitori.RigaModel
+@{ var ordine = Model.Ordine!; ViewData["Title"] = Model.Elimina ? "Elimina riga ordine" : Model.Riga is null ? "Nuova riga ordine" : "Modifica riga ordine"; }
+<div class="mb-3"><a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore">Ordine @ordine.NumeroCompleto</a><h1 class="h3 mt-2">@ViewData["Title"]</h1></div>
+<section class="pfw-panel">
+@if (Model.Elimina)
+{
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        @if (Model.Dipendenze.Count > 0)
+        {
+            <partial name="Shared/OrdiniFornitori/_Dipendenze" model="Model.Dipendenze" />
+        }
+        else
+        {
+            <p>Confermi l’eliminazione della riga @Model.Riga!.RigaNr — @Model.Riga.Descrizione?</p>
+            <form method="post" asp-page-handler="Elimina" asp-route-idOrdine="@ordine.IdOrdineFornitore" asp-route-id="@Model.Riga!.IdRigaOrdineFornitore">
+                <input asp-for="Dati.VersioneOrdine" type="hidden" /><input asp-for="Dati.VersioneRiga" type="hidden" />
+                <button type="submit" class="pfw-btn pfw-btn-danger">Conferma eliminazione</button>
+            </form>
+        }
+    </div>
+}
+else
+{
+    <form method="post" asp-route-idOrdine="@ordine.IdOrdineFornitore" asp-route-id="@Model.Riga?.IdRigaOrdineFornitore">
+        <div class="pfw-panel-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <input asp-for="Dati.VersioneOrdine" type="hidden" /><input asp-for="Dati.VersioneRiga" type="hidden" />
+            <div class="row g-3">
+                <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Dati.RigaNr" class="form-label">Numero riga *</label><input asp-for="Dati.RigaNr" class="form-control" /><span asp-validation-for="Dati.RigaNr" class="text-danger"></span></div>
+                <div class="col-12 col-md-3 pfw-field-required">
+                    <label asp-for="Dati.TipoRiga" class="form-label">Tipo riga *</label>
+                    <select asp-for="Dati.TipoRiga" class="form-select" id="tipo-riga">
+                        <option value="Materiale">Materiale</option><option value="Lavorazione">Lavorazione</option><option value="Nota">Nota</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6" id="selettore-materiale">
+                    <label asp-for="Dati.IdMateriale" class="form-label">Materiale da anagrafica</label>
+                    <select asp-for="Dati.IdMateriale" class="form-select" id="materiale-riga">
+                        <option value="">Materiale libero</option>
+                        @foreach (var m in Model.Materiali) { <option value="@m.IdMateriale" data-descrizione="@m.Descrizione" data-um="@m.CodiceUM">@m.CodiceMateriale - @m.Descrizione@(m.Attivo ? "" : " (non attivo)")</option> }
+                    </select>
+                </div>
+                <div class="col-12 col-md-6" id="selettore-lavorazione">
+                    <label asp-for="Dati.IdLavorazione" class="form-label">Lavorazione da anagrafica</label>
+                    <select asp-for="Dati.IdLavorazione" class="form-select" id="lavorazione-riga">
+                        <option value="">Lavorazione libera</option>
+                        @foreach (var l in Model.Lavorazioni) { <option value="@l.IdLavorazione" data-descrizione="@l.Descrizione">@l.CodiceLavorazione - @l.Descrizione@(l.Attiva ? "" : " (non attiva)")</option> }
+                    </select>
+                </div>
+                <div class="col-12 pfw-field-required"><label asp-for="Dati.Descrizione" class="form-label">Descrizione *</label><input asp-for="Dati.Descrizione" class="form-control" id="descrizione-riga" /><span asp-validation-for="Dati.Descrizione" class="text-danger"></span></div>
+                <div class="col-12 col-md-3">
+                    <label asp-for="Dati.UM" class="form-label">Unità di misura</label>
+                    <select asp-for="Dati.UM" class="form-select" id="um-riga">
+                        <option value="">Non specificata</option>
+                        @foreach (var um in Model.UnitaMisura) { <option value="@um.CodiceUM">@um.Display</option> }
+                        @if (!string.IsNullOrWhiteSpace(Model.Dati.UM) && !Model.UnitaMisura.Any(x => x.CodiceUM == Model.Dati.UM))
+                        { <option value="@Model.Dati.UM">@Model.Dati.UM (valore precedente)</option> }
+                    </select>
+                </div>
+                <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Dati.Quantita" class="form-label">Quantità *</label><input asp-for="Dati.Quantita" class="form-control text-end" /><span asp-validation-for="Dati.Quantita" class="text-danger"></span></div>
+                <div class="col-12 col-md-3"><label asp-for="Dati.PrezzoUnitario" class="form-label">Prezzo unitario</label><input asp-for="Dati.PrezzoUnitario" class="form-control text-end" id="prezzo-riga" /><span asp-validation-for="Dati.PrezzoUnitario" class="text-danger"></span></div>
+                <div class="col-12 col-md-3"><label asp-for="Dati.DataConsegnaPrevista" class="form-label">Consegna prevista</label><input asp-for="Dati.DataConsegnaPrevista" class="form-control" /></div>
+                <div class="col-12"><label asp-for="Dati.Note" class="form-label">Note</label><textarea asp-for="Dati.Note" class="form-control" rows="3"></textarea><span asp-validation-for="Dati.Note" class="text-danger"></span></div>
+            </div>
+        </div>
+        <div class="pfw-panel-footer d-flex justify-content-end"><button type="submit" class="pfw-btn pfw-btn-primary">Salva</button></div>
+    </form>
+}
+    <div class="pfw-panel-footer"><a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-secondary">Torna all’ordine</a></div>
+</section>
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const tipo = document.getElementById("tipo-riga");
+            if (!tipo) return;
+            const materiale = document.getElementById("materiale-riga");
+            const lavorazione = document.getElementById("lavorazione-riga");
+            const descrizione = document.getElementById("descrizione-riga");
+            const um = document.getElementById("um-riga");
+            const prezzo = document.getElementById("prezzo-riga");
+            function aggiornaTipo() {
+                document.getElementById("selettore-materiale").hidden = tipo.value !== "Materiale";
+                document.getElementById("selettore-lavorazione").hidden = tipo.value !== "Lavorazione";
+                materiale.disabled = tipo.value !== "Materiale";
+                lavorazione.disabled = tipo.value !== "Lavorazione";
+                prezzo.readOnly = tipo.value === "Nota";
+                if (tipo.value === "Nota") prezzo.value = "0";
+            }
+            function applicaSelezione(selettore) {
+                const opzione = selettore.selectedOptions[0];
+                descrizione.value = opzione?.dataset.descrizione || "";
+                if (selettore === materiale) um.value = opzione?.dataset.um || "";
+            }
+            tipo.addEventListener("change", () => {
+                materiale.value = "";
+                lavorazione.value = "";
+                descrizione.value = "";
+                um.value = "";
+                aggiornaTipo();
+            });
+            materiale.addEventListener("change", () => applicaSelezione(materiale));
+            lavorazione.addEventListener("change", () => applicaSelezione(lavorazione));
+            aggiornaTipo();
+        })();
+    </script>
+}

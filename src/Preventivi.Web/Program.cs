@@ -90,6 +90,8 @@ builder.Services.AddScoped<
     ArticoloRepository>();
 
 builder.Services.AddScoped<IFornitoreRepository, FornitoreRepository>();
+builder.Services.AddScoped<global::Preventivi.Core.OrdiniFornitori.IOrdineFornitoreRepository,
+    global::Preventivi.Data.OrdiniFornitori.OrdineFornitoreRepository>();
 
 builder.Services.AddScoped<
     IModelloCicloRepository,

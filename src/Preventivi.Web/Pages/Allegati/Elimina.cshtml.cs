@@ -163,6 +163,11 @@ public class EliminaModel : PageModel
             return RedirectToPage("/Anagrafiche/Fornitori/Dettaglio", new { id = allegato.IdEntita });
         }
 
+        if (allegato.Entita == AllegatoEntita.OrdiniFornitori)
+        {
+            return RedirectToPage("/OrdiniFornitori/Dettaglio", new { id = allegato.IdEntita });
+        }
+
         if (allegato.Entita == AllegatoEntita.DistintaBaseNodi)
         {
             return RedirectToPage("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id = allegato.IdEntita });

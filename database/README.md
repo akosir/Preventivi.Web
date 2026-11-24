@@ -5,6 +5,25 @@ versionati del progetto.
 
 ## Regole
 
+### Ordini fornitori TEC-018, primo pacchetto
+
+Dopo la versione `2026112301`, eseguire sul database di test
+`06_Aggiornamenti/TEC-018_01_Ordini_Fornitori_Bozza.sql`.
+Registra la versione `2026112302`, codice `TEC-018-ORDINI-BOZZA`,
+richiesta dall'applicazione aggiornata.
+
+Lo script estende le tabelle esistenti con audit e rowversion, crea
+OrdiniFornitoriAudit e OrdiniFornitoriProgressivi, installa le procedure
+di gestione e attiva la voce menu `frmOrdiniFornitori`.
+I permessi dei ruoli continuano a essere gestiti tramite MenuPermessiRuoli.
+ADMIN dispone dell'accesso completo. Il pacchetto non inserisce ordini
+di prova.
+
+Collaudare creazione e numerazione, modifica della testata e delle righe,
+materiali e lavorazioni da anagrafica o liberi, note a importo zero,
+ricalcolo, concorrenza, stampa, allegati, eliminazione controllata,
+filtri e accesso per profilo. Gli stati diversi da Bozza sono consultabili.
+
 ### Anagrafica Fornitori TEC-017
 
 Dopo la versione `2026111901`, eseguire nel database di test

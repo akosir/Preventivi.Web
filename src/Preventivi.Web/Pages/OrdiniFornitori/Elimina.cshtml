@@ -1,0 +1,24 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.OrdiniFornitori.EliminaModel
+@{ var ordine = Model.Ordine!; ViewData["Title"] = "Elimina ordine"; }
+<h1 class="h3 mb-3">Elimina ordine @ordine.NumeroCompleto</h1>
+<section class="pfw-panel">
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        @if (!ordine.Modificabile) { <p>L’eliminazione richiede un ordine in Bozza.</p> }
+        else if (Model.Dipendenze.Count > 0)
+        {
+            <p>Rimuovere i riferimenti seguenti prima dell’eliminazione.</p>
+            <partial name="Shared/OrdiniFornitori/_Dipendenze" model="Model.Dipendenze" />
+        }
+        else
+        {
+            <p>Confermi l’eliminazione dell’ordine di @ordine.RagioneSociale, con @Model.Righe.Count righe e totale @ordine.TotaleOrdine.ToString("C2")?</p>
+            <form method="post">
+                <input type="hidden" name="versione" value="@Convert.ToBase64String(ordine.VersioneRiga)" />
+                <button type="submit" class="pfw-btn pfw-btn-danger">Conferma eliminazione</button>
+            </form>
+        }
+    </div>
+    <div class="pfw-panel-footer"><a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-secondary">Torna all’ordine</a></div>
+</section>

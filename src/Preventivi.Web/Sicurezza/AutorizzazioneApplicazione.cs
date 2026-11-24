@@ -16,6 +16,7 @@ public static class AutorizzazioneApplicazione
     public const string PolicyAdmin = "Admin";
     public const string PolicyDevelopmentAdmin = "DevelopmentAdmin";
     public const string PolicyPreventivi = "Preventivi";
+    public const string PolicyOrdiniFornitori = "OrdiniFornitori";
     public const string PolicyClienti = "Clienti";
     public const string PolicyRichiesteClienti = "RichiesteClienti";
     public const string PolicyCampionature = "Campionature";
@@ -53,6 +54,7 @@ public static class AutorizzazioneApplicazione
             policy.RequireAssertion(context =>
                 isDevelopment && context.User.IsInRole(RuoloAdmin)));
         AggiungiPolicyModulo(options, PolicyPreventivi, PermessiApplicazione.Preventivi);
+        AggiungiPolicyModulo(options, PolicyOrdiniFornitori, PermessiApplicazione.OrdiniFornitori);
         AggiungiPolicyModulo(options, PolicyClienti, PermessiApplicazione.Clienti);
         AggiungiPolicyModulo(
             options,
@@ -78,6 +80,7 @@ public static class AutorizzazioneApplicazione
         options.Conventions.AllowAnonymousToPage("/Account/AccessoNegato");
         options.Conventions.AllowAnonymousToPage("/Error");
         options.Conventions.AuthorizeFolder("/Preventivi", PolicyPreventivi);
+        options.Conventions.AuthorizeFolder("/OrdiniFornitori", PolicyOrdiniFornitori);
         options.Conventions.AuthorizeFolder("/Clienti", PolicyClienti);
         options.Conventions.AuthorizeFolder(
             "/RichiesteClienti",
@@ -114,6 +117,7 @@ public static class AutorizzazioneApplicazione
         var permesso = entita switch
         {
             AllegatoEntita.Preventivi => PermessiApplicazione.Preventivi,
+            AllegatoEntita.OrdiniFornitori => PermessiApplicazione.OrdiniFornitori,
             AllegatoEntita.PreventiviRigheComponenti => PermessiApplicazione.Preventivi,
             AllegatoEntita.PreventiviRigheMateriali => PermessiApplicazione.Preventivi,
             AllegatoEntita.PreventiviRigheLavorazioni => PermessiApplicazione.Preventivi,

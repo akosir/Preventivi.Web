@@ -18,6 +18,7 @@ public class NuovoModel : PageModel
     private readonly ICampionaturaRepository _campionaturaRepository;
     private readonly IArticoloRepository _articoloRepository;
     private readonly IFornitoreRepository _fornitoreRepository;
+    private readonly global::Preventivi.Core.OrdiniFornitori.IOrdineFornitoreRepository _ordineFornitoreRepository;
     private readonly IModelloCicloRepository _modelloCicloRepository;
     private readonly IDistintaBaseRepository _distintaBaseRepository;
     private readonly ILogger<NuovoModel> _logger;
@@ -28,6 +29,7 @@ public class NuovoModel : PageModel
         ICampionaturaRepository campionaturaRepository,
         IArticoloRepository articoloRepository,
         IFornitoreRepository fornitoreRepository,
+        global::Preventivi.Core.OrdiniFornitori.IOrdineFornitoreRepository ordineFornitoreRepository,
         IModelloCicloRepository modelloCicloRepository,
         IDistintaBaseRepository distintaBaseRepository,
         ILogger<NuovoModel> logger)
@@ -37,6 +39,7 @@ public class NuovoModel : PageModel
         _campionaturaRepository = campionaturaRepository;
         _articoloRepository = articoloRepository;
         _fornitoreRepository = fornitoreRepository;
+        _ordineFornitoreRepository = ordineFornitoreRepository;
         _modelloCicloRepository = modelloCicloRepository;
         _distintaBaseRepository = distintaBaseRepository;
         _logger = logger;
@@ -235,6 +238,11 @@ public class NuovoModel : PageModel
                 return RedirectToPage("/Anagrafiche/Fornitori/Dettaglio", new { id = IdEntita });
             }
 
+            if (Entita == AllegatoEntita.OrdiniFornitori)
+            {
+                return RedirectToPage("/OrdiniFornitori/Dettaglio", new { id = IdEntita });
+            }
+
             if (Entita == AllegatoEntita.DistintaBaseNodi)
             {
                 return RedirectToPage("/Anagrafiche/Distinte/Nodi/Dettaglio", new { id = IdEntita });
@@ -317,6 +325,8 @@ public class NuovoModel : PageModel
                 await _articoloRepository.GetDettaglioAsync(IdEntita, cancellationToken) is not null,
             AllegatoEntita.Fornitori =>
                 await _fornitoreRepository.GetDettaglioAsync(IdEntita, cancellationToken) is not null,
+            AllegatoEntita.OrdiniFornitori =>
+                await _ordineFornitoreRepository.GetDettaglioAsync(IdEntita, cancellationToken) is not null,
             AllegatoEntita.ModelliCiclo =>
                 await _modelloCicloRepository.GetDettaglioAsync(IdEntita, cancellationToken) is not null,
             AllegatoEntita.DistintaBaseNodi =>

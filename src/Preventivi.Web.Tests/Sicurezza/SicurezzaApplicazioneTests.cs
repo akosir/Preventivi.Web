@@ -198,6 +198,7 @@ public sealed class SicurezzaApplicazioneTests
     [InlineData(AllegatoEntita.Articoli, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.ModelliCiclo, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.Fornitori, PermessiApplicazione.Anagrafiche)]
+    [InlineData(AllegatoEntita.OrdiniFornitori, PermessiApplicazione.OrdiniFornitori)]
     [InlineData(AllegatoEntita.DistintaBaseNodi, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.DistintaMateriali, PermessiApplicazione.Anagrafiche)]
     [InlineData(AllegatoEntita.DistintaLavorazioni, PermessiApplicazione.Anagrafiche)]
@@ -254,6 +255,17 @@ public sealed class SicurezzaApplicazioneTests
             AutorizzazioneApplicazione.ConfiguraPolicy(options, isDevelopment));
         return services.BuildServiceProvider()
             .GetRequiredService<IAuthorizationService>();
+    }
+
+    [Theory]
+    [InlineData(PermessiApplicazione.OrdiniFornitori, true)]
+    [InlineData(PermessiApplicazione.Preventivi, false)]
+    public async Task OrdiniFornitori_RichiedeIlPermessoDelModulo(string permesso, bool atteso)
+    {
+        var service = CreaAuthorizationService(isDevelopment: false);
+        var principal = CreaPrincipal(new Claim(AutorizzazioneApplicazione.ClaimPermesso, permesso));
+        var risultato = await service.AuthorizeAsync(principal, null, AutorizzazioneApplicazione.PolicyOrdiniFornitori);
+        Assert.Equal(atteso, risultato.Succeeded);
     }
 
     private static ClaimsPrincipal CreaPrincipal(params Claim[] claims)

@@ -1983,6 +1983,76 @@ superati, compresi i profili con il solo permesso Clienti, il solo permesso
 Anagrafiche e senza entrambi. La nuova navigazione resta da verificare
 a runtime nell'applicazione aggiornata.
 
+### 5.23 TEC-018 — Ordini fornitori, decisioni 347–351
+
+**Classificazione:** [D]. **Stato:** decisioni approvate il 23 novembre
+2026, implementazione autorizzata dalla successiva conferma esplicita
+dell'utente nella stessa sessione.
+**Fonte:** conferma esplicita dell'utente in questa sessione Work.
+
+Il primo pacchetto riguarda la gestione delle bozze degli ordini fornitori.
+
+- **347 — Testata ordine.** Un fornitore per ordine, scelto tra quelli
+  attivi. Numero progressivo annuale assegnato dal sistema, data ordine,
+  oggetto, note e consegna prevista. Creazione nello stato Bozza.
+- **348 — Righe ordine.** Gestione delle tipologie già previste Materiale,
+  Lavorazione e Nota. Materiali e lavorazioni selezionabili da anagrafica
+  oppure descritti liberamente. Quantità positiva, unità di misura, prezzo
+  unitario, consegna prevista e note. Le righe Nota hanno valore economico
+  zero.
+- **349 — Calcoli economici.** Totale riga uguale a quantità per prezzo
+  unitario, arrotondato a due decimali. Totale ordine uguale alla somma
+  delle righe. Salvataggio e ricalcolo nella stessa transazione. Gli importi
+  dell'ordine sono autonomi rispetto a quelli del preventivo.
+- **350 — Consultazione e documenti.** Elenco con filtri per numero/anno,
+  fornitore, periodo, stato e oggetto. Dettaglio con testata e righe, stampa
+  dell'ordine e allegati MB-01. Accesso dal menu e dalla dashboard secondo
+  i permessi del modulo.
+- **351 — Modifiche e controlli.** Testata e righe modificabili in Bozza.
+  Eliminazione previa conferma e controllo delle dipendenze. Gli allegati
+  richiedono rimozione esplicita. Audit delle operazioni e controllo di
+  concorrenza con rowversion.
+
+Il pacchetto successivo definirà generazione dai preventivi, invio,
+ricezioni e transizioni di stato, comprese le correzioni amministrative.
+La conferma delle decisioni precede la conferma separata
+dell'implementazione secondo il metodo concordato.
+
+**[C] Implementazione predisposta.** Il pacchetto introduce le pagine
+OrdiniFornitori, i relativi repository e la policy del modulo
+`frmOrdiniFornitori`. Il menu e la dashboard espongono la gestione secondo
+i permessi. La pagina di stampa riprende testata, fornitore e righe.
+Gli allegati usano MB-01 con chiave OrdiniFornitori.
+
+Lo script `TEC-018_01_Ordini_Fornitori_Bozza.sql` richiede `2026112301`
+e registra `2026112302`. Aggiunge audit, rowversion e numerazione annuale
+con progressivo conservato anche dopo l'eliminazione di un ordine.
+La modifica di un ordine numerato conserva l'anno assegnato.
+I salvataggi controllano lo stato e le versioni di ordine e riga,
+ricalcolano i totali nella stessa transazione e registrano l'operazione.
+L'eliminazione dell'ordine richiede conferma comprensiva delle righe e si
+arresta in presenza di dipendenze esterne o allegati.
+La successiva esecuzione dello script e il collaudo sono documentati sotto.
+
+**[C] Verifiche locali del 23 novembre 2026.** Compilazione riuscita e
+158 test automatici superati, inclusi i controlli delle scritture fuori
+Bozza, dei permessi del modulo e dei decimali italiani. Script SQL
+verificato sintatticamente con ScriptDom.
+
+**[C] Collaudo riferito dall'utente, completato il 24 novembre 2026.**
+L'utente ha confermato l'esecuzione dello script e l'esito positivo di
+creazione, numerazione annuale e conservazione del progressivo dopo
+eliminazione, modifica della testata, materiali e lavorazioni da
+anagrafica e liberi, note a importo zero, eliminazione di righe e ordini,
+ricalcolo, stampa, allegati e blocco dell'eliminazione con allegati,
+concorrenza su testata e righe, filtri, validazione di quantità e prezzi,
+numero riga duplicato, decimali e arrotondamento. Questi riscontri
+runtime provengono dalle prove dell'utente.
+
+Il collaudo runtime con profilo operatore resta pendente perché la
+gestione utenti non è ancora disponibile. I controlli dei permessi sono
+coperti dai test automatici locali.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

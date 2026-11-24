@@ -12,6 +12,7 @@ public class IndexModel : PageModel
     private readonly IPreventivoRepository _preventivoRepository;
     private readonly IRichiestaClienteRepository _richiestaClienteRepository;
     private readonly ICampionaturaRepository _campionaturaRepository;
+    private readonly global::Preventivi.Core.OrdiniFornitori.IOrdineFornitoreRepository _ordiniRepository;
 
     public IReadOnlyList<DashboardKpiItem> Indicatori { get; private set; }
         = Array.Empty<DashboardKpiItem>();
@@ -31,15 +32,18 @@ public class IndexModel : PageModel
     public bool PuoVisualizzareRichiesteClienti { get; private set; }
     public bool PuoVisualizzareCampionature { get; private set; }
     public bool PuoVisualizzareAnagrafiche { get; private set; }
+    public bool PuoVisualizzareOrdiniFornitori => AutorizzazioneApplicazione.PuoAccedereAlPermesso(User, PermessiApplicazione.OrdiniFornitori);
 
     public IndexModel(
         IPreventivoRepository preventivoRepository,
         IRichiestaClienteRepository richiestaClienteRepository,
-        ICampionaturaRepository campionaturaRepository)
+        ICampionaturaRepository campionaturaRepository,
+        global::Preventivi.Core.OrdiniFornitori.IOrdineFornitoreRepository ordiniRepository)
     {
         _preventivoRepository = preventivoRepository;
         _richiestaClienteRepository = richiestaClienteRepository;
         _campionaturaRepository = campionaturaRepository;
+        _ordiniRepository = ordiniRepository;
     }
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
@@ -83,7 +87,13 @@ public class IndexModel : PageModel
         var preventiviDaInviare =
             preventivi.Count(IsDaInviare);
 
-        var richiesteAperte = richieste.Count(richiesta =>
+        var ordini = PuoVisualizzareOrdiniFornitori
+            ? await _ordiniRepository.GetElencoAsync(new global::Preventivi.Core.OrdiniFornitori.OrdineFornitoreFiltro(), cancellationToken)
+            : Array.Empty<global::Preventivi.Core.OrdiniFornitori.OrdineFornitoreDettaglio>();
+        var ordiniAperti = ordini.Count(x => x.Stato is "Bozza" or "Inviato" or "Parziale");
+
+        var richiesteAperte =
+            richieste.Count(richiesta =>
             !RichiestaClienteValori.StatoFinale(richiesta.Stato));
 
         var campionatureAperte = campionature.Count(campionatura =>
@@ -114,8 +124,8 @@ public class IndexModel : PageModel
                 "C"),
             new DashboardKpiItem(
                 "Ordini fornitori",
-                "-",
-                "Modulo ordini non collegato",
+                PuoVisualizzareOrdiniFornitori ? ordiniAperti.ToString() : "-",
+                PuoVisualizzareOrdiniFornitori ? "Ordini aperti" : "Accesso non autorizzato",
                 "O")
         ];
 

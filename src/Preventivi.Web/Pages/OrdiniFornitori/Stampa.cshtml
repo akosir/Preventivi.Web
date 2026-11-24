@@ -1,0 +1,32 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.OrdiniFornitori.StampaModel
+@{ var ordine = Model.Ordine!; ViewData["Title"] = $"Ordine {ordine.NumeroCompleto}"; }
+<div class="no-print d-flex gap-2 mb-3">
+    <a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore" class="pfw-btn pfw-btn-secondary">Torna all’ordine</a>
+    <button type="button" class="pfw-btn pfw-btn-primary" onclick="window.print()">Stampa</button>
+</div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><h1 class="pfw-panel-title">Ordine fornitore @ordine.NumeroCompleto</h1><span class="pfw-badge pfw-badge-secondary">@ordine.Stato</span></div>
+    <div class="pfw-panel-body">
+        <div class="row mb-4">
+            <div class="col-6"><h2 class="h5">@ordine.RagioneSociale</h2><p>@ordine.Indirizzo<br />@ordine.CAP @ordine.Citta @ordine.Provincia<br />@ordine.PartitaIVA<br />@ordine.Email</p></div>
+            <div class="col-6"><p>Data ordine @ordine.DataOrdine.ToString("dd/MM/yyyy")<br />Consegna prevista @(ordine.DataConsegnaPrevista?.ToString("dd/MM/yyyy") ?? "-")</p></div>
+        </div>
+        <h2 class="h5">@ordine.Oggetto</h2>
+        <table class="table pfw-table">
+            <thead><tr><th>Riga</th><th>Descrizione</th><th>UM</th><th class="text-end">Quantità</th><th class="text-end">Prezzo unitario</th><th class="text-end">Totale</th><th>Consegna</th></tr></thead>
+            <tbody>
+            @foreach (var riga in Model.Righe)
+            {
+                <tr>
+                    <td>@riga.RigaNr</td><td>@riga.Descrizione @if (!string.IsNullOrWhiteSpace(riga.Note)) { <div class="pfw-secondary-text">@riga.Note</div> }</td>
+                    <td>@riga.UM</td><td class="text-end">@riga.Quantita.ToString("N4")</td><td class="text-end">@riga.PrezzoUnitario.ToString("C4")</td><td class="text-end">@riga.TotaleRiga.ToString("C2")</td>
+                    <td>@riga.DataConsegnaPrevista?.ToString("dd/MM/yyyy")</td>
+                </tr>
+            }
+            </tbody>
+            <tfoot><tr><th colspan="5">Totale ordine</th><th class="text-end">@ordine.TotaleOrdine.ToString("C2")</th><td></td></tr></tfoot>
+        </table>
+        @if (!string.IsNullOrWhiteSpace(ordine.Note)) { <h2 class="h5 mt-3">Note</h2><p class="text-break">@ordine.Note</p> }
+    </div>
+</section>
