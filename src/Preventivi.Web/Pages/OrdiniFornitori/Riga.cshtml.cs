@@ -46,6 +46,15 @@ public sealed class RigaModel(IOrdineFornitoreRepository repository, IAnagrafich
     {
         if (!await CaricaAsync(idOrdine, id, cancellationToken)) return NotFound();
         if (!Ordine!.Modificabile) return RedirectToPage("./Dettaglio", new { id = idOrdine });
+        if (Riga?.DaPreventivo == true)
+        {
+            Dati.TipoRiga = Riga.TipoRiga;
+            Dati.IdMateriale = Riga.IdMateriale;
+            Dati.IdLavorazione = Riga.IdLavorazione;
+            Dati.UM = Riga.UM;
+            foreach (var campo in new[] { "TipoRiga", "IdMateriale", "IdLavorazione", "UM" })
+                ModelState.Remove($"Dati.{campo}");
+        }
         var versioneOrdine = OrdiniFornitoriErrori.LeggiVersione(Dati.VersioneOrdine, ModelState);
         var versioneRiga = id.HasValue ? OrdiniFornitoriErrori.LeggiVersione(Dati.VersioneRiga, ModelState) : [];
         if (!ModelState.IsValid) return Page();

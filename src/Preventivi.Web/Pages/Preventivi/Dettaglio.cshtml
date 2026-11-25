@@ -1,5 +1,7 @@
 @page
 @model Preventivi.DettaglioModel
+@inject Microsoft.AspNetCore.Authorization.IAuthorizationService AutorizzazioneAcquisti
+@using Microsoft.AspNetCore.Authorization
 
 @{
     ViewData["Title"] = $"Preventivo {Model.Preventivo!.NumeroCompleto}";
@@ -38,6 +40,14 @@
             </div>
 
             <div class="preventivi-actions">
+                @if (global::Preventivi.Core.Preventivi.PreventivoMarkupAnteprima.StatoModificabile(Model.Preventivo.Stato))
+                {
+                    <a asp-page="/Preventivi/ApplicaMarkup" asp-route-id="@Model.Preventivo.IdPreventivo" class="pfw-btn pfw-btn-secondary">Applica markup alle righe esistenti</a>
+                }
+                @if ((await AutorizzazioneAcquisti.AuthorizeAsync(User, global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PolicyOrdiniFornitori)).Succeeded)
+                {
+                    <a asp-page="/OrdiniFornitori/Genera" asp-route-idPreventivo="@Model.Preventivo.IdPreventivo" class="pfw-btn pfw-btn-secondary">Genera ordini fornitori</a>
+                }
                 <a asp-page="/Preventivi/Anteprima"
                    asp-route-id="@Model.Preventivo.IdPreventivo"
                    asp-route-tipo="cliente"
@@ -60,6 +70,11 @@
         </div>
 
     </div>
+
+    @if (TempData["MessaggioSuccesso"] is string messaggioSuccesso)
+    {
+        <div class="alert alert-success" role="status">@messaggioSuccesso</div>
+    }
 
     <section class="pfw-panel">
 
@@ -363,6 +378,10 @@
                                                class="pfw-btn pfw-btn-secondary pfw-btn-compact">
                                                 Apri
                                             </a>
+                                            @if (global::Preventivi.Core.Preventivi.PreventivoMarkupAnteprima.StatoModificabile(Model.Preventivo.Stato))
+                                            {
+                                                <a asp-page="/Preventivi/Varianti/Modifica" asp-route-idPreventivo="@Model.Preventivo.IdPreventivo" asp-route-idVariantePreventivo="@variante.IdVariantePreventivo" class="pfw-btn pfw-btn-secondary pfw-btn-compact">Modifica</a>
+                                            }
                                             <a asp-page="/Preventivi/Varianti/Elimina"
                                                asp-route-idPreventivo="@Model.Preventivo.IdPreventivo"
                                                asp-route-idVariantePreventivo="@variante.IdVariantePreventivo"

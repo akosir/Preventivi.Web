@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Data.SqlClient;
 using Preventivi.Core.Preventivi;
 
 namespace Preventivi.Web.Pages.Preventivi.Riga;
@@ -15,6 +16,8 @@ public class NuovoModel : PageModel
 
     [BindProperty(SupportsGet = true)]
     public int IdPreventivo { get; set; }
+    [BindProperty(SupportsGet = true)] public int? IdVariantePreventivo { get; set; }
+    public PreventivoVarianteItem? Variante { get; private set; }
 
     [BindProperty]
     public PreventivoRigaCreateModel Riga { get; set; } = new();
@@ -45,12 +48,19 @@ public class NuovoModel : PageModel
             return NotFound();
         }
 
+        if (IdVariantePreventivo.HasValue)
+        {
+            if (!await CaricaVarianteAsync(cancellationToken)) return NotFound();
+            if (!PreventivoMarkupAnteprima.StatoModificabile(preventivo.Stato)) return Forbid();
+        }
+
         await CaricaTipiAsync(cancellationToken);
         await CaricaLookupAsync(cancellationToken);
 
         Riga = new PreventivoRigaCreateModel
         {
             IdPreventivo = IdPreventivo,
+            IdVariantePreventivo = IdVariantePreventivo,
             Quantita = 1,
             MarkupPerc = preventivo.MarkupPercDefault,
             IdTipoRiga = TipiRiga.FirstOrDefault()?.IdTipoRiga ?? 0
@@ -67,6 +77,14 @@ public class NuovoModel : PageModel
         }
 
         Riga.IdPreventivo = IdPreventivo;
+        Riga.IdVariantePreventivo = IdVariantePreventivo;
+        if (IdVariantePreventivo.HasValue)
+        {
+            if (!await CaricaVarianteAsync(cancellationToken)) return NotFound();
+            var preventivo = await _preventivoRepository.GetDettaglioAsync(IdPreventivo, cancellationToken);
+            if (preventivo is null) return NotFound();
+            if (!PreventivoMarkupAnteprima.StatoModificabile(preventivo.Stato)) return Forbid();
+        }
 
         await CaricaTipiAsync(cancellationToken);
         await CaricaLookupAsync(cancellationToken);
@@ -119,10 +137,16 @@ public class NuovoModel : PageModel
             return Page();
         }
 
-        var idRigaPreventivo =
-            await _preventivoRepository.CreaRigaAsync(
-                Riga,
-                cancellationToken);
+        int idRigaPreventivo;
+        try
+        {
+            idRigaPreventivo = await _preventivoRepository.CreaRigaAsync(Riga, cancellationToken);
+        }
+        catch (SqlException exception) when (IdVariantePreventivo.HasValue && (exception.Number is >= 54211 and <= 54215 or 2601 or 2627))
+        {
+            ModelState.AddModelError(string.Empty, "La riga non può essere inserita. Verificare lo stato della variante e il numero riga, poi riaprire la pagina.");
+            return Page();
+        }
 
         return RedirectToPage(
             "/Preventivi/Riga/Workspace",
@@ -137,6 +161,12 @@ public class NuovoModel : PageModel
     {
         TipiRiga =
             await _preventivoRepository.GetTipiRigaAsync(cancellationToken);
+    }
+
+    private async Task<bool> CaricaVarianteAsync(CancellationToken cancellationToken)
+    {
+        Variante = await _preventivoRepository.GetVarianteAsync(IdVariantePreventivo!.Value, cancellationToken);
+        return Variante is { Attiva: true } && Variante.IdPreventivo == IdPreventivo;
     }
 
     private async Task CaricaLookupAsync(CancellationToken cancellationToken)

@@ -45,6 +45,10 @@
                 <h2 class="pfw-panel-title">Dati preventivo</h2>
                 <div class="pfw-panel-subtitle">Numero e anno restano invariati</div>
             </div>
+            @if (global::Preventivi.Core.Preventivi.PreventivoMarkupAnteprima.StatoModificabile(Model.Preventivo.Stato))
+            {
+                <a asp-page="/Preventivi/ApplicaMarkup" asp-route-id="@Model.Preventivo.IdPreventivo" class="pfw-btn pfw-btn-secondary">Applica markup alle righe esistenti</a>
+            }
         </div>
 
         <form method="post" class="p-3">
@@ -87,6 +91,7 @@
                     <label asp-for="Dati.MarkupPercDefault" class="form-label">Markup predefinito %</label>
                     <input asp-for="Dati.MarkupPercDefault" class="form-control text-end" />
                     <span asp-validation-for="Dati.MarkupPercDefault" class="text-danger"></span>
+                    <div class="form-text">Valore iniziale per le nuove righe. Per aggiornare quelle esistenti usa «Applica markup alle righe esistenti», dove puoi indicare la nuova percentuale. Salva prima le altre modifiche della pagina.</div>
                 </div>
                 <div class="col-12">
                     <label asp-for="Dati.Note" class="form-label">Note</label>

@@ -11,11 +11,21 @@
     <div class="pfw-panel-header">
         <div>
             <h1 class="pfw-panel-title">Dettaglio variante preventivo</h1>
-            <div class="pfw-panel-subtitle">Lettura variante</div>
+            <div class="pfw-panel-subtitle">Dati della variante e righe collegate</div>
         </div>
+        @if (Model.Modificabile)
+        {
+            <div class="preventivi-actions">
+                <a asp-page="./Nuovo" asp-route-idPreventivo="@Model.IdPreventivo" class="pfw-btn pfw-btn-secondary">Nuova variante</a>
+                <a asp-page="./Modifica" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idVariantePreventivo="@Model.IdVariantePreventivo" class="pfw-btn pfw-btn-primary">Modifica</a>
+                <a asp-page="./Elimina" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idVariantePreventivo="@Model.IdVariantePreventivo" class="pfw-btn pfw-btn-danger">Elimina</a>
+            </div>
+        }
     </div>
 
     <div class="p-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        @if (TempData["MessaggioSuccesso"] is string messaggio) { <p class="alert alert-success" role="status">@messaggio</p> }
         <div class="row g-3">
             <div class="col-12 col-md-3">
                 <label class="form-label">Codice variante</label>
@@ -49,7 +59,7 @@
         </div>
 
         <div class="d-flex justify-content-end gap-2 mt-4">
-            @if (!Model.Variante.VarianteScelta)
+            @if (Model.Modificabile && !Model.Variante.VarianteScelta)
             {
                 <form method="post" asp-page-handler="Seleziona">
                     <input type="hidden" asp-for="IdVariantePreventivo" />
@@ -65,5 +75,35 @@
         </div>
     </div>
 
+</section>
+<section class="pfw-panel mt-3">
+    <div class="pfw-panel-header">
+        <div><h2 class="pfw-panel-title">Righe della variante</h2><div class="pfw-panel-subtitle">I totali derivano da queste righe. Le righe comuni restano nel preventivo.</div></div>
+        @if (Model.Modificabile)
+        { <a asp-page="/Preventivi/Riga/Nuovo" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idVariantePreventivo="@Model.IdVariantePreventivo" class="pfw-btn pfw-btn-primary">Nuova riga</a> }
+    </div>
+    @if (Model.Righe.Count == 0)
+    { <div class="pfw-panel-body"><p class="mb-0">Nessuna riga associata alla variante.</p></div> }
+    else
+    {
+        <div class="table-responsive"><table class="table pfw-table">
+            <thead><tr><th>Riga</th><th>Descrizione</th><th class="text-end">Quantità</th><th class="text-end">Totale costi</th><th class="text-end">Totale vendita</th><th>Azioni</th></tr></thead>
+            <tbody>
+            @foreach (var riga in Model.Righe)
+            {
+                <tr><td>@riga.RigaNr</td><td>@riga.DescrizioneVoce</td><td class="text-end">@riga.Quantita.ToString("N4")</td><td class="text-end">@riga.TotaleCosti.ToString("C2")</td><td class="text-end">@riga.TotaleVendita.ToString("C2")</td>
+                    <td><div class="preventivi-actions">
+                        <a asp-page="/Preventivi/Riga/Workspace" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idRigaPreventivo="@riga.IdRigaPreventivo" class="pfw-btn pfw-btn-secondary">Apri</a>
+                        @if (Model.Modificabile)
+                        {
+                            <a asp-page="/Preventivi/Riga/Modifica" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idRigaPreventivo="@riga.IdRigaPreventivo" class="pfw-btn pfw-btn-secondary">Modifica</a>
+                            <a asp-page="/Preventivi/Riga/Elimina" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idRigaPreventivo="@riga.IdRigaPreventivo" class="pfw-btn pfw-btn-danger">Elimina</a>
+                        }
+                    </div></td>
+                </tr>
+            }
+            </tbody>
+        </table></div>
+    }
 </section>
 </div>

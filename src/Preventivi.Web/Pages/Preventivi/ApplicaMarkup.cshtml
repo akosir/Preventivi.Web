@@ -1,0 +1,44 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Preventivi.ApplicaMarkupModel
+@{ var preventivo = Model.Preventivo!; ViewData["Title"] = "Applica markup alle righe esistenti"; }
+<div class="workspace-header">
+    <a asp-page="/Preventivi/Dettaglio" asp-route-id="@preventivo.IdPreventivo">Preventivo @preventivo.NumeroCompleto</a>
+    <h1 class="workspace-title mt-2">Applica markup alle righe esistenti</h1>
+    <p class="workspace-subtitle">@preventivo.Oggetto</p>
+</div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><h2 class="pfw-panel-title">Conferma aggiornamento dei prezzi automatici</h2></div>
+    <div class="pfw-panel-body">
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <p>La percentuale indicata diventa il markup predefinito del preventivo e viene applicata alle righe con prezzo automatico, comprese tutte le varianti. Le righe con prezzo manuale mantengono il proprio markup e prezzo unitario.</p>
+        <p>Vengono ricalcolati costi, vendita e margini. Il totale del preventivo comprende le righe comuni e la sola variante attiva selezionata.</p>
+        <p>Righe con prezzo automatico <strong>@Model.Righe.Count(x => x.IdRigaPreventivo.HasValue && !x.PrezzoManuale)</strong> · Righe con prezzo manuale <strong>@Model.Righe.Count(x => x.IdRigaPreventivo.HasValue && x.PrezzoManuale)</strong></p>
+        @if (Model.Modificabile)
+        {
+            <form method="post">
+                <input asp-for="Impronta" type="hidden" />
+                <div class="pfw-field-required mb-3">
+                    <label asp-for="Markup" class="form-label">Markup da applicare % *</label>
+                    <input asp-for="Markup" type="text" inputmode="decimal" class="form-control text-end" required />
+                    <span asp-validation-for="Markup" class="text-danger"></span>
+                </div>
+                <div class="form-check mb-3"><input asp-for="Conferma" class="form-check-input" /><label asp-for="Conferma" class="form-check-label">Confermo l’applicazione alle righe esistenti e il ricalcolo dei totali</label></div>
+                <button type="submit" class="pfw-btn pfw-btn-primary">Conferma e ricalcola</button>
+            </form>
+        }
+        else
+        { <p class="alert alert-warning">Il markup delle righe può essere aggiornato negli stati Bozza, Da Verificare e Pronto da Inviare.</p> }
+    </div>
+    <div class="table-responsive">
+        <table class="table pfw-table">
+            <thead><tr><th>Riga</th><th>Variante</th><th>Descrizione</th><th>Prezzo</th><th class="text-end">Markup attuale %</th><th class="text-end">Vendita attuale</th></tr></thead>
+            <tbody>
+            @foreach (var riga in Model.Righe.Where(x => x.IdRigaPreventivo.HasValue))
+            {
+                <tr><td>@riga.RigaNr</td><td>@(riga.CodiceVariante ?? "Riga comune")</td><td>@riga.DescrizioneVoce</td><td>@(riga.PrezzoManuale ? "Manuale · conservato" : "Automatico · da aggiornare")</td><td class="text-end">@riga.MarkupPerc.ToString("N2")</td><td class="text-end">@riga.TotaleVendita.ToString("C2")</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="pfw-panel-footer"><a asp-page="/Preventivi/Dettaglio" asp-route-id="@preventivo.IdPreventivo" class="pfw-btn pfw-btn-secondary">Annulla e torna al preventivo</a></div>
+</section>

@@ -1,5 +1,7 @@
 @page
 @model global::Preventivi.Web.Pages.Preventivi.Riga.WorkspaceModel
+@inject Microsoft.AspNetCore.Authorization.IAuthorizationService AutorizzazioneAcquisti
+@using Microsoft.AspNetCore.Authorization
 
 @{
     ViewData["Title"] = $"Riga {Model.Riga!.RigaNr} - Preventivo {Model.Preventivo!.NumeroCompleto}";
@@ -41,6 +43,10 @@
                 </div>
             </div>
             <div class="preventivi-actions">
+                @if ((await AutorizzazioneAcquisti.AuthorizeAsync(User, global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.PolicyOrdiniFornitori)).Succeeded)
+                {
+                    <a asp-page="/OrdiniFornitori/Genera" asp-route-idPreventivo="@Model.Preventivo.IdPreventivo" asp-route-idRigaPreventivo="@Model.Riga.IdRigaPreventivo" class="pfw-btn pfw-btn-secondary">Genera ordini fornitori</a>
+                }
                 @if (Model.Riga.IdArticolo.HasValue && !Model.RigaLibera
                     && Model.Preventivo.Stato is ("Bozza" or "Da Verificare" or "Pronto da Inviare"))
                 {

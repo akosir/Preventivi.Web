@@ -2,6 +2,16 @@
 
 public interface IPreventivoRepository
 {
+    Task AggiornaVarianteAsync(int idPreventivo, int idVariantePreventivo, string codice,
+        string descrizione, string? note, string impronta, bool varianteScelta, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<PreventivoRigaListItem>> GetRigheVarianteAsync(int idPreventivo,
+        int idVariantePreventivo, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<PreventivoMarkupAnteprima>> GetAnteprimaMarkupAsync(
+        int idPreventivo, CancellationToken cancellationToken = default);
+
+    Task ApplicaMarkupAsync(int idPreventivo, decimal markup, string impronta,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<PreventivoRigaDistintaDaVerificare>> GetDistinteDaVerificareAsync(
         int idPreventivo, CancellationToken cancellationToken = default);
 

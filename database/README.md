@@ -5,6 +5,119 @@ versionati del progetto.
 
 ## Regole
 
+### Variante scelta nella modifica
+
+Dopo `2026112502`, eseguire nel database di test
+`06_Aggiornamenti/TEC-009_11_Scelta_In_Modifica_Variante.sql`.
+Installa `2026112503`, codice `TEC-009-VARIANTI-SCELTA`, richiesto
+dall'applicazione aggiornata. Lo script non è stato applicato dall'agente.
+
+Aggiorna `Preventivi_Varianti_Aggiorna` con il parametro obbligatorio
+`@VarianteScelta`. Dati e scelta si salvano nella stessa transazione, con
+ricalcolo del totale e rollback completo in caso di errore. Non modifica
+tabelle o dati operativi durante l'installazione.
+
+Collaudare caricamento della casella, sostituzione di una scelta esistente,
+deselezione della variante scelta e totale delle sole righe comuni.
+Lasciare deselezionata una variante diversa deve conservare l'altra scelta.
+Verificare dati non validi, codice duplicato e salvataggio concorrente,
+senza modifiche parziali ai dati o alla scelta.
+
+### Completamento modifica varianti preventivo
+
+Dopo `2026112501`, eseguire nel database di test
+`06_Aggiornamenti/TEC-009_10_Modifica_Varianti.sql`. Registra
+`2026112502`, codice `TEC-009-VARIANTI-MODIFICA`, richiesto
+dall'applicazione aggiornata. Non è stato applicato dall'agente.
+
+Aggiorna `Preventivi_Varianti_Dettaglio` e aggiunge
+`Preventivi_Varianti_Aggiorna`, `Preventivi_Varianti_Righe` e
+`Preventivi_Varianti_Righe_Crea`. Le tabelle e i dati operativi non sono
+modificati dall'installazione. Il wrapper di creazione riga verifica
+appartenenza, variante attiva e stato aperto del preventivo, poi richiama
+la procedura corrente con l'associazione alla variante e il ricalcolo.
+
+Collaudare modifica di codice, descrizione e note; codice duplicato;
+blocco di salvataggi concorrenti; blocco di preventivo chiuso o variante
+non attiva; appartenenza al preventivo. Nel dettaglio verificare solo le
+righe della variante e aggiungerne una con Nuova riga, verificando totali,
+associazione, accesso alla modifica e conservazione delle righe comuni.
+Riprendere quindi il terzo collaudo del markup sulle varianti.
+
+### Applicazione del markup alle righe esistenti
+
+Dopo `2026112402`, eseguire nel database di test
+`06_Aggiornamenti/TEC-009_09_Markup_Righe_Esistenti.sql`.
+Registra `2026112501`, codice `TEC-009-MARKUP`, richiesto dall'applicazione
+aggiornata. Lo script è incrementale, transazionale e ripetibile con gli
+stessi metadati. Non è stato applicato dall'agente.
+
+Crea `Preventivi_Markup_Impronta`, `Preventivi_Markup_Anteprima` e
+`Preventivi_Markup_Applica`. Non cambia lo schema delle tabelle né i dati
+operativi durante l'installazione. L'azione applicativa aggiorna la
+percentuale predefinita e le righe automatiche in una transazione e
+riutilizza il ricalcolo TEC-009 per righe, varianti e testata. Il prezzo
+unitario e il markup delle righe manuali restano conservati.
+
+Collaudi runtime da eseguire dopo lo script
+
+1. Aprire un preventivo in Bozza e annotare vendita e prezzi manuali.
+2. Aprire Applica markup alle righe esistenti, indicare una percentuale
+   diversa, confermare e verificare i nuovi prezzi automatici, i margini
+   e la conservazione delle righe manuali. La sola modifica del
+   predefinito dalla normale pagina Modifica mantiene il comportamento
+   precedente.
+3. Verificare tutte le varianti e il totale della sola variante scelta,
+   insieme alle righe comuni. Provare anche markup zero e preventivo
+   senza righe.
+4. Verificare che annullamento, conferma mancante, percentuale negativa o
+   con più di due decimali non applichino modifiche.
+5. Modificare una riga o il preventivo in un'altra scheda dopo l'apertura
+   e verificare il rifiuto dell'anteprima superata. Verificare il blocco
+   negli stati non aperti, anche con richiesta diretta.
+6. Verificare il rollback completo quando un errore impedisce il
+   ricalcolo. Gli ordini fornitori devono mantenere i propri prezzi.
+
+### Generazione acquisti dai preventivi TEC-018, terzo pacchetto
+
+Dopo `2026112401`, eseguire nel database di test
+`06_Aggiornamenti/TEC-018_03_Generazione_Da_Preventivi.sql`.
+Installa `2026112402`, codice `TEC-018-GENERAZIONE`, richiesto
+dall'applicazione aggiornata. Lo script è transazionale e verificato
+tramite impronta del payload. Non è stato applicato dall'agente.
+
+Aggiunge alle righe ordine IdRigaMatPrev, IdRigaLavPrev e IdRigaCompPrev,
+con FK e indici, e OrdiniFornitoriGenerazioni per riconoscere le richieste
+già eseguite. Installa la funzione OrdiniFornitori_AcquistiPreventivo e le
+procedure OrdiniFornitori_Generazione_Anteprima e
+OrdiniFornitori_Generazione_Conferma. Aggiorna Salva, Righe_Salva, Elimina
+e Righe_Elimina con serializzazione applicativa, conservando i controlli
+di Bozza, audit, versioni e dipendenze.
+
+I riferimenti degli ordini storici non sono ricostruiti per supposizione.
+Un riferimento alla riga preventivo senza origine puntuale, compatibile
+con l'elemento da acquistare, produce un avviso bloccante da riconciliare.
+Nessun dato di prova è inserito e nessun valore del preventivo è aggiornato.
+
+Collaudi runtime da eseguire dopo lo script
+
+1. Aprire Genera ordini fornitori da preventivo e da singola riga.
+2. Verificare flag di acquisto, componente, riga comune e variante.
+3. Verificare fornitore suggerito attivo, scelta mancante e disattivato.
+4. Selezionare materiali e lavorazioni di due fornitori e modificare
+   quantità/prezzi. Confermare e verificare due nuove bozze, totali,
+   riferimenti e conservazione dei valori del preventivo.
+5. Riaprire l'anteprima e verificare gli impegni e il residuo. Ordinare
+   parzialmente e completare il residuo. Bloccare gli eccessi.
+6. Confermare due anteprime concorrenti e reinviare la stessa richiesta.
+   Verificare assenza di duplicati, residuo e atomicità dei fornitori.
+7. Modificare l'origine dopo l'anteprima e verificare il rifiuto della
+   conferma. Riaprire l'anteprima per leggere i dati aggiornati.
+8. Modificare quantità/prezzo della bozza generata, verificare il blocco
+   degli aumenti oltre residuo e liberare l'impegno eliminando una riga.
+9. Verificare avviso per ordini storici e conservazione delle origini
+   referenziate. Verificare accesso con uno solo dei due permessi.
+
 ### Invio e storico ordini TEC-018, secondo pacchetto
 
 Dopo `2026112302`, eseguire nel database di test

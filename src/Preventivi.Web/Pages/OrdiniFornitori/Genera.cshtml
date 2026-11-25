@@ -1,0 +1,78 @@
+@page
+@model global::Preventivi.Web.Pages.OrdiniFornitori.GeneraModel
+@{ ViewData["Title"] = "Genera ordini da preventivo"; var preventivo = Model.Preventivo!; }
+<div class="workspace-header">
+    <a asp-page="/Preventivi/Dettaglio" asp-route-id="@Model.IdPreventivo">Preventivo @preventivo.NumeroCompleto</a>
+    <h1 class="workspace-title mt-2">Genera ordini fornitori</h1>
+    <p class="workspace-subtitle">@preventivo.Oggetto · @(Model.IdRigaPreventivo.HasValue ? "Acquisti della riga selezionata" : "Acquisti del preventivo e delle sue varianti")</p>
+</div>
+@if (Model.Creati.Count > 0)
+{
+    <section class="pfw-panel">
+        <div class="pfw-panel-header"><h2 class="pfw-panel-title">Ordini generati in Bozza</h2></div>
+        <div class="pfw-panel-body">
+            <p class="alert alert-success" role="status">Creazione completata. I valori del preventivo sono conservati.</p>
+            <ul>
+            @foreach (var ordine in Model.Creati)
+            {
+                <li><a asp-page="./Dettaglio" asp-route-id="@ordine.IdOrdineFornitore">@ordine.NumeroCompleto · @ordine.RagioneSociale</a> · @ordine.TotaleOrdine.ToString("C2")</li>
+            }
+            </ul>
+        </div>
+    </section>
+}
+else
+{
+    <form method="post">
+        <input asp-for="IdPreventivo" type="hidden" /><input asp-for="IdRigaPreventivo" type="hidden" /><input asp-for="Richiesta" type="hidden" />
+        <section class="pfw-panel">
+            <div class="pfw-panel-header"><h2 class="pfw-panel-title">Anteprima acquisti</h2></div>
+            <div class="pfw-panel-body">
+                <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+                <p>Seleziona gli elementi, verifica il fornitore e conferma quantità e prezzo. Verrà creato un nuovo ordine per ciascun fornitore selezionato.</p>
+                <p class="text-muted">Le quantità già ordinate comprendono le bozze e gli ordini inviati, parziali o ricevuti. Per le lavorazioni il prezzo proposto ripartisce il costo totale, comprensivo di setup e costo fisso, sulla quantità.</p>
+                <div class="pfw-field-required mb-3"><label asp-for="DataOrdine" class="form-label">Data ordine *</label><input asp-for="DataOrdine" type="date" class="form-control" asp-format="{0:yyyy-MM-dd}" required /></div>
+                @if (Model.Origini.Count == 0) { <p class="alert alert-info">Nessun materiale da acquistare o lavorazione esterna da ordinare.</p> }
+                @if (Model.Origini.Any(x => x.DaRiconciliare)) { <p class="alert alert-warning">Alcuni elementi hanno ordini precedenti senza un collegamento univoco. Verificare i riferimenti storici prima di generarne altri.</p> }
+                @for (var i = 0; i < Model.Elementi.Count; i++)
+                {
+                    var input = Model.Elementi[i];
+                    var origine = Model.Origini.SingleOrDefault(x => x.Tipo == input.Tipo && x.IdOrigine == input.IdOrigine);
+                    if (origine is null) { continue; }
+                    var disponibile = origine.Residuo > 0 && !origine.DaRiconciliare;
+                    <section class="pfw-panel mb-3">
+                        <div class="pfw-panel-header">
+                            <div><h3 class="pfw-panel-title">@origine.Descrizione</h3>
+                                <div class="pfw-panel-subtitle">@origine.Tipo · Riga @origine.RigaNr · @(origine.IdVariantePreventivo.HasValue ? $"Variante #{origine.IdVariantePreventivo}" : "Preventivo base") · @(origine.Componente ?? "Riga comune")</div>
+                            </div>
+                            <div class="form-check"><input asp-for="Elementi[i].Selezionato" class="form-check-input" disabled="@(!disponibile)" /><label asp-for="Elementi[i].Selezionato" class="form-check-label">Da ordinare</label></div>
+                        </div>
+                        <div class="pfw-panel-body">
+                            <input asp-for="Elementi[i].Tipo" type="hidden" /><input asp-for="Elementi[i].IdOrigine" type="hidden" /><input asp-for="Elementi[i].Impronta" type="hidden" />
+                            <p>Fabbisogno @origine.Quantita.ToString("N4") @origine.UM · Già ordinati @origine.GiaOrdinata.ToString("N4") · Residuo @origine.Residuo.ToString("N4")</p>
+                            @if (origine.DaRiconciliare) { <p class="text-danger">Collegamenti degli ordini storici da riconciliare.</p> }
+                            else if (!disponibile) { <p class="text-muted">Fabbisogno già coperto.</p> }
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6 pfw-field-required"><label asp-for="Elementi[i].IdFornitore" class="form-label">Fornitore per l’acquisto *</label>
+                                    <select asp-for="Elementi[i].IdFornitore" class="form-select"><option value="">Seleziona un fornitore attivo</option>
+                                    @foreach (var f in Model.Fornitori) { <option value="@f.IdFornitore">@f.CodiceFornitore - @f.RagioneSociale</option> }
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Elementi[i].Quantita" class="form-label">Quantità da ordinare *</label><input asp-for="Elementi[i].Quantita" type="text" inputmode="decimal" class="form-control text-end" /></div>
+                                <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Elementi[i].PrezzoUnitario" class="form-label">Prezzo unitario d’acquisto *</label><input asp-for="Elementi[i].PrezzoUnitario" type="text" inputmode="decimal" class="form-control text-end" /></div>
+                            </div>
+                        </div>
+                    </section>
+                }
+            </div>
+            @if (Model.Origini.Any(x => x.Residuo > 0 && !x.DaRiconciliare))
+            { <div class="pfw-panel-footer"><button type="submit" class="pfw-btn pfw-btn-primary">Conferma e genera ordini in Bozza</button></div> }
+        </section>
+    </form>
+}
+<div class="mt-3">
+@if (Model.IdRigaPreventivo.HasValue)
+{ <a asp-page="/Preventivi/Riga/Workspace" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idRigaPreventivo="@Model.IdRigaPreventivo" class="pfw-btn pfw-btn-secondary">Torna alla riga</a> }
+else
+{ <a asp-page="/Preventivi/Dettaglio" asp-route-id="@Model.IdPreventivo" class="pfw-btn pfw-btn-secondary">Torna al preventivo</a> }
+</div>

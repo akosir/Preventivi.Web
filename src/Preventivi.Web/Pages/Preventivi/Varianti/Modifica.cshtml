@@ -1,0 +1,30 @@
+@page
+@model global::Preventivi.Web.Pages.Preventivi.Varianti.ModificaModel
+@{ ViewData["Title"] = "Modifica variante"; }
+<div class="workspace-header"><a asp-page="./Dettaglio" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idVariantePreventivo="@Model.IdVariantePreventivo">Variante @Model.Variante!.CodiceVariante</a><h1 class="workspace-title mt-2">Modifica variante</h1></div>
+<section class="pfw-panel">
+    <div class="pfw-panel-header"><h2 class="pfw-panel-title">Dati variante</h2></div>
+    <form method="post">
+        <div class="pfw-panel-body">
+            <input asp-for="IdPreventivo" type="hidden" /><input asp-for="IdVariantePreventivo" type="hidden" /><input asp-for="Impronta" type="hidden" />
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            @if (!Model.Modificabile) { <p class="alert alert-warning">Il preventivo o la variante non consentono modifiche.</p> }
+            <fieldset disabled="@(!Model.Modificabile)">
+                <div class="row g-3">
+                    <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Codice" class="form-label">Codice variante *</label><input asp-for="Codice" class="form-control" maxlength="30" required /><span asp-validation-for="Codice" class="text-danger"></span></div>
+                    <div class="col-12 col-md-9 pfw-field-required"><label asp-for="Descrizione" class="form-label">Descrizione variante *</label><input asp-for="Descrizione" class="form-control" maxlength="250" required /><span asp-validation-for="Descrizione" class="text-danger"></span></div>
+                    <div class="col-12"><label asp-for="Note" class="form-label">Note</label><textarea asp-for="Note" class="form-control" rows="4"></textarea></div>
+                    <div class="col-12"><div class="form-check"><input asp-for="VarianteScelta" class="form-check-input" /><label asp-for="VarianteScelta" class="form-check-label">Variante scelta</label></div>
+                        <div class="form-text">Selezionandola sostituisci la precedente scelta. Deselezionando la variante attualmente scelta, il totale comprenderà soltanto le righe comuni. Una variante non scelta lasciata deselezionata conserva l’eventuale altra scelta.</div>
+                    </div>
+                </div>
+            </fieldset>
+            <p class="form-text mt-3">I valori economici sono calcolati dalle righe. Il salvataggio della scelta ricalcola il totale del preventivo.</p>
+        </div>
+        <div class="pfw-panel-footer d-flex flex-wrap gap-2 justify-content-end">
+            <a asp-page="/Preventivi/Dettaglio" asp-route-id="@Model.IdPreventivo" class="pfw-btn pfw-btn-secondary">Torna al preventivo</a>
+            <a asp-page="./Dettaglio" asp-route-idPreventivo="@Model.IdPreventivo" asp-route-idVariantePreventivo="@Model.IdVariantePreventivo" class="pfw-btn pfw-btn-secondary">Annulla</a>
+            @if (Model.Modificabile) { <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button> }
+        </div>
+    </form>
+</section>

@@ -4,7 +4,7 @@ namespace Preventivi.Web.UI.Modules.OrdiniFornitori;
 
 public static class OrdiniFornitoriErrori
 {
-    public static bool Gestito(int numero) => numero is >= 54101 and <= 54129 or 547 or 2601 or 2627 or 8115;
+    public static bool Gestito(int numero) => numero is >= 54101 and <= 54136 or 547 or 2601 or 2627 or 8115;
     public static string Messaggio(int numero) => numero switch
     {
         54101 => "Compilare correttamente i campi obbligatori.",
@@ -25,6 +25,13 @@ public static class OrdiniFornitoriErrori
         54125 => "L’ordine contiene ricezioni e non può essere riaperto.",
         54126 => "La motivazione amministrativa è obbligatoria.",
         54127 => "I documenti inviati sono conservati nello storico e non sono modificabili.",
+        54130 => "Selezionare elementi validi con quantità positive, prezzo non negativo e fornitore attivo.",
+        54131 => "Un’altra operazione sugli ordini è in corso. Riprovare la conferma.",
+        54132 => "Gli elementi del preventivo sono cambiati. Riaprire l’anteprima prima di confermare.",
+        54133 => "La quantità supera il residuo disponibile. Verificare le quantità già ordinate.",
+        54134 => "Per una riga generata dal preventivo conservare tipo, anagrafica e unità di misura.",
+        54135 => "Questa richiesta è già stata utilizzata. Consultare gli ordini oppure aprire una nuova anteprima.",
+        54136 => "Esistono ordini storici senza riferimenti univoci. Riconciliarli prima di generare altri acquisti.",
         _ => "L’operazione sull’ordine non è consentita."
     };
 

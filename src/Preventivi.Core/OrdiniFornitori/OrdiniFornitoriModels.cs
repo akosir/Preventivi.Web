@@ -73,6 +73,11 @@ public class OrdineFornitoreRigaSalvataggio
 
 public sealed class OrdineFornitoreRiga : OrdineFornitoreRigaSalvataggio
 {
+    public int? IdRigaPreventivo { get; set; }
+    public int? IdRigaCompPrev { get; set; }
+    public int? IdRigaMatPrev { get; set; }
+    public int? IdRigaLavPrev { get; set; }
+    public bool DaPreventivo => IdRigaMatPrev.HasValue || IdRigaLavPrev.HasValue;
     public int IdRigaOrdineFornitore { get; set; }
     public int IdOrdineFornitore { get; set; }
     public decimal TotaleRiga { get; set; }

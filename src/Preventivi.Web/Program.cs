@@ -92,6 +92,8 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<IFornitoreRepository, FornitoreRepository>();
 builder.Services.AddScoped<global::Preventivi.Core.OrdiniFornitori.IOrdineFornitoreRepository,
     global::Preventivi.Data.OrdiniFornitori.OrdineFornitoreRepository>();
+builder.Services.AddScoped<global::Preventivi.Core.OrdiniFornitori.IGenerazioneOrdiniFornitoriRepository,
+    global::Preventivi.Data.OrdiniFornitori.GenerazioneOrdiniFornitoriRepository>();
 
 builder.Services.AddScoped<
     IModelloCicloRepository,

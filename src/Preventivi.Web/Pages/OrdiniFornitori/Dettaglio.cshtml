@@ -54,7 +54,14 @@
             @foreach (var riga in Model.Righe)
             {
                 <tr>
-                    <td>@riga.RigaNr</td><td>@riga.TipoRiga</td><td>@riga.Descrizione</td><td>@riga.UM</td>
+                    <td>@riga.RigaNr</td><td>@riga.TipoRiga</td><td>@riga.Descrizione
+                        @if (riga.DaPreventivo)
+                        {
+                            <div class="small text-muted">Origine · riga preventivo #@riga.IdRigaPreventivo
+                                · @(riga.IdRigaCompPrev.HasValue ? $"componente #{riga.IdRigaCompPrev}" : "riga comune")
+                                · @(riga.IdRigaMatPrev.HasValue ? $"materiale #{riga.IdRigaMatPrev}" : $"lavorazione #{riga.IdRigaLavPrev}")</div>
+                        }
+                    </td><td>@riga.UM</td>
                     <td class="text-end">@riga.Quantita.ToString("N4")</td><td class="text-end">@riga.PrezzoUnitario.ToString("C4")</td><td class="text-end">@riga.TotaleRiga.ToString("C2")</td>
                     <td>@riga.DataConsegnaPrevista?.ToString("dd/MM/yyyy")</td>
                     @if (ordine.Modificabile)

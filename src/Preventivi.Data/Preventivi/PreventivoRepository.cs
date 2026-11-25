@@ -9,6 +9,31 @@ public sealed class PreventivoRepository : IPreventivoRepository
 {
     private readonly DatabaseExecutor _db;
 
+    public async Task AggiornaVarianteAsync(int idPreventivo, int idVariantePreventivo, string codice,
+        string descrizione, string? note, string impronta, bool varianteScelta, CancellationToken cancellationToken = default) =>
+        await _db.ExecuteAsync("dbo.Preventivi_Varianti_Aggiorna",
+            [new SqlParameter("@IdPreventivo", idPreventivo), new SqlParameter("@IdVariantePreventivo", idVariantePreventivo),
+             Text("@Codice", codice, 30), Text("@Descrizione", descrizione, 250), NullableText("@Note", note),
+             new SqlParameter("@Impronta", SqlDbType.VarChar, 64) { Value = impronta },
+             new SqlParameter("@VarianteScelta", SqlDbType.Bit) { Value = varianteScelta }], cancellationToken);
+
+    public Task<IReadOnlyList<PreventivoRigaListItem>> GetRigheVarianteAsync(int idPreventivo,
+        int idVariantePreventivo, CancellationToken cancellationToken = default) =>
+        _db.QueryAsync<PreventivoRigaListItem>("dbo.Preventivi_Varianti_Righe",
+            [new SqlParameter("@IdPreventivo", idPreventivo), new SqlParameter("@IdVariantePreventivo", idVariantePreventivo)], cancellationToken);
+
+    public Task<IReadOnlyList<PreventivoMarkupAnteprima>> GetAnteprimaMarkupAsync(
+        int idPreventivo, CancellationToken cancellationToken = default) =>
+        _db.QueryAsync<PreventivoMarkupAnteprima>("dbo.Preventivi_Markup_Anteprima",
+            [new SqlParameter("@IdPreventivo", SqlDbType.Int) { Value = idPreventivo }], cancellationToken);
+
+    public async Task ApplicaMarkupAsync(int idPreventivo, decimal markup, string impronta,
+        CancellationToken cancellationToken = default) =>
+        await _db.ExecuteAsync("dbo.Preventivi_Markup_Applica",
+            [new SqlParameter("@IdPreventivo", SqlDbType.Int) { Value = idPreventivo },
+             Decimal("@Markup", markup, 9, 2),
+             new SqlParameter("@Impronta", SqlDbType.VarChar, 64) { Value = impronta }], cancellationToken);
+
     public Task<IReadOnlyList<PreventivoRigaDistintaDaVerificare>> GetDistinteDaVerificareAsync(
         int idPreventivo, CancellationToken cancellationToken = default) =>
         _db.QueryAsync<PreventivoRigaDistintaDaVerificare>("dbo.Preventivi_Righe_DistintaDaVerificare",
@@ -160,7 +185,7 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
         };
 
         return await _db.ExecuteScalarAsync<int>(
-            "dbo.Preventivi_Righe_Crea",
+            riga.IdVariantePreventivo.HasValue ? "dbo.Preventivi_Varianti_Righe_Crea" : "dbo.Preventivi_Righe_Crea",
             parameters,
             cancellationToken);
     }

@@ -2122,6 +2122,229 @@ Restano pendenti i collaudi runtime con profilo operatore e con ricezioni
 presenti, fino alla disponibilità delle relative gestioni. I blocchi
 corrispondenti sono coperti dai test automatici locali.
 
+### 5.25 TEC-018 — Generazione dai preventivi, decisioni 357–361
+
+**Classificazione:** [D]. **Stato:** decisioni approvate il 24 novembre
+2026. Implementazione autorizzata separatamente dall'utente nella stessa
+sessione, con «confermo implementazione».
+**Fonte:** conferma esplicita dell'utente in questa sessione Work.
+
+- **357 — Selezione degli elementi.** Dal preventivo o dalla singola
+  riga, l'operatore apre un'anteprima dei materiali Da acquistare e delle
+  lavorazioni Da acquistare esternamente, scegliendo quali ordinare.
+- **358 — Fornitore.** Ogni elemento deve avere un fornitore attivo,
+  proposto da quello suggerito e modificabile nell'anteprima. Gli elementi
+  senza fornitore richiedono assegnazione prima della conferma.
+- **359 — Quantità e prezzi.** L'anteprima propone quantità calcolate e
+  costi del preventivo come quantità e prezzi d'acquisto, modificabili
+  dall'operatore. La conferma conserva i valori del preventivo.
+- **360 — Creazione e tracciabilità.** La conferma genera un nuovo ordine
+  in Bozza per ciascun fornitore, con collegamenti puntuali a preventivo,
+  riga, componente e materiale o lavorazione di origine.
+- **361 — Controllo delle duplicazioni.** L'anteprima mostra le quantità
+  già ordinate e propone il residuo. La conferma ripete i controlli sul
+  server, gestisce richieste concorrenti e crea gli ordini nella stessa
+  transazione.
+
+La conferma delle decisioni precede la conferma separata
+dell'implementazione secondo il metodo concordato.
+
+**Implementazione locale [C], 24 novembre 2026**
+
+La pagina `/OrdiniFornitori/Genera` si apre dal dettaglio preventivo o
+dalla singola riga e richiede entrambi i permessi Preventivi e Ordini
+fornitori. Le righe delle varianti sono identificate nell'anteprima e
+nessun elemento viene selezionato automaticamente.
+
+Si usa la quantità operativa già memorizzata, secondo le decisioni
+165–166. Per i materiali il prezzo proposto è il costo unitario. Per le
+lavorazioni è il costo totale calcolato, compresi setup e costo fisso,
+diviso per la quantità e arrotondato a quattro decimali. Quantità e prezzi
+di acquisto sono modificabili senza scritture sui dati del preventivo.
+
+Il residuo sottrae le quantità degli ordini Bozza, Inviato, Parziale e
+Ricevuto. Gli ordini Annullato sono esclusi. La modifica di una riga
+generata conserva tipo, anagrafica, unità e origine e verifica gli aumenti
+di quantità sul residuo corrente. L'eliminazione controllata della bozza
+o delle sue righe libera il relativo impegno.
+
+`TEC-018_03_Generazione_Da_Preventivi.sql` richiede `2026112401` e
+registra `2026112402`, codice `TEC-018-GENERAZIONE`. Aggiunge i riferimenti
+puntuali alle righe d'ordine, tre FK verso le origini e il registro delle
+richieste di generazione. Le origini restano protette dall'eliminazione
+finché sono referenziate. I vecchi ordini senza riferimenti univoci non
+vengono attribuiti automaticamente e bloccano nuove generazioni sugli
+elementi potenzialmente già ordinati, con avviso di riconciliazione.
+
+La conferma ripete i controlli sotto transazione, blocca le origini e
+serializza le scritture applicative degli ordini tramite applock. Registra
+audit di testata e righe e riconosce il reinvio della stessa richiesta.
+Il pacchetto è preparato localmente. Applicazione sul database e collaudo
+runtime restano da eseguire.
+
+Verifiche locali [C] eseguite per il pacchetto 357–361
+
+- compilazione dell'intera soluzione con MSBuild, senza errori o warning
+  nella verifica finale;
+- 179 test automatici superati, di cui 13 nuovi casi per l'anteprima,
+  la validazione, l'appartenenza alla riga e il requisito del permesso;
+- controllo sintattico ScriptDom del batch e degli otto blocchi SQL
+  dinamici, con verifica SHA-256 del payload;
+- nessuna esecuzione SQL sul server e nessuna verifica runtime delle
+  transazioni o dei nuovi vincoli dichiarata completata.
+
+### 5.26 Integrazione alla decisione 170 — Applicazione esplicita del markup
+
+**Classificazione:** [D]. **Stato:** approvazione funzionale e autorizzazione
+all'implementazione ricevute il 25 novembre 2026 con «confermo», a seguito
+della proposta di un'azione esplicita con conferma e ricalcolo.
+
+Il markup di testata resta il valore predefinito per le nuove righe. È
+approvata l'azione «Applica markup alle righe esistenti» che, dopo conferma,
+aggiorna il predefinito e il markup delle righe con prezzo automatico,
+ricalcolando righe, varianti e totale del preventivo. I prezzi manuali
+devono essere conservati.
+
+**Implementazione locale [C]**
+
+La pagina `/Preventivi/ApplicaMarkup/{id}` è raggiungibile dal dettaglio e
+dalla modifica del preventivo, con permesso Preventivi ereditato dalla
+cartella. Mostra le righe comuni e delle varianti, la percentuale attuale e
+le righe manuali. Richiede una percentuale non negativa con massimo due
+decimali e una conferma esplicita. L'operazione è disponibile negli stessi
+stati aperti già utilizzati per l'aggiornamento della distinta, Bozza,
+Da Verificare e Pronto da Inviare. Le altre gestioni degli stati non sono
+modificate da questo intervento.
+
+Le righe manuali conservano sia markup sia prezzo unitario. Il ricalcolo
+riutilizza `sp_RicalcolaTotaliRigaPreventivo`,
+`sp_RicalcolaTotaliVariante` e `sp_RicalcolaTotaliPreventivo`. La testata
+continua a includere soltanto le righe comuni e la variante attiva
+selezionata, secondo la decisione 171. I prezzi degli ordini fornitori non
+sono interessati dall'azione.
+
+`TEC-009_09_Markup_Righe_Esistenti.sql` richiede `2026112402` e registra
+`2026112501`, codice `TEC-009-MARKUP`. Crea tre procedure per impronta,
+anteprima e applicazione. Non modifica le tabelle e non aggiorna dati
+operativi durante l'installazione. La conferma verifica nuovamente stato
+e impronta di testata, righe, materiali, lavorazioni e varianti sotto
+transazione. Un errore di ricalcolo annulla l'intera applicazione.
+
+La modifica è preparata localmente. L'applicazione dello script sul
+database e il collaudo runtime del markup restano da eseguire.
+
+Verifiche locali [C] del 25 novembre 2026
+
+- compilazione della soluzione senza errori o warning;
+- 198 test automatici superati, inclusi 19 nuovi casi per anteprima,
+  conferma obbligatoria, percentuali e culture numeriche, stato, rifiuto
+  dell'anteprima superata e assenza del preventivo;
+- quattro blocchi SQL validati con ScriptDom e impronta SHA-256 del
+  payload verificata. Queste verifiche non attestano l'esecuzione del
+  ricalcolo sul server SQL.
+
+### 5.27 Completamento della modifica delle varianti
+
+**Classificazione:** [C]. **Fonte:** segnalazione dell'utente durante il
+terzo collaudo del markup, 25 novembre 2026. Il dettaglio variante
+esponeva soltanto lettura e selezione. Mancavano pagina di modifica,
+elenco delle righe e collegamento per inserire una riga nella variante.
+L'intervento completa le azioni UI già previste da DA-022.
+
+Sono aggiunti Modifica, Nuova variante ed Elimina nel dettaglio e Modifica
+nell'elenco varianti del preventivo. La pagina Modifica consente codice,
+descrizione e note, conservando scelta, stato e valori economici. Codice
+e descrizione rispettano i limiti dello schema, 30 e 250 caratteri. I
+totali continuano a essere calcolati dalle righe.
+
+Il dettaglio elenca soltanto le righe della variante nel preventivo
+richiesto, con accessi alle gestioni già esistenti. Nuova riga conserva
+l'associazione alla variante ed esegue i controlli di appartenenza e
+stato. Le nuove operazioni di modifica dati e inserimento riga sono
+consentite per una variante attiva in un preventivo Bozza, Da Verificare
+o Pronto da Inviare. La modifica ripete in transazione il controllo
+dell'impronta della variante per impedire sovrascritture concorrenti.
+
+`TEC-009_10_Modifica_Varianti.sql` richiede `2026112501` e registra
+`2026112502`, codice `TEC-009-VARIANTI-MODIFICA`. Aggiorna la lettura della
+variante con note, stato e impronta e aggiunge le procedure di modifica,
+lettura delle righe e creazione contestuale. La creazione riutilizza la
+procedura operativa corrente e il relativo ricalcolo. Non modifica tabelle
+o dati durante l'installazione. Script applicato e collaudo runtime non
+sono ancora attestati. Il terzo collaudo del markup resta pendente.
+
+Verifiche locali [C] del completamento varianti
+
+- compilazione della soluzione senza errori o warning;
+- 211 test automatici superati, inclusi 13 nuovi casi per modifica,
+  appartenenza, stato, impronta e associazione delle righe;
+- controllo sintattico ScriptDom del batch e dei quattro moduli SQL
+  dinamici e verifica SHA-256 del payload. Il risultato non attesta
+  l'esecuzione delle procedure sul database.
+
+### 5.28 Scelta della variante dalla pagina Modifica
+
+**Classificazione:** [D]. **Fonte:** conferma «ok» del 25 novembre 2026
+alla proposta di aggiungere Variante scelta in modifica con selezione
+atomica e ricalcolo. Integra la decisione 174.
+
+La modifica mostra la scelta corrente e consente di cambiarla insieme a
+codice, descrizione e note. Selezionare la variante sostituisce la scelta
+precedente. Deselezionare la variante attualmente scelta lascia il
+preventivo senza variante selezionata e il totale comprende le sole righe
+comuni. Una variante non scelta lasciata deselezionata non modifica la
+scelta di un'altra variante.
+
+**Implementazione locale [C]**
+
+Un solo salvataggio transazionale aggiorna i dati e la scelta. Il ramo di
+selezione riutilizza `Preventivi_Varianti_Seleziona`, liberando prima
+l'eventuale scelta precedente per rispettare l'indice univoco filtrato.
+La deselezione riguarda soltanto la variante modificata. Entrambi i rami
+ricalcolano variante e preventivo con le procedure correnti. Restano i
+controlli di stato, appartenenza, codice univoco e impronta concorrente.
+
+`TEC-009_11_Scelta_In_Modifica_Variante.sql` richiede `2026112502` e
+registra `2026112503`, codice `TEC-009-VARIANTI-SCELTA`. Aggiorna soltanto
+la procedura di salvataggio, senza modificare tabelle o dati operativi
+durante l'installazione. Applicazione SQL e collaudo runtime restano da
+eseguire. I test automatici della UI non attestano il ricalcolo sul server.
+
+Verifiche locali [C] completate con compilazione senza errori o warning,
+214 test automatici superati, controllo sintattico ScriptDom del batch e
+del modulo SQL dinamico e verifica dell'impronta SHA-256 del payload.
+
+### 5.29 Consolidamento dei collaudi riferiti dall'utente
+
+**Classificazione:** [C]. **Data:** 25 novembre 2026.
+
+L'utente ha riferito l'esecuzione senza errori degli script
+`TEC-018_03_Generazione_Da_Preventivi.sql`,
+`TEC-009_09_Markup_Righe_Esistenti.sql`,
+`TEC-009_10_Modifica_Varianti.sql` e
+`TEC-009_11_Scelta_In_Modifica_Variante.sql`, fino alla versione
+`2026112503`. Il registro SQL installato non è stato ricontrollato
+indipendentemente dall'agente.
+
+Sono stati confermati dall'utente gli esiti positivi dei collaudi di
+anteprima acquisti, generazione per fornitore, quantità residue, modifiche
+e cancellazione delle righe ordine, concorrenza di conferma, reinvio della
+richiesta, origine aggiornata, fornitore obbligatorio o disattivato,
+filtro per singola riga, selezione vuota e tracciabilità delle origini.
+
+Sono stati inoltre confermati i collaudi di applicazione del markup,
+conservazione dei prezzi manuali, aggiornamento di tutte le varianti,
+totale della sola variante scelta, annullamento, conferma obbligatoria,
+anteprima superata, percentuali non valide, markup zero, stati chiusi e
+preventivo senza righe. Per le varianti sono stati confermati ritorno al
+preventivo, selezione, deselezione e conservazione dell'altra scelta.
+
+Restano pendenti i controlli runtime della generazione con un profilo
+privo di uno dei permessi richiesti e con ordini storici privi di origine
+univoca. I collaudi riferiti dall'utente e i 214 test automatici locali
+sono evidenze distinte. La verifica automatica non sostituisce le prove
+runtime ancora pendenti.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

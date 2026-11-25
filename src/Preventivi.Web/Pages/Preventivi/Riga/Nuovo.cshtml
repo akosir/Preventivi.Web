@@ -12,7 +12,7 @@
         <div>
             <h1 class="pfw-panel-title">Nuova riga preventivo</h1>
             <div class="pfw-panel-subtitle">
-                Inserimento riga sul preventivo
+                @(Model.Variante is null ? "Inserimento riga sul preventivo" : $"Inserimento riga nella variante {Model.Variante.CodiceVariante}")
             </div>
         </div>
     </div>
@@ -20,6 +20,7 @@
     <form method="post" class="p-3">
 
         <input type="hidden" asp-for="IdPreventivo" />
+        <input type="hidden" asp-for="IdVariantePreventivo" />
 
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 

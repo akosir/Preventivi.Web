@@ -9,6 +9,9 @@ public sealed class PreventivoVarianteItem
     public string CodiceVariante { get; set; } = string.Empty;
 
     public string DescrizioneVariante { get; set; } = string.Empty;
+    public string? Note { get; set; }
+    public bool Attiva { get; set; } = true;
+    public string Impronta { get; set; } = string.Empty;
 
     public bool VarianteScelta { get; set; }
 
