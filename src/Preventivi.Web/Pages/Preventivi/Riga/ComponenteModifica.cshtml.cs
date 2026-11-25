@@ -53,6 +53,7 @@ public class ComponenteModificaModel : PageModel
         if (Dati.QuantitaBase <= 0)
             ModelState.AddModelError("Dati.QuantitaBase", "La quantita base deve essere maggiore di zero.");
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Dati, "Dati");
         if (!ModelState.IsValid)
             return Page();
 

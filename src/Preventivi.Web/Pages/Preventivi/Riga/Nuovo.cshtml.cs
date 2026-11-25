@@ -132,6 +132,7 @@ public class NuovoModel : PageModel
                 "La quantità deve essere maggiore di zero.");
         }
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Riga, "Riga");
         if (!ModelState.IsValid)
         {
             return Page();

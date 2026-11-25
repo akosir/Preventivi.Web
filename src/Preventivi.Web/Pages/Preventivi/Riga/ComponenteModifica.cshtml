@@ -25,7 +25,7 @@
         </div>
         <form method="post" class="p-3">
             <input type="hidden" asp-for="Dati.IdRigaCompPrev" />
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
             <div class="row g-3">
                 <div class="col-12 col-md-4"><label class="form-label">Origine</label>
                     <input class="form-control" value="@Model.Componente!.TipoOrigineComponente" readonly /></div>
@@ -34,7 +34,8 @@
                 <div class="col-12 col-md-4"><label class="form-label">Livello</label>
                     <input class="form-control" value="@Model.Componente.Livello" readonly /></div>
                 <div class="col-12 pfw-field-required"><label asp-for="Dati.DescrizioneNodo" class="form-label">Descrizione</label>
-                    <input asp-for="Dati.DescrizioneNodo" class="form-control" />
+                    <input maxlength="200" asp-for="Dati.DescrizioneNodo" class="form-control" />
+                            <span class="form-text">Massimo 200 caratteri.</span>
                     <span asp-validation-for="Dati.DescrizioneNodo" class="text-danger"></span></div>
                 <div class="col-12 col-md-3 pfw-field-required"><label asp-for="Dati.QuantitaBase" class="form-label">Quantita base</label>
                     <input asp-for="Dati.QuantitaBase" class="form-control text-end" />

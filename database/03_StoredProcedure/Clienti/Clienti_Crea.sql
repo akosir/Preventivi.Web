@@ -1,15 +1,15 @@
 CREATE OR ALTER PROCEDURE dbo.Clienti_Crea
 (
-    @CodiceCliente      NVARCHAR(50),
-    @RagioneSociale     NVARCHAR(200),
-    @PartitaIVA         NVARCHAR(30)=NULL,
-    @CodiceFiscale      NVARCHAR(30)=NULL,
-    @Indirizzo          NVARCHAR(200)=NULL,
+    @CodiceCliente      NVARCHAR(30),
+    @RagioneSociale     NVARCHAR(150),
+    @PartitaIVA         NVARCHAR(20)=NULL,
+    @CodiceFiscale      NVARCHAR(20)=NULL,
+    @Indirizzo          NVARCHAR(150)=NULL,
     @CAP                NVARCHAR(10)=NULL,
     @Citta              NVARCHAR(100)=NULL,
     @Provincia          NVARCHAR(10)=NULL,
     @Telefono           NVARCHAR(50)=NULL,
-    @Email              NVARCHAR(200)=NULL,
+    @Email              NVARCHAR(150)=NULL,
     @Attivo             BIT = 1
 )
 AS

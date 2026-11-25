@@ -40,7 +40,7 @@
         <div class="p-3">
             @if (Model.EliminazioneRichiesta)
             {
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+                <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
             }
 
             @if (ComponentiModel.IsNuovo(modo))
@@ -131,7 +131,7 @@
                       asp-route-modo="nuovo"
                       asp-route-idPreventivo="@idPreventivo"
                       asp-route-idRigaPreventivo="@idRigaPreventivo">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                     <input type="hidden" asp-for="Origine" />
                     <input type="hidden" asp-for="RicercaArticolo" />
@@ -145,9 +145,10 @@
                             <label asp-for="NuovoComponente.DescrizioneNodo" class="form-label">
                                 Descrizione componente
                             </label>
-                            <input asp-for="NuovoComponente.DescrizioneNodo"
+                            <input maxlength="200" asp-for="NuovoComponente.DescrizioneNodo"
                                    class="form-control"
                                    readonly="@(Model.Origine == ComponentiModel.OrigineDistinta)" />
+                            <span class="form-text">Massimo 200 caratteri.</span>
                             <span asp-validation-for="NuovoComponente.DescrizioneNodo" class="text-danger"></span>
                         </div>
                         <div class="col-12 col-md-6 pfw-field-required">

@@ -54,6 +54,7 @@ public class NuovoModel : PageModel
                 "Inserire la descrizione variante.");
         }
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Variante, "Variante");
         if (!ModelState.IsValid)
         {
             return Page();

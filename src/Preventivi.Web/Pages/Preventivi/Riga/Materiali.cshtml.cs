@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Allegati;
+using IAnagraficheProduttiveRepository = Preventivi.Core.Anagrafiche.IAnagraficheProduttiveRepository;
 using Preventivi.Core.Preventivi;
 using Preventivi.Core.Preventivi.Eliminazione;
 using Preventivi.Web.UI.Modules.Allegati;
@@ -14,6 +15,7 @@ public class MaterialiModel : PageModel
     public const string OrigineLibero = "Libero";
 
     private readonly IPreventivoRepository _preventivoRepository;
+    private readonly IAnagraficheProduttiveRepository _anagraficheRepository;
     private readonly IAllegatoRepository _allegatoRepository;
     private readonly IPreventivoEliminazioneService _eliminazioneService;
 
@@ -54,11 +56,13 @@ public class MaterialiModel : PageModel
     public MaterialiModel(
         IPreventivoRepository preventivoRepository,
         IAllegatoRepository allegatoRepository,
-        IPreventivoEliminazioneService eliminazioneService)
+        IPreventivoEliminazioneService eliminazioneService,
+        IAnagraficheProduttiveRepository anagraficheRepository)
     {
         _preventivoRepository = preventivoRepository;
         _allegatoRepository = allegatoRepository;
         _eliminazioneService = eliminazioneService;
+        _anagraficheRepository = anagraficheRepository;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -209,7 +213,8 @@ public class MaterialiModel : PageModel
 
         await PreparaNuovoMaterialeAsync(
             idRigaPreventivo,
-            cancellationToken);
+            cancellationToken,
+            inizializza: false);
 
         if (Origine == OrigineDistinta)
         {
@@ -227,7 +232,7 @@ public class MaterialiModel : PageModel
             }
             else
             {
-                ApplicaMaterialeDistinta(MaterialeDistintaSelezionato);
+                ApplicaMaterialeDistinta(MaterialeDistintaSelezionato, inizializza: false);
             }
         }
 
@@ -247,21 +252,31 @@ public class MaterialiModel : PageModel
             }
             else
             {
-                ApplicaMaterialeAnagrafica(MaterialeAnagraficaSelezionato);
+                ApplicaMaterialeAnagrafica(MaterialeAnagraficaSelezionato, inizializza: false);
             }
-        }
-
-        if (string.IsNullOrWhiteSpace(NuovoMateriale.DescrizioneMateriale))
-        {
-            ModelState.AddModelError(
-                nameof(NuovoMateriale.DescrizioneMateriale),
-                "La descrizione del materiale e obbligatoria.");
         }
 
         NuovoMateriale.IdRigaPreventivo = idRigaPreventivo;
         NuovoMateriale.IdRigaCompPrev = Componente.IdRigaCompPrev;
         NuovoMateriale.IdNodoDistinta = Componente.IdNodoDistinta;
 
+        if (Origine == OrigineLibero)
+            NuovoMateriale.IdMateriale = null;
+        else
+        {
+            foreach (var campo in new[] { "IdMateriale", "DescrizioneMateriale", "TipoMateriale", "UM" })
+                ModelState.Remove($"NuovoMateriale.{campo}");
+        }
+
+        if (string.IsNullOrWhiteSpace(NuovoMateriale.DescrizioneMateriale))
+            ModelState.AddModelError("NuovoMateriale.DescrizioneMateriale", "La descrizione del materiale e obbligatoria.");
+        if (NuovoMateriale.Quantita < 0 || NuovoMateriale.CostoUnitario < 0)
+            ModelState.AddModelError(string.Empty, "Quantita e costo non possono essere negativi.");
+        if (NuovoMateriale.IdFornitoreSuggerito.HasValue &&
+            Fornitori.All(x => x.IdFornitore != NuovoMateriale.IdFornitoreSuggerito))
+            ModelState.AddModelError("NuovoMateriale.IdFornitoreSuggerito", "Selezionare un fornitore attivo disponibile.");
+
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, NuovoMateriale, "NuovoMateriale");
         if (!ModelState.IsValid)
         {
             return Page();
@@ -302,8 +317,12 @@ public class MaterialiModel : PageModel
 
     private async Task PreparaNuovoMaterialeAsync(
         int idRigaPreventivo,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool inizializza = true)
     {
+        if (!inizializza && !new[] { OrigineDistinta, OrigineAnagrafica, OrigineLibero }
+                .Contains(Origine, StringComparer.OrdinalIgnoreCase))
+            ModelState.AddModelError(nameof(Origine), "Selezionare un'origine materiale valida.");
         NormalizeOrigine();
 
         if (Componente?.IdNodoDistinta is > 0)
@@ -322,30 +341,39 @@ public class MaterialiModel : PageModel
         Fornitori =
             await _preventivoRepository.GetFornitoriAsync(cancellationToken);
 
-        if (IdDistintaMaterialeSelezionato is > 0)
+        var materialiAttivi = await _anagraficheRepository.GetMaterialiAsync(
+            soloAttivi: true, cancellationToken: cancellationToken);
+        var idAttivi = materialiAttivi.Select(x => x.IdMateriale).ToHashSet();
+        MaterialiDistinta = MaterialiDistinta.Where(x => idAttivi.Contains(x.IdMateriale)).ToArray();
+        MaterialiAnagrafica = MaterialiAnagrafica.Where(x => idAttivi.Contains(x.IdMateriale)).ToArray();
+
+        if (Origine == OrigineDistinta && IdDistintaMaterialeSelezionato is > 0)
         {
             MaterialeDistintaSelezionato =
-                await _preventivoRepository.GetMaterialeDistintaAsync(
-                    IdDistintaMaterialeSelezionato.Value,
-                    cancellationToken);
+                MaterialiDistinta.FirstOrDefault(x =>
+                    x.IdDistintaMateriale == IdDistintaMaterialeSelezionato &&
+                    x.IdNodoDistinta == Componente?.IdNodoDistinta);
 
-            if (MaterialeDistintaSelezionato is not null)
+            if (inizializza && MaterialeDistintaSelezionato is not null)
             {
                 ApplicaMaterialeDistinta(MaterialeDistintaSelezionato);
             }
         }
 
-        if (IdMaterialeSelezionato is > 0)
+        if (Origine == OrigineAnagrafica && IdMaterialeSelezionato is > 0 &&
+            idAttivi.Contains(IdMaterialeSelezionato.Value))
         {
             MaterialeAnagraficaSelezionato =
                 await _preventivoRepository.GetMaterialeAnagraficaAsync(
                     IdMaterialeSelezionato.Value,
                     cancellationToken);
 
-            if (MaterialeAnagraficaSelezionato is not null &&
-                Origine == OrigineAnagrafica)
+            if (MaterialeAnagraficaSelezionato is not null)
             {
-                ApplicaMaterialeAnagrafica(MaterialeAnagraficaSelezionato);
+                if (MaterialiAnagrafica.All(x => x.IdMateriale != IdMaterialeSelezionato))
+                    MaterialiAnagrafica = MaterialiAnagrafica.Append(MaterialeAnagraficaSelezionato).ToArray();
+                if (inizializza)
+                    ApplicaMaterialeAnagrafica(MaterialeAnagraficaSelezionato);
             }
         }
 
@@ -353,19 +381,23 @@ public class MaterialiModel : PageModel
         NuovoMateriale.IdRigaCompPrev = Componente?.IdRigaCompPrev;
         NuovoMateriale.IdNodoDistinta = Componente?.IdNodoDistinta;
 
-        if (NuovoMateriale.Quantita == 0)
+        if (inizializza && NuovoMateriale.Quantita == 0)
         {
             NuovoMateriale.Quantita = 1;
         }
+        if (inizializza && NuovoMateriale.IdFornitoreSuggerito.HasValue &&
+            Fornitori.All(x => x.IdFornitore != NuovoMateriale.IdFornitoreSuggerito))
+            NuovoMateriale.IdFornitoreSuggerito = null;
     }
 
     private void ApplicaMaterialeDistinta(
-        DistintaMaterialeLookupItem materiale)
+        DistintaMaterialeLookupItem materiale, bool inizializza = true)
     {
         NuovoMateriale.IdMateriale = materiale.IdMateriale;
         NuovoMateriale.DescrizioneMateriale = materiale.DescrizioneMateriale;
         NuovoMateriale.TipoMateriale = materiale.TipoMateriale;
         NuovoMateriale.UM = materiale.UM;
+        if (!inizializza) return;
         NuovoMateriale.Quantita = materiale.Quantita;
         NuovoMateriale.CostoUnitario = materiale.CostoUnitario;
         NuovoMateriale.DaAcquistare = materiale.DaAcquistare;
@@ -373,12 +405,13 @@ public class MaterialiModel : PageModel
     }
 
     private void ApplicaMaterialeAnagrafica(
-        MaterialeLookupItem materiale)
+        MaterialeLookupItem materiale, bool inizializza = true)
     {
         NuovoMateriale.IdMateriale = materiale.IdMateriale;
         NuovoMateriale.DescrizioneMateriale = materiale.Descrizione;
         NuovoMateriale.TipoMateriale = materiale.TipoMateriale;
         NuovoMateriale.UM = materiale.UM;
+        if (!inizializza) return;
         NuovoMateriale.CostoUnitario = materiale.CostoUnitario;
         NuovoMateriale.DaAcquistare = materiale.GestitoAAcquisto;
         NuovoMateriale.IdFornitoreSuggerito = materiale.IdFornitorePredefinito;

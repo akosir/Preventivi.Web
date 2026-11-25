@@ -1,21 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Preventivi;
+using Preventivi.Core.Anagrafiche;
 
 namespace Preventivi.Web.Pages.Preventivi.Riga;
 
 public class LavorazioneModificaModel : PageModel
 {
     private readonly IPreventivoRepository _repository;
+    private readonly IAnagraficheProduttiveRepository _anagraficheRepository;
 
-    public LavorazioneModificaModel(IPreventivoRepository repository)
+    public LavorazioneModificaModel(IPreventivoRepository repository, IAnagraficheProduttiveRepository anagraficheRepository)
     {
         _repository = repository;
+        _anagraficheRepository = anagraficheRepository;
     }
 
     public PreventivoRigaLavorazioneItem? Lavorazione { get; private set; }
-    public IReadOnlyList<FornitoreLookupItem> Fornitori { get; private set; }
-        = Array.Empty<FornitoreLookupItem>();
+    public IReadOnlyList<FornitoreAnagraficaLookupItem> Fornitori { get; private set; }
+        = Array.Empty<FornitoreAnagraficaLookupItem>();
 
     [BindProperty]
     public PreventivoRigaLavorazioneUpdateModel Dati { get; set; } = new();
@@ -56,9 +59,11 @@ public class LavorazioneModificaModel : PageModel
         if (Dati.TempoSetupMin < 0 || Dati.TempoPezzoMin < 0 || Dati.Quantita < 0 ||
             Dati.CostoOrario < 0 || Dati.CostoFisso < 0)
             ModelState.AddModelError(string.Empty, "Tempi, quantita e costi non possono essere negativi.");
-        if (Dati.IdFornitoreSuggerito is > 0 && Fornitori.All(x => x.IdFornitore != Dati.IdFornitoreSuggerito))
+        if (Dati.IdFornitoreSuggerito.HasValue && Fornitori.All(x => x.IdFornitore != Dati.IdFornitoreSuggerito ||
+                (!x.Attivo && x.IdFornitore != Lavorazione!.IdFornitoreSuggerito)))
             ModelState.AddModelError("Dati.IdFornitoreSuggerito", "Il fornitore selezionato non e disponibile.");
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Dati, "Dati");
         if (!ModelState.IsValid)
             return Page();
 
@@ -76,7 +81,7 @@ public class LavorazioneModificaModel : PageModel
         var riga = await _repository.GetRigaAsync(idRigaPreventivo, cancellationToken);
         var componente = await _repository.GetComponenteAsync(idComponente, cancellationToken);
         Lavorazione = await _repository.GetLavorazioneAsync(id, cancellationToken);
-        Fornitori = await _repository.GetFornitoriAsync(cancellationToken);
+        Fornitori = await _anagraficheRepository.GetFornitoriAsync(Lavorazione?.IdFornitoreSuggerito, cancellationToken);
         return riga?.IdPreventivo == idPreventivo &&
                componente?.IdRigaPreventivo == idRigaPreventivo &&
                Lavorazione?.IdRigaPreventivo == idRigaPreventivo &&

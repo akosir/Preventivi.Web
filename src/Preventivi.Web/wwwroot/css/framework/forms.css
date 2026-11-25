@@ -6,3 +6,7 @@
 .pfw-field-required .form-control {
     border-left: 3px solid var(--app-danger);
 }
+
+.pfw-clienti-validation.validation-summary-valid {
+    display: none;
+}

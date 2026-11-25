@@ -11,9 +11,7 @@
 
 <form method="post">
 
-    @await Html.PartialAsync(
-        "Shared/Clienti/_ClienteForm",
-        Model.Cliente)
+    <partial name="~/Pages/Shared/Clienti/_ClienteForm.cshtml" for="Cliente" />
 
     <div class="d-flex justify-content-end gap-2 mt-3">
 

@@ -54,7 +54,7 @@
         <form method="post" class="p-3">
             <input type="hidden" asp-for="Dati.IdPreventivo" />
             <input type="hidden" asp-for="Dati.IdRichiestaCliente" />
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
             <div class="row g-3">
                 <div class="col-12 col-md-3 pfw-field-required">
@@ -84,7 +84,8 @@
                 </div>
                 <div class="col-12 pfw-field-required">
                     <label asp-for="Dati.Oggetto" class="form-label">Oggetto</label>
-                    <input asp-for="Dati.Oggetto" class="form-control" />
+                    <input maxlength="250" asp-for="Dati.Oggetto" class="form-control" />
+                            <span class="form-text">Massimo 250 caratteri.</span>
                     <span asp-validation-for="Dati.Oggetto" class="text-danger"></span>
                 </div>
                 <div class="col-12 col-md-3 pfw-field-required">

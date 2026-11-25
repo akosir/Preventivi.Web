@@ -112,6 +112,9 @@ builder.Services.AddScoped<
     DistintaBaseReportService>();
 builder.Services.AddSingleton<DistintaBasePdfGenerator>();
 builder.Services.AddSingleton<DistintaBaseExcelService>();
+builder.Services.AddSingleton<ArticoliExcelService>();
+builder.Services.AddScoped<IArticoliImportazioneRepository, ArticoliImportazioneRepository>();
+builder.Services.AddScoped<IArticoliImportazioneService, ArticoliImportazioneService>();
 
 builder.Services.AddScoped<
     IPreventivoRepository,

@@ -18,18 +18,20 @@
     <form method="post" class="p-3">
         <input type="hidden" asp-for="IdPreventivo" />
 
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
         <div class="row g-3">
             <div class="col-12 col-md-3 pfw-field-required">
                 <label class="form-label" asp-for="Variante.CodiceVariante">Codice variante</label>
-                <input class="form-control" asp-for="Variante.CodiceVariante" />
+                <input class="form-control" maxlength="30" asp-for="Variante.CodiceVariante" />
+                            <span class="form-text">Massimo 30 caratteri.</span>
                 <span class="text-danger" asp-validation-for="Variante.CodiceVariante"></span>
             </div>
 
             <div class="col-12 col-md-9 pfw-field-required">
                 <label class="form-label" asp-for="Variante.DescrizioneVariante">Descrizione variante</label>
-                <input class="form-control" asp-for="Variante.DescrizioneVariante" />
+                <input class="form-control" maxlength="250" asp-for="Variante.DescrizioneVariante" />
+                            <span class="form-text">Massimo 250 caratteri.</span>
                 <span class="text-danger" asp-validation-for="Variante.DescrizioneVariante"></span>
             </div>
 

@@ -1,0 +1,62 @@
+@page
+@model global::Preventivi.Web.Pages.Anagrafiche.Articoli.ImportaModel
+@{ ViewData["Title"] = "Importa articoli da Excel"; }
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="./Index">Articoli</a> / Importazione Excel</div>
+        <h1 class="h3 mb-1">Importa nuovi articoli</h1>
+        <p class="pfw-secondary-text mb-0">Anteprima e conferma prima dell'inserimento. Gli articoli esistenti non vengono aggiornati.</p>
+    </div>
+    <a asp-page-handler="Modello" class="pfw-btn pfw-btn-secondary">Scarica modello Excel</a>
+</div>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+}
+<section class="pfw-panel mb-3">
+    <div class="pfw-panel-header"><h2 class="pfw-panel-title">Carica il file</h2></div>
+    <div class="pfw-panel-body">
+        <p>Compila il foglio <strong>Articoli</strong>. Codice articolo e descrizione sono obbligatori; versione, codice cliente e note tecniche sono facoltativi. Usa codici come testo per mantenere gli zeri iniziali.</p>
+        <form method="post" enctype="multipart/form-data" asp-page-handler="Anteprima" class="row g-3 align-items-end">
+            <div class="col-12 col-lg-9 pfw-field-required">
+                <label asp-for="Dati.File" class="form-label">File Excel</label>
+                <input asp-for="Dati.File" type="file" accept=".xlsx" class="form-control" required />
+                <span class="form-text">Solo .xlsx, massimo 2 MB. I clienti indicati devono essere gia presenti e attivi.</span>
+            </div>
+            <div class="col-12 col-lg-3"><button type="submit" class="pfw-btn pfw-btn-primary">Verifica e mostra anteprima</button></div>
+        </form>
+    </div>
+</section>
+@if (Model.Errori.Count > 0)
+{
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header"><h2 class="pfw-panel-title">Errori da correggere</h2></div>
+        <div class="pfw-panel-body"><p>Nessun articolo e stato importato. Correggi il file e caricalo nuovamente.</p></div>
+        <div class="table-responsive"><table class="table pfw-table mb-0">
+            <thead><tr><th>Foglio</th><th>Riga</th><th>Campo</th><th>Errore</th></tr></thead>
+            <tbody>@foreach (var errore in Model.Errori)
+            { <tr><td>@errore.Foglio</td><td>@(errore.RigaExcel > 0 ? errore.RigaExcel.ToString() : "-")</td><td>@errore.Campo</td><td>@errore.Messaggio</td></tr> }</tbody>
+        </table></div>
+    </section>
+}
+@if (Model.AnteprimaDisponibile)
+{
+    <section class="pfw-panel mb-3">
+        <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">Anteprima nuovi articoli</h2><p class="pfw-secondary-text mb-0">@Model.NomeFile · @Model.Righe.Count articoli da inserire</p></div></div>
+        <div class="pfw-panel-body"><div class="alert alert-success mb-0">File valido. Nessun dato e stato ancora scritto. Tutti i nuovi articoli saranno attivi.</div></div>
+        <div class="table-responsive"><table class="table pfw-table mb-0">
+            <thead><tr><th>Riga</th><th>Codice articolo</th><th>Descrizione</th><th>Versione articolo</th><th>Codice cliente</th><th>Note tecniche</th></tr></thead>
+            <tbody>@foreach (var riga in Model.Righe)
+            { <tr><td>@riga.RigaExcel</td><td>@riga.CodiceArticolo</td><td>@riga.Descrizione</td><td>@(riga.Versione ?? "-")</td><td>@(riga.CodiceCliente ?? "-")</td><td>@(riga.NoteTecniche ?? "-")</td></tr> }</tbody>
+        </table></div>
+        <div class="pfw-panel-footer d-flex justify-content-end">
+            <form method="post" asp-page-handler="Applica">
+                <input asp-for="Dati.ContenutoBase64" type="hidden" />
+                <input asp-for="Dati.TokenAnteprima" type="hidden" />
+                <button type="submit" class="pfw-btn pfw-btn-primary" onclick="return confirm('Confermare l’importazione di tutti gli articoli?');">Conferma importazione</button>
+            </form>
+        </div>
+    </section>
+}
+<a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Torna agli articoli</a>

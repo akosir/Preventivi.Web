@@ -110,6 +110,7 @@ public class ModificaModel : PageModel
             Riga.IdModelloCiclo = null;
         }
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Riga, "Riga");
         if (!ModelState.IsValid)
         {
             return Page();

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Allegati;
+using IAnagraficheProduttiveRepository = Preventivi.Core.Anagrafiche.IAnagraficheProduttiveRepository;
 using Preventivi.Core.Preventivi;
 using Preventivi.Core.Preventivi.Eliminazione;
 using Preventivi.Web.UI.Modules.Allegati;
@@ -14,6 +15,7 @@ public class LavorazioniModel : PageModel
     public const string OrigineLibero = "Libero";
 
     private readonly IPreventivoRepository _preventivoRepository;
+    private readonly IAnagraficheProduttiveRepository _anagraficheRepository;
     private readonly IAllegatoRepository _allegatoRepository;
     private readonly IPreventivoEliminazioneService _eliminazioneService;
 
@@ -54,11 +56,13 @@ public class LavorazioniModel : PageModel
     public LavorazioniModel(
         IPreventivoRepository preventivoRepository,
         IAllegatoRepository allegatoRepository,
-        IPreventivoEliminazioneService eliminazioneService)
+        IPreventivoEliminazioneService eliminazioneService,
+        IAnagraficheProduttiveRepository anagraficheRepository)
     {
         _preventivoRepository = preventivoRepository;
         _allegatoRepository = allegatoRepository;
         _eliminazioneService = eliminazioneService;
+        _anagraficheRepository = anagraficheRepository;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -209,7 +213,8 @@ public class LavorazioniModel : PageModel
 
         await PreparaNuovaLavorazioneAsync(
             idRigaPreventivo,
-            cancellationToken);
+            cancellationToken,
+            inizializza: false);
 
         if (Origine == OrigineDistinta)
         {
@@ -227,7 +232,7 @@ public class LavorazioniModel : PageModel
             }
             else
             {
-                ApplicaLavorazioneDistinta(LavorazioneDistintaSelezionata);
+                ApplicaLavorazioneDistinta(LavorazioneDistintaSelezionata, inizializza: false);
             }
         }
 
@@ -247,21 +252,32 @@ public class LavorazioniModel : PageModel
             }
             else
             {
-                ApplicaLavorazioneAnagrafica(LavorazioneAnagraficaSelezionata);
+                ApplicaLavorazioneAnagrafica(LavorazioneAnagraficaSelezionata, inizializza: false);
             }
-        }
-
-        if (string.IsNullOrWhiteSpace(NuovaLavorazione.DescrizioneLavorazione))
-        {
-            ModelState.AddModelError(
-                nameof(NuovaLavorazione.DescrizioneLavorazione),
-                "La descrizione della lavorazione e obbligatoria.");
         }
 
         NuovaLavorazione.IdRigaPreventivo = idRigaPreventivo;
         NuovaLavorazione.IdRigaCompPrev = Componente.IdRigaCompPrev;
         NuovaLavorazione.IdNodoDistinta = Componente.IdNodoDistinta;
 
+        if (Origine == OrigineLibero)
+            NuovaLavorazione.IdLavorazione = null;
+        else
+        {
+            ModelState.Remove("NuovaLavorazione.IdLavorazione");
+            ModelState.Remove("NuovaLavorazione.DescrizioneLavorazione");
+        }
+
+        if (string.IsNullOrWhiteSpace(NuovaLavorazione.DescrizioneLavorazione))
+            ModelState.AddModelError("NuovaLavorazione.DescrizioneLavorazione", "La descrizione della lavorazione e obbligatoria.");
+        if (NuovaLavorazione.TempoSetupMin < 0 || NuovaLavorazione.TempoPezzoMin < 0 ||
+            NuovaLavorazione.Quantita < 0 || NuovaLavorazione.CostoOrario < 0 || NuovaLavorazione.CostoFisso < 0)
+            ModelState.AddModelError(string.Empty, "Tempi, quantita e costi non possono essere negativi.");
+        if (NuovaLavorazione.IdFornitoreSuggerito.HasValue &&
+            Fornitori.All(x => x.IdFornitore != NuovaLavorazione.IdFornitoreSuggerito))
+            ModelState.AddModelError("NuovaLavorazione.IdFornitoreSuggerito", "Selezionare un fornitore attivo disponibile.");
+
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, NuovaLavorazione, "NuovaLavorazione");
         if (!ModelState.IsValid)
         {
             return Page();
@@ -302,8 +318,12 @@ public class LavorazioniModel : PageModel
 
     private async Task PreparaNuovaLavorazioneAsync(
         int idRigaPreventivo,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool inizializza = true)
     {
+        if (!inizializza && !new[] { OrigineDistinta, OrigineAnagrafica, OrigineLibero }
+                .Contains(Origine, StringComparer.OrdinalIgnoreCase))
+            ModelState.AddModelError(nameof(Origine), "Selezionare un'origine lavorazione valida.");
         NormalizeOrigine();
 
         if (Componente?.IdNodoDistinta is > 0)
@@ -322,30 +342,39 @@ public class LavorazioniModel : PageModel
         Fornitori =
             await _preventivoRepository.GetFornitoriAsync(cancellationToken);
 
-        if (IdDistintaLavorazioneSelezionata is > 0)
+        var lavorazioniAttive = await _anagraficheRepository.GetLavorazioniAsync(
+            soloAttive: true, cancellationToken: cancellationToken);
+        var idAttivi = lavorazioniAttive.Select(x => x.IdLavorazione).ToHashSet();
+        LavorazioniDistinta = LavorazioniDistinta.Where(x => idAttivi.Contains(x.IdLavorazione)).ToArray();
+        LavorazioniAnagrafica = LavorazioniAnagrafica.Where(x => idAttivi.Contains(x.IdLavorazione)).ToArray();
+
+        if (Origine == OrigineDistinta && IdDistintaLavorazioneSelezionata is > 0)
         {
             LavorazioneDistintaSelezionata =
-                await _preventivoRepository.GetLavorazioneDistintaAsync(
-                    IdDistintaLavorazioneSelezionata.Value,
-                    cancellationToken);
+                LavorazioniDistinta.FirstOrDefault(x =>
+                    x.IdDistintaLavorazione == IdDistintaLavorazioneSelezionata &&
+                    x.IdNodoDistinta == Componente?.IdNodoDistinta);
 
-            if (LavorazioneDistintaSelezionata is not null)
+            if (inizializza && LavorazioneDistintaSelezionata is not null)
             {
                 ApplicaLavorazioneDistinta(LavorazioneDistintaSelezionata);
             }
         }
 
-        if (IdLavorazioneSelezionata is > 0)
+        if (Origine == OrigineAnagrafica && IdLavorazioneSelezionata is > 0 &&
+            idAttivi.Contains(IdLavorazioneSelezionata.Value))
         {
             LavorazioneAnagraficaSelezionata =
                 await _preventivoRepository.GetLavorazioneAnagraficaAsync(
                     IdLavorazioneSelezionata.Value,
                     cancellationToken);
 
-            if (LavorazioneAnagraficaSelezionata is not null &&
-                Origine == OrigineAnagrafica)
+            if (LavorazioneAnagraficaSelezionata is not null)
             {
-                ApplicaLavorazioneAnagrafica(LavorazioneAnagraficaSelezionata);
+                if (LavorazioniAnagrafica.All(x => x.IdLavorazione != IdLavorazioneSelezionata))
+                    LavorazioniAnagrafica = LavorazioniAnagrafica.Append(LavorazioneAnagraficaSelezionata).ToArray();
+                if (inizializza)
+                    ApplicaLavorazioneAnagrafica(LavorazioneAnagraficaSelezionata);
             }
         }
 
@@ -353,22 +382,26 @@ public class LavorazioniModel : PageModel
         NuovaLavorazione.IdRigaCompPrev = Componente?.IdRigaCompPrev;
         NuovaLavorazione.IdNodoDistinta = Componente?.IdNodoDistinta;
 
-        if (NuovaLavorazione.Sequenza is null)
+        if (inizializza && NuovaLavorazione.Sequenza is null)
         {
             NuovaLavorazione.Sequenza = 10;
         }
 
-        if (NuovaLavorazione.Quantita == 0)
+        if (inizializza && NuovaLavorazione.Quantita == 0)
         {
             NuovaLavorazione.Quantita = 1;
         }
+        if (inizializza && NuovaLavorazione.IdFornitoreSuggerito.HasValue &&
+            Fornitori.All(x => x.IdFornitore != NuovaLavorazione.IdFornitoreSuggerito))
+            NuovaLavorazione.IdFornitoreSuggerito = null;
     }
 
     private void ApplicaLavorazioneDistinta(
-        DistintaLavorazioneLookupItem lavorazione)
+        DistintaLavorazioneLookupItem lavorazione, bool inizializza = true)
     {
         NuovaLavorazione.IdLavorazione = lavorazione.IdLavorazione;
         NuovaLavorazione.DescrizioneLavorazione = lavorazione.DescrizioneLavorazione;
+        if (!inizializza) return;
         NuovaLavorazione.Sequenza = lavorazione.Sequenza;
         NuovaLavorazione.TempoSetupMin = lavorazione.TempoSetupMin;
         NuovaLavorazione.TempoPezzoMin = lavorazione.TempoPezzoMin;
@@ -379,10 +412,11 @@ public class LavorazioniModel : PageModel
     }
 
     private void ApplicaLavorazioneAnagrafica(
-        LavorazioneLookupItem lavorazione)
+        LavorazioneLookupItem lavorazione, bool inizializza = true)
     {
         NuovaLavorazione.IdLavorazione = lavorazione.IdLavorazione;
         NuovaLavorazione.DescrizioneLavorazione = lavorazione.Descrizione;
+        if (!inizializza) return;
         NuovaLavorazione.TempoSetupMin = lavorazione.TempoSetupMinDefault;
         NuovaLavorazione.TempoPezzoMin = lavorazione.TempoPezzoMinDefault;
         NuovaLavorazione.CostoOrario = lavorazione.CostoOrarioStandard;

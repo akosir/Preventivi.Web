@@ -19,12 +19,13 @@
 
         </div>
 
-        <a href="@Model.UrlNuovo"
-           class="pfw-btn pfw-btn-primary">
-
-            @Model.TestoPulsanteNuovo
-
-        </a>
+        @if (!string.IsNullOrWhiteSpace(Model.TestoPulsanteNuovo) &&
+             !string.IsNullOrWhiteSpace(Model.UrlNuovo) && Model.UrlNuovo != "#")
+        {
+            <a href="@Model.UrlNuovo" class="pfw-btn pfw-btn-primary">
+                @Model.TestoPulsanteNuovo
+            </a>
+        }
 
     </div>
 

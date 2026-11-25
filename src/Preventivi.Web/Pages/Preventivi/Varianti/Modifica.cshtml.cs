@@ -10,9 +10,9 @@ public sealed class ModificaModel(IPreventivoRepository repository, ILogger<Modi
 {
     [BindProperty(SupportsGet = true)] public int IdPreventivo { get; set; }
     [BindProperty(SupportsGet = true)] public int IdVariantePreventivo { get; set; }
-    [BindProperty, Required(ErrorMessage = "Inserire il codice variante."), StringLength(30)]
+    [BindProperty, Required(ErrorMessage = "Inserire il codice variante."), StringLength(30, ErrorMessage = "Il codice variante puo contenere al massimo {1} caratteri.")]
     public string Codice { get; set; } = string.Empty;
-    [BindProperty, Required(ErrorMessage = "Inserire la descrizione variante."), StringLength(250)]
+    [BindProperty, Required(ErrorMessage = "Inserire la descrizione variante."), StringLength(250, ErrorMessage = "La descrizione variante puo contenere al massimo {1} caratteri.")]
     public string Descrizione { get; set; } = string.Empty;
     [BindProperty] public string? Note { get; set; }
     [BindProperty] public bool VarianteScelta { get; set; }
@@ -36,9 +36,9 @@ public sealed class ModificaModel(IPreventivoRepository repository, ILogger<Modi
     {
         if (!await CaricaAsync(cancellationToken)) return NotFound();
         if (!Modificabile) ModelState.AddModelError(string.Empty, "Lo stato del preventivo o della variante non consente modifiche.");
-        if (string.IsNullOrWhiteSpace(Codice) || Codice.Trim().Length > 30)
+        if (string.IsNullOrWhiteSpace(Codice) || Codice.Length > 30)
             ModelState.AddModelError(nameof(Codice), "Inserire un codice variante di massimo 30 caratteri.");
-        if (string.IsNullOrWhiteSpace(Descrizione) || Descrizione.Trim().Length > 250)
+        if (string.IsNullOrWhiteSpace(Descrizione) || Descrizione.Length > 250)
             ModelState.AddModelError(nameof(Descrizione), "Inserire una descrizione di massimo 250 caratteri.");
         if (string.IsNullOrEmpty(Impronta) || Impronta != Variante!.Impronta)
             ModelState.AddModelError(string.Empty, "La variante è cambiata. Riaprire la pagina prima di salvare.");

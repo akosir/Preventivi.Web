@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Preventivi.Core.Preventivi;
 
 public sealed class PreventivoRigaCreateModel
@@ -10,6 +12,7 @@ public sealed class PreventivoRigaCreateModel
 
     public int? IdModelloCiclo { get; set; }
 
+    [StringLength(250, ErrorMessage = "La descrizione della riga puo contenere al massimo {1} caratteri.")]
     public string DescrizioneVoce { get; set; } = string.Empty;
 
     public decimal Quantita { get; set; }

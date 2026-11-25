@@ -8,7 +8,10 @@
         <h1 class="h3 mb-1">Articoli</h1>
         <p class="pfw-secondary-text mb-0">Anagrafica prodotti e documentazione tecnica</p>
     </div>
-    <a asp-page="./Nuovo" class="pfw-btn pfw-btn-primary">Nuovo</a>
+    <div class="d-flex gap-2">
+        <a asp-page="./Importa" class="pfw-btn pfw-btn-secondary">Importa Excel</a>
+        <a asp-page="./Nuovo" class="pfw-btn pfw-btn-primary">Nuovo</a>
+    </div>
 </div>
 
 @if (TempData["MessaggioSuccesso"] is string messaggio)

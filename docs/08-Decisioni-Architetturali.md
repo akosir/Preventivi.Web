@@ -2438,6 +2438,190 @@ non è attestata dai collaudi riferiti; resta distinta dal blocco verificato
 con un solo ADMIN e dai controlli automatici locali. La gestione dei
 permessi dei ruoli rimane fuori da questo pacchetto.
 
+### 5.31 Controllo campi — Lookup materiali e lavorazioni, decisioni 372–376
+
+**Classificazione:** [D]. **Stato:** decisioni e implementazione confermate
+separatamente dall'utente nella sessione Work del 25 novembre 2026.
+Gli identificativi 372–376 sono assegnati in continuita con TEC-019.
+
+- **372 — Compilazione iniziale.** La scelta da anagrafica o distinta propone
+  i dati della sorgente soltanto nell'inizializzazione del nuovo elemento.
+- **373 — Conservazione dei valori operativi.** Il salvataggio conserva
+  quantita, sequenza, tempi, costi, opzioni di acquisto e fornitore modificabili
+  digitati dall'operatore; non ripristina i valori economici della sorgente.
+- **374 — Verifica della sorgente.** Il server verifica gli identificativi,
+  l'appartenenza della voce distinta al nodo del componente e l'utilizzabilita
+  dell'anagrafica. Identita, descrizione e altri dati non modificabili della
+  sorgente non sono desunti dai soli campi inviati dal browser.
+- **375 — Selezioni storiche.** Un fornitore gia associato e poi disattivato
+  resta visibile e conservabile nella modifica del materiale o lavorazione,
+  contrassegnato come valore precedente. Le nuove selezioni ammettono fornitori
+  attivi; l'identificativo storico ammesso proviene dal record letto sul server.
+  Materiali e lavorazioni non attivi non sono proposti per nuovi inserimenti.
+- **376 — Errori di validazione.** Ripresentare il form conservando i valori
+  modificabili digitati, il testo non numerico ricevuto dal binding e la
+  selezione valida anche quando non compare nei risultati del filtro corrente.
+
+**Implementazione [C].** Il caricamento dei lookup e separato dall'applicazione
+dei valori iniziali nei PageModel Materiali e Lavorazioni. Il POST ricostruisce
+il contesto e i dati non modificabili, mantenendo i valori operativi ricevuti.
+La modifica utilizza il lookup Anagrafiche_Fornitori_Lookup gia esistente,
+passando il fornitore del record corrente, con controllo anche sul server.
+Le pagine conservano PFW e mostrano il riepilogo degli errori di tutti i campi;
+le label dei form di inserimento interessati sono esplicite e leggibili.
+Non sono necessarie modifiche a tabelle, stored procedure o VersioniSchema.
+
+**Verifiche locali [C], 25 novembre 2026.** `dotnet test
+src/Preventivi.Web.slnx -m:1 --no-restore` ha compilato la soluzione senza
+segnalazioni e superato 265 test (69 Data e 196 Web), inclusi 21 nuovi casi
+sui PageModel: proposta iniziale, conservazione dei valori digitati e dello
+zero, errore di binding, mantenimento della selezione filtrata, sorgente di
+altro nodo o disattivata, identificativi nascosti, fornitore non disponibile,
+conservazione/sostituzione del fornitore storico e contesto errato.
+`git diff --check` non ha rilevato errori. I repository sono simulati nei nuovi
+test: non attestano il database installato o il rendering nel browser.
+
+**Collaudo runtime ancora da eseguire.** Inserire materiale e lavorazione da
+anagrafica e da distinta, modificare i valori proposti e verificare salvataggio
+e riapertura. Provare un errore numerico e verificare la conservazione del form.
+Su un elemento con fornitore successivamente disattivato, verificare apertura,
+conservazione e sostituzione con un fornitore attivo. Queste prove non sono
+attestate dai soli test automatici dei PageModel.
+
+### 5.32 Controllo campi — Lunghezze testi, decisioni 377–381
+
+**Classificazione:** [D]. **Stato:** decisioni e implementazione confermate
+separatamente dall'utente nella sessione Work del 25 novembre 2026.
+
+- **377 — Limiti coerenti.** Maschere, modelli e parametri di scrittura devono
+  rispettare i limiti delle colonne SQL in inserimento e modifica.
+- **378 — Clienti.** Codice cliente 30, ragione sociale 150, partita IVA e
+  codice fiscale 20, indirizzo ed email 150 caratteri. Restano CAP 10, citta
+  100, provincia 10 e telefono 50, coerenti con la tabella esistente.
+- **379 — Preventivi e dettagli.** Oggetto e descrizione riga 250, descrizione
+  componente e materiale 200, lavorazione 150, codice variante 30 e descrizione
+  variante 250. Tipo materiale 30 e unita di misura del materiale 10.
+  Le note nelle colonne NVARCHAR(MAX) non ricevono nuovi limiti funzionali.
+- **380 — Validazione leggibile.** Mostrare i limiti e verificare sul server
+  anche richieste che aggirano il limite HTML. In caso di errore conservare
+  il testo ricevuto e ripresentare il form, con messaggi comprensibili.
+- **381 — Nessun troncamento silenzioso.** Allineare i parametri di repository
+  e stored procedure; rifiutare testi di scrittura troppo lunghi prima che
+  ADO.NET possa troncarli. L'ampliamento delle colonne richiede una decisione
+  specifica e non e incluso in questo pacchetto.
+
+**Implementazione [C].** StringLength con messaggi italiani nei modelli Clienti
+e Preventivi interessati, maxlength e indicazioni nelle maschere, controllo
+esplicito dopo la ricostruzione dei dati da lookup. Il form Cliente condiviso
+usa il prefisso Cliente anche per errori e valori ripresentati. I repository
+controllano le lunghezze dei testi di scrittura prima di aprire la connessione.
+Le ricerche non sono ampliate da questo intervento.
+
+La migrazione `PFW_01_Lunghezze_Testi.sql` richiede `2026112504` e registra
+`2026112505`, codice `PFW-LUNGHEZZE-TESTI`, richiesta dal codice aggiornato.
+Verifica le colonne esistenti e allinea 20 parametri in 7 procedure,
+conservandone i corpi installati. Non modifica tabelle o dati applicativi.
+Le definizioni autonome Clienti_Crea e Clienti_Aggiorna sono allineate; gli
+script storici versionati restano invariati. Lo script non e stato applicato
+al database dall'agente; il collaudo runtime e ancora da eseguire.
+
+**Verifiche locali [C].** Compilazione e 322 test superati (69 Data e 253 Web),
+inclusi 56 nuovi casi su limiti, errori, conservazione dei valori e rifiuto
+prima della connessione SQL; aggiornato anche il test della versione schema.
+ScriptDom: script incrementale, due definizioni Clienti e sette procedure
+risultanti dalla simulazione offline validi. Verificati SHA-256 del payload,
+20 corrispondenze con le colonne della baseline e conservazione dei sette
+corpi delle procedure. Questi controlli non attestano lo schema installato
+o l'esecuzione della migrazione.
+
+**Collaudo riferito dall'utente [C].** L'utente ha confermato l'esecuzione
+dello script e il salvataggio/riapertura dei testi al limite per codice cliente,
+riga, componente, materiale, lavorazione e variante, anche in modifica.
+Il registro SQL non e stato verificato indipendentemente dall'agente.
+
+**Correzione grafica successiva [C].** Su segnalazione dell'utente, il riepilogo
+Clienti privo di errori e nascosto tramite la classe di validazione standard;
+il pulsante dell'intestazione viene mostrato soltanto con testo e destinazione
+effettivi. Il collegamento Nuovo Cliente nell'elenco resta disponibile.
+La verifica visiva della correzione nel browser e ancora da eseguire.
+
+### 5.33 Importazione Excel Articoli — Decisioni 382–386
+
+**Classificazione:** [D]. **Stato:** decisioni e implementazione confermate
+separatamente dall'utente nella sessione Work del 25 novembre 2026.
+
+- **382 — Modello Excel.** Foglio Articoli con Codice articolo e Descrizione
+  obbligatori, rispettivamente 50 e 200 caratteri; Versione articolo facoltativa
+  di 20 caratteri, Codice cliente facoltativo di 30 e Note tecniche facoltative.
+  Codici e versioni devono conservare la natura testuale e gli zeri iniziali.
+- **383 — Associazione cliente.** Il file utilizza il codice e non l'ID del
+  cliente. Un codice compilato deve individuare un cliente esistente e attivo.
+  Il valore vuoto lascia l'articolo senza cliente. Non creare clienti impliciti.
+- **384 — Solo nuovi articoli.** Creare articoli attivi come nell'inserimento
+  manuale. Codici duplicati nel file o gia presenti, anche se disattivati,
+  bloccano l'importazione. Nessun aggiornamento o riattivazione automatici.
+- **385 — Anteprima.** Modello scaricabile e caricamento .xlsx fino a 2 MB,
+  con riepilogo ed errori per foglio, riga e campo. Nessuna scrittura prima
+  della conferma; un file con errori non puo essere confermato.
+- **386 — Conferma atomica.** Ripetere i controlli sul server e inserire tutti
+  gli articoli in una transazione. Un errore impedisce l'inserimento dell'intero
+  file. Registrare autore, data, file ed esito dell'operazione.
+
+**Implementazione [C].** L'elenco Articoli espone Importa Excel. Il modello
+comprende istruzioni, foglio Articoli e clienti attivi disponibili. Colonne e
+label sono leggibili e le pagine utilizzano PFW. Il lettore tratta testo inline
+e stringhe condivise, controlla intestazioni e formule, ignora righe vuote e
+riporta i numeri di riga originali. Le colonne facoltative possono essere
+omesse; le colonne non previste sono segnalate. Gli allegati e la creazione
+delle distinte non fanno parte dell'importazione Articoli.
+
+La nuova catena e UI → IArticoliImportazioneService → repository → stored
+procedure. L'anteprima interroga il database in sola lettura per duplicati e
+clienti attivi, usando le stesse collation dei codici installati. La conferma
+verifica un token protetto con Data Protection, valido 20 minuti e legato a
+utente, nome file e SHA-256; rilegge lo stesso file e non riceve ID cliente
+dal browser. Le nuove pagine richiedono il permesso Anagrafiche e conservano
+antiforgery. Non viene introdotto un nuovo ruolo.
+
+`PFW_02_Importazione_Articoli.sql` richiede `2026112505` e registra
+`2026112506`, codice `PFW-IMPORT-ARTICOLI`, richiesto dall'applicazione.
+Crea ArticoliImportazioni, indice univoco sulle impronte completate e trigger
+che impedisce modifica/cancellazione del registro. Aggiunge
+Anagrafiche_Articoli_Importazione_Valida e _Applica. La prima non modifica dati;
+la seconda serializza le importazioni con sp_getapplock e ripete i controlli
+con blocchi mantenuti fino al termine della transazione. Non usa MERGE e non
+modifica gli articoli esistenti. I rifiuti controllati dalla procedura sono
+registrati dopo il rollback, con zero articoli inseriti; gli errori di formato
+o anteprima restano nella UI e non generano scritture sul database.
+
+**Verifiche locali [C].** Compilazione tramite output temporaneo separato,
+senza chiudere la sessione Visual Studio dell'utente. Superati 281 test Web e
+80 test Data, per un totale di 361. I nuovi casi comprendono modello e codici
+testuali, celle condivise, file vuoti/corrotti/troppo grandi, intestazioni,
+formule, limiti dei campi, anteprima senza scritture, permesso Anagrafiche,
+file/token modificati, cambio utente, scadenza e rifiuto concorrente simulato.
+ScriptDom valida lo script esterno, due procedure e il trigger (4 batch).
+Verificata l'impronta SHA-256 del payload. I test usano repository/servizi
+simulati: non attestano la transazione sul server, i blocchi reali, il registro
+installato o il collaudo nel browser. Nessuna migrazione e stata applicata
+dall'agente; commit e push non eseguiti.
+
+**Collaudo runtime da eseguire.** Dopo lo script e il riavvio del codice:
+scaricare il modello da Articoli → Importa Excel; provare un nuovo articolo
+con cliente attivo e uno senza cliente, verificare anteprima senza inserimenti,
+conferma e riapertura con valori completi. Provare codice gia presente anche
+disattivato, duplicato nel file, cliente inesistente/non attivo e testo oltre
+limite: nessun articolo deve essere inserito. Verificare che un articolo o un
+cliente cambiato dopo l'anteprima faccia rifiutare l'intero file. Verificare il
+registro ArticoliImportazioni e un tentativo di conferma ripetuto. La revisione
+dell'importazione Distinte base resta un pacchetto successivo.
+
+**Applicazione riferita dall'utente [C].** L'utente ha confermato l'esecuzione
+di `PFW_02_Importazione_Articoli.sql` prima di richiedere commit e push.
+Il registro VersioniSchema non e stato ricontrollato dall'agente. Il collaudo
+runtime dell'importazione Articoli resta da eseguire; la conferma dello script
+non viene considerata conferma del collaudo.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

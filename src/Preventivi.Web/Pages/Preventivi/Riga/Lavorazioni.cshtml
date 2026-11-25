@@ -127,7 +127,7 @@
                       asp-route-idPreventivo="@idPreventivo"
                       asp-route-idRigaPreventivo="@idRigaPreventivo"
                       asp-route-idComponente="@idComponente">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                     <input type="hidden" asp-for="Origine" />
                     <input type="hidden" asp-for="RicercaLavorazione" />
@@ -138,38 +138,39 @@
 
                     <div class="row g-3">
                         <div class="col-12 col-md-3">
-                            <label asp-for="NuovaLavorazione.Sequenza" class="form-label"></label>
+                            <label asp-for="NuovaLavorazione.Sequenza" class="form-label">Sequenza</label>
                             <input asp-for="NuovaLavorazione.Sequenza" class="form-control text-end" />
                         </div>
                         <div class="col-12 pfw-field-required">
-                            <label asp-for="NuovaLavorazione.DescrizioneLavorazione" class="form-label"></label>
-                            <input asp-for="NuovaLavorazione.DescrizioneLavorazione"
+                            <label asp-for="NuovaLavorazione.DescrizioneLavorazione" class="form-label">Descrizione lavorazione</label>
+                            <input maxlength="150" asp-for="NuovaLavorazione.DescrizioneLavorazione"
                                    class="form-control"
                                    readonly="@(Model.Origine != LavorazioniModel.OrigineLibero)" />
+                            <span class="form-text">Massimo 150 caratteri.</span>
                             <span asp-validation-for="NuovaLavorazione.DescrizioneLavorazione" class="text-danger"></span>
                         </div>
                         <div class="col-12 col-md-3">
-                            <label asp-for="NuovaLavorazione.TempoSetupMin" class="form-label"></label>
+                            <label asp-for="NuovaLavorazione.TempoSetupMin" class="form-label">Tempo preparazione (min)</label>
                             <input asp-for="NuovaLavorazione.TempoSetupMin" class="form-control text-end" />
                         </div>
                         <div class="col-12 col-md-3">
-                            <label asp-for="NuovaLavorazione.TempoPezzoMin" class="form-label"></label>
+                            <label asp-for="NuovaLavorazione.TempoPezzoMin" class="form-label">Tempo per pezzo (min)</label>
                             <input asp-for="NuovaLavorazione.TempoPezzoMin" class="form-control text-end" />
                         </div>
                         <div class="col-12 col-md-3">
-                            <label asp-for="NuovaLavorazione.Quantita" class="form-label"></label>
+                            <label asp-for="NuovaLavorazione.Quantita" class="form-label">Quantità</label>
                             <input asp-for="NuovaLavorazione.Quantita" class="form-control text-end" />
                         </div>
                         <div class="col-12 col-md-3">
-                            <label asp-for="NuovaLavorazione.CostoOrario" class="form-label"></label>
+                            <label asp-for="NuovaLavorazione.CostoOrario" class="form-label">Costo orario</label>
                             <input asp-for="NuovaLavorazione.CostoOrario" class="form-control text-end" />
                         </div>
                         <div class="col-12 col-md-3">
-                            <label asp-for="NuovaLavorazione.CostoFisso" class="form-label"></label>
+                            <label asp-for="NuovaLavorazione.CostoFisso" class="form-label">Costo fisso</label>
                             <input asp-for="NuovaLavorazione.CostoFisso" class="form-control text-end" />
                         </div>
                         <div class="col-12 col-md-3">
-                            <label asp-for="NuovaLavorazione.IdFornitoreSuggerito" class="form-label"></label>
+                            <label asp-for="NuovaLavorazione.IdFornitoreSuggerito" class="form-label">Fornitore suggerito</label>
                             <select asp-for="NuovaLavorazione.IdFornitoreSuggerito" class="form-select">
                                 <option value="">Nessun fornitore</option>
                                 @foreach (var fornitore in Model.Fornitori)
@@ -181,7 +182,7 @@
                         <div class="col-12 col-md-4 d-flex align-items-end">
                             <div class="form-check">
                                 <input asp-for="NuovaLavorazione.DaAcquistareEsterno" class="form-check-input" />
-                                <label asp-for="NuovaLavorazione.DaAcquistareEsterno" class="form-check-label"></label>
+                                <label asp-for="NuovaLavorazione.DaAcquistareEsterno" class="form-check-label">Da acquistare all'esterno</label>
                             </div>
                         </div>
                     </div>

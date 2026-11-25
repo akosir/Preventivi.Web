@@ -35,7 +35,7 @@
 
         <form method="post" class="p-3">
             <input type="hidden" asp-for="Riga.IdRigaPreventivo" />
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
             <div class="row g-3">
                 <div class="col-12 col-md-2 pfw-field-required">
                     <label asp-for="Riga.RigaNr" class="form-label">Numero riga</label>
@@ -86,10 +86,11 @@
                 </div>
                 <div class="col-12 pfw-field-required">
                     <label asp-for="Riga.DescrizioneVoce" class="form-label">Descrizione</label>
-                    <textarea asp-for="Riga.DescrizioneVoce"
+                    <textarea maxlength="250" asp-for="Riga.DescrizioneVoce"
                               class="form-control"
                               id="riga-descrizione"
-                              rows="3"></textarea>
+                              rows="3">
+                            <span class="form-text">Massimo 250 caratteri.</span></textarea>
                     <span asp-validation-for="Riga.DescrizioneVoce" class="text-danger"></span>
                 </div>
                 <div class="col-12 col-md-3 pfw-field-required">

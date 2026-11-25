@@ -5,6 +5,76 @@ versionati del progetto.
 
 ## Regole
 
+### Importazione nuovi Articoli da Excel — Decisioni 382–386
+
+Prima di utilizzare il codice aggiornato, eseguire nel database previsto
+`06_Aggiornamenti/PFW_02_Importazione_Articoli.sql`, dopo `2026112505`.
+Registra `2026112506`, codice `PFW-IMPORT-ARTICOLI`, ora richiesta dal codice.
+Lo script e predisposto nel repository ma non applicato dall'agente.
+
+L'utente ha successivamente confermato l'esecuzione dello script. Il registro
+installato non e stato verificato dall'agente e il collaudo runtime
+dell'importazione Articoli resta da eseguire.
+
+Nuovi oggetti: ArticoliImportazioni (registro di completamenti e rifiuti),
+indice univoco delle impronte completate, trigger di immutabilita,
+Anagrafiche_Articoli_Importazione_Valida e _Applica. Nessuna anagrafica di prova,
+nessun aggiornamento, riattivazione o eliminazione di articoli esistenti.
+La migrazione e transazionale e la riesecuzione con stessa versione/impronta
+non produce modifiche. Lo script non seleziona il database.
+
+L'anteprima usa solo letture; l'applicazione ripete la validazione nella
+transazione e controlla duplicati (inclusi i non attivi), limiti dei campi e
+clienti attivi secondo le collation dei codici installati. sp_getapplock
+serializza le importazioni; HOLDLOCK conserva i controlli fino al commit.
+I rifiuti gestiti dalla procedura registrano l'esito dopo il rollback, con
+zero articoli inseriti. Gli errori del caricamento Excel non scrivono nel DB.
+
+Verifiche locali: 361 test complessivi, ScriptDom su 4 batch e SHA-256.
+Non sono prove del database installato. Collaudo: Articoli → Importa Excel,
+download modello, anteprima e conferma di nuovi articoli con/senza cliente;
+duplicati nel file e nel DB, cliente non valido, lunghezze, variazioni dopo
+l'anteprima e conferma ripetuta. Controllare il registro con:
+
+```sql
+SELECT IdImportazione, NomeFile, Utente, DataOperazione, Stato, NumeroArticoli, Messaggio
+FROM dbo.ArticoliImportazioni
+ORDER BY DataOperazione DESC;
+```
+
+### Controllo campi — Lunghezze testi, decisioni 377–381
+
+Prima di avviare il codice aggiornato, applicare sul database previsto
+`06_Aggiornamenti/PFW_01_Lunghezze_Testi.sql`. Richiede `2026112504`
+(`TEC-019-UTENTI`) e registra `2026112505` (`PFW-LUNGHEZZE-TESTI`),
+ora richiesta dall'applicazione. Lo script non e stato applicato dall'agente.
+
+La migrazione allinea 20 parametri NVARCHAR in 7 procedure: Clienti_Crea,
+Clienti_Aggiorna, Preventivi_Righe_Crea, Preventivi_Righe_Componenti_Crea,
+Preventivi_Righe_Materiali_Crea, Preventivi_Righe_Lavorazioni_Crea e
+Preventivi_Varianti_Crea. Non amplia le colonne e non modifica i dati.
+Verifica i tipi e le lunghezze delle colonne sul database di destinazione,
+accetta solo la dimensione precedente nota o quella corretta, conserva il
+corpo delle procedure installate e modifica la dimensione della dichiarazione.
+In caso di difformita annulla l'intera transazione e indica l'oggetto da
+verificare. Sono necessari i permessi di lettura delle definizioni e ALTER.
+Non rieseguire gli script storici dopo questa migrazione.
+
+La riesecuzione con la stessa registrazione e impronta non applica modifiche.
+Il controllo di versione impedisce l'uso operativo prima dell'aggiornamento.
+
+Verifiche locali: ScriptDom sullo script e sulle due definizioni Clienti;
+simulazione offline sui sorgenti di 20 parametri, 7 corpi procedura conservati
+e 7 definizioni risultanti valide; SHA-256 del payload verificato. Queste
+verifiche non costituiscono un'esecuzione SQL o un collaudo del database.
+
+Collaudo dopo lo script: salvare e riaprire testi della lunghezza massima
+in Clienti e nelle descrizioni di preventivo, riga, componente, materiale,
+lavorazione e variante. Verificare anche messaggi e conservazione dei dati
+con una richiesta oltre limite, in inserimento e modifica. Le maschere
+limitano la digitazione; il controllo sul server deve operare anche quando
+il limite HTML viene aggirato. Nessun testo deve essere troncato dal repository.
+
 ### TEC-019 — Gestione utenti ADMIN, decisioni 367–371
 
 Dopo `2026112503`, eseguire nel database di test

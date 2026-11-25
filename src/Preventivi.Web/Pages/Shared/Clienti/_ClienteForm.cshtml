@@ -4,31 +4,33 @@
 
     <div class="pfw-panel-body">
 
-        <div asp-validation-summary="ModelOnly"
-             class="alert alert-danger mb-3">
+        <div asp-validation-summary="All"
+             class="pfw-clienti-validation alert alert-danger mb-3">
         </div>
 
         <div class="row g-3">
 
-            <div class="col-md-3">
+            <div class="col-md-3 pfw-field-required">
 
-                <label asp-for="CodiceCliente" class="form-label"></label>
+                <label asp-for="CodiceCliente" class="form-label">Codice cliente</label>
 
                 <input asp-for="CodiceCliente"
-                       class="form-control" />
+                       class="form-control" maxlength="30" />
+                <span class="form-text">Massimo 30 caratteri.</span>
 
                 <span asp-validation-for="CodiceCliente"
                       class="text-danger"></span>
 
             </div>
 
-            <div class="col-md-9">
+            <div class="col-md-9 pfw-field-required">
 
                 <label asp-for="RagioneSociale"
-                       class="form-label"></label>
+                       class="form-label">Ragione sociale</label>
 
                 <input asp-for="RagioneSociale"
-                       class="form-control" />
+                       class="form-control" maxlength="150" />
+                <span class="form-text">Massimo 150 caratteri.</span>
 
                 <span asp-validation-for="RagioneSociale"
                       class="text-danger"></span>
@@ -38,20 +40,22 @@
             <div class="col-md-4">
 
                 <label asp-for="PartitaIVA"
-                       class="form-label"></label>
+                       class="form-label">Partita IVA</label>
 
                 <input asp-for="PartitaIVA"
-                       class="form-control" />
+                       class="form-control" maxlength="20" />
+                <span class="form-text">Massimo 20 caratteri.</span>
 
             </div>
 
             <div class="col-md-4">
 
                 <label asp-for="CodiceFiscale"
-                       class="form-label"></label>
+                       class="form-label">Codice fiscale</label>
 
                 <input asp-for="CodiceFiscale"
-                       class="form-control" />
+                       class="form-control" maxlength="20" />
+                <span class="form-text">Massimo 20 caratteri.</span>
 
             </div>
 
@@ -63,7 +67,7 @@
                            class="form-check-input" />
 
                     <label asp-for="Attivo"
-                           class="form-check-label"></label>
+                           class="form-check-label">Attivo</label>
 
                 </div>
 
@@ -72,60 +76,66 @@
             <div class="col-md-12">
 
                 <label asp-for="Indirizzo"
-                       class="form-label"></label>
+                       class="form-label">Indirizzo</label>
 
                 <input asp-for="Indirizzo"
-                       class="form-control" />
+                       class="form-control" maxlength="150" />
+                <span class="form-text">Massimo 150 caratteri.</span>
 
             </div>
 
             <div class="col-md-2">
 
                 <label asp-for="CAP"
-                       class="form-label"></label>
+                       class="form-label">CAP</label>
 
                 <input asp-for="CAP"
-                       class="form-control" />
+                       class="form-control" maxlength="10" />
+                <span class="form-text">Massimo 10 caratteri.</span>
 
             </div>
 
             <div class="col-md-6">
 
                 <label asp-for="Citta"
-                       class="form-label"></label>
+                       class="form-label">Citta</label>
 
                 <input asp-for="Citta"
-                       class="form-control" />
+                       class="form-control" maxlength="100" />
+                <span class="form-text">Massimo 100 caratteri.</span>
 
             </div>
 
             <div class="col-md-2">
 
                 <label asp-for="Provincia"
-                       class="form-label"></label>
+                       class="form-label">Provincia</label>
 
                 <input asp-for="Provincia"
-                       class="form-control" />
+                       class="form-control" maxlength="10" />
+                <span class="form-text">Massimo 10 caratteri.</span>
 
             </div>
 
             <div class="col-md-6">
 
                 <label asp-for="Telefono"
-                       class="form-label"></label>
+                       class="form-label">Telefono</label>
 
                 <input asp-for="Telefono"
-                       class="form-control" />
+                       class="form-control" maxlength="50" />
+                <span class="form-text">Massimo 50 caratteri.</span>
 
             </div>
 
             <div class="col-md-6">
 
                 <label asp-for="Email"
-                       class="form-label"></label>
+                       class="form-label">Email</label>
 
                 <input asp-for="Email"
-                       class="form-control" />
+                       class="form-control" maxlength="150" />
+                <span class="form-text">Massimo 150 caratteri.</span>
 
             </div>
 

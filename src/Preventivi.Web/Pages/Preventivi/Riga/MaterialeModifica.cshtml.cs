@@ -1,21 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Preventivi.Core.Preventivi;
+using Preventivi.Core.Anagrafiche;
 
 namespace Preventivi.Web.Pages.Preventivi.Riga;
 
 public class MaterialeModificaModel : PageModel
 {
     private readonly IPreventivoRepository _repository;
+    private readonly IAnagraficheProduttiveRepository _anagraficheRepository;
 
-    public MaterialeModificaModel(IPreventivoRepository repository)
+    public MaterialeModificaModel(IPreventivoRepository repository, IAnagraficheProduttiveRepository anagraficheRepository)
     {
         _repository = repository;
+        _anagraficheRepository = anagraficheRepository;
     }
 
     public PreventivoRigaMaterialeItem? Materiale { get; private set; }
-    public IReadOnlyList<FornitoreLookupItem> Fornitori { get; private set; }
-        = Array.Empty<FornitoreLookupItem>();
+    public IReadOnlyList<FornitoreAnagraficaLookupItem> Fornitori { get; private set; }
+        = Array.Empty<FornitoreAnagraficaLookupItem>();
 
     [BindProperty]
     public PreventivoRigaMaterialeUpdateModel Dati { get; set; } = new();
@@ -55,9 +58,11 @@ public class MaterialeModificaModel : PageModel
             ModelState.AddModelError("Dati.Quantita", "La quantita non puo essere negativa.");
         if (Dati.CostoUnitario < 0)
             ModelState.AddModelError("Dati.CostoUnitario", "Il costo unitario non puo essere negativo.");
-        if (Dati.IdFornitoreSuggerito is > 0 && Fornitori.All(x => x.IdFornitore != Dati.IdFornitoreSuggerito))
+        if (Dati.IdFornitoreSuggerito.HasValue && Fornitori.All(x => x.IdFornitore != Dati.IdFornitoreSuggerito ||
+                (!x.Attivo && x.IdFornitore != Materiale!.IdFornitoreSuggerito)))
             ModelState.AddModelError("Dati.IdFornitoreSuggerito", "Il fornitore selezionato non e disponibile.");
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Dati, "Dati");
         if (!ModelState.IsValid)
             return Page();
 
@@ -75,7 +80,7 @@ public class MaterialeModificaModel : PageModel
         var riga = await _repository.GetRigaAsync(idRigaPreventivo, cancellationToken);
         var componente = await _repository.GetComponenteAsync(idComponente, cancellationToken);
         Materiale = await _repository.GetMaterialeAsync(id, cancellationToken);
-        Fornitori = await _repository.GetFornitoriAsync(cancellationToken);
+        Fornitori = await _anagraficheRepository.GetFornitoriAsync(Materiale?.IdFornitoreSuggerito, cancellationToken);
         return riga?.IdPreventivo == idPreventivo &&
                componente?.IdRigaPreventivo == idRigaPreventivo &&
                Materiale?.IdRigaPreventivo == idRigaPreventivo &&

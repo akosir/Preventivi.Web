@@ -79,6 +79,7 @@ public class DettaglioModel : PageModel
     {
         Header = CreaHeader();
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Cliente, "Cliente");
         if (!ModelState.IsValid)
         {
             return Page();

@@ -22,10 +22,11 @@
             <div class="pfw-panel-subtitle">Origine e associazione al componente restano invariate</div></div></div>
         <form method="post" class="p-3">
             <input type="hidden" asp-for="Dati.IdRigaLavPrev" />
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
             <div class="row g-3">
                 <div class="col-12 pfw-field-required"><label asp-for="Dati.DescrizioneLavorazione" class="form-label">Descrizione</label>
-                    <input asp-for="Dati.DescrizioneLavorazione" class="form-control" />
+                    <input maxlength="150" asp-for="Dati.DescrizioneLavorazione" class="form-control" />
+                            <span class="form-text">Massimo 150 caratteri.</span>
                     <span asp-validation-for="Dati.DescrizioneLavorazione" class="text-danger"></span></div>
                 <div class="col-12 col-md-2"><label asp-for="Dati.Sequenza" class="form-label">Sequenza</label>
                     <input asp-for="Dati.Sequenza" class="form-control text-end" /></div>
@@ -43,7 +44,7 @@
                     <select asp-for="Dati.IdFornitoreSuggerito" class="form-select">
                         <option value="">Nessun fornitore</option>
                         @foreach (var fornitore in Model.Fornitori)
-                        { <option value="@fornitore.IdFornitore">@fornitore.Display</option> }
+                        { <option value="@fornitore.IdFornitore">@fornitore.Display@(fornitore.Attivo ? "" : " (non attivo - valore precedente)")</option> }
                     </select></div>
                 <div class="col-12 col-md-4 d-flex align-items-end"><div class="form-check">
                     <input asp-for="Dati.DaAcquistareEsterno" class="form-check-input" />

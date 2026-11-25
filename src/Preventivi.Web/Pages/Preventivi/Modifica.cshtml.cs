@@ -98,6 +98,7 @@ public class ModificaModel : PageModel
             ModelState.AddModelError("Dati.IdCliente", "Il cliente selezionato non e disponibile.");
         }
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Dati, "Dati");
         if (!ModelState.IsValid)
         {
             return Page();

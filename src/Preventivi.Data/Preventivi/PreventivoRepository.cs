@@ -173,7 +173,7 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
             NullableInt("@RigaNr", riga.RigaNr),
             NullableInt("@IdArticolo", riga.IdArticolo),
             NullableInt("@IdModelloCiclo", riga.IdModelloCiclo),
-            Text("@DescrizioneVoce", riga.DescrizioneVoce, 500),
+            Text("@DescrizioneVoce", riga.DescrizioneVoce, 250),
             Decimal("@Quantita", riga.Quantita, 18, 4),
             Decimal("@PrezzoUnitarioVendita", riga.PrezzoUnitarioVendita, 18, 4),
             NullableText("@Note", riga.Note),
@@ -240,7 +240,7 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
     {
         return await _db.QueryAsync<ArticoloLookupItem>(
             "dbo.Articoli_Ricerca",
-            [NullableShortText("@Ricerca", ricerca, 100)],
+            [NullableShortText("@Ricerca", ricerca, 100, verificaLunghezza: false)],
             cancellationToken);
     }
 
@@ -296,7 +296,7 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
     {
         return await _db.QueryAsync<MaterialeLookupItem>(
             "dbo.Materiali_Ricerca",
-            [NullableShortText("@Ricerca", ricerca, 100)],
+            [NullableShortText("@Ricerca", ricerca, 100, verificaLunghezza: false)],
             cancellationToken);
     }
 
@@ -336,7 +336,7 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
     {
         return await _db.QueryAsync<LavorazioneLookupItem>(
             "dbo.Lavorazioni_Ricerca",
-            [NullableShortText("@Ricerca", ricerca, 100)],
+            [NullableShortText("@Ricerca", ricerca, 100, verificaLunghezza: false)],
             cancellationToken);
     }
 
@@ -397,8 +397,8 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
         var parameters = new[]
         {
             new SqlParameter("@IdPreventivo", variante.IdPreventivo),
-            Text("@CodiceVariante", variante.CodiceVariante, 60),
-            Text("@DescrizioneVariante", variante.DescrizioneVariante, 500),
+            Text("@CodiceVariante", variante.CodiceVariante, 30),
+            Text("@DescrizioneVariante", variante.DescrizioneVariante, 250),
             NullableText("@Note", variante.Note),
             new SqlParameter("@VarianteScelta", SqlDbType.Bit) { Value = variante.VarianteScelta }
         };
@@ -461,7 +461,7 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
             NullableInt("@IdArticoloOrigine", componente.IdArticoloOrigine),
             NullableInt("@IdNodoDistinta", componente.IdNodoDistinta),
             NullableInt("@IdNodoPadre", componente.IdNodoPadre),
-            Text("@DescrizioneNodo", componente.DescrizioneNodo, 400),
+            Text("@DescrizioneNodo", componente.DescrizioneNodo, 200),
             new SqlParameter("@Livello", componente.Livello),
             Decimal("@QuantitaBase", componente.QuantitaBase, 18, 4),
             NullableInt("@OrdineVisualizzazione", componente.OrdineVisualizzazione)
@@ -535,9 +535,9 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
             NullableInt("@IdRigaCompPrev", materiale.IdRigaCompPrev),
             NullableInt("@IdNodoDistinta", materiale.IdNodoDistinta),
             NullableInt("@IdMateriale", materiale.IdMateriale),
-            Text("@DescrizioneMateriale", materiale.DescrizioneMateriale, 400),
-            NullableShortText("@TipoMateriale", materiale.TipoMateriale, 60),
-            NullableShortText("@UM", materiale.UM, 20),
+            Text("@DescrizioneMateriale", materiale.DescrizioneMateriale, 200),
+            NullableShortText("@TipoMateriale", materiale.TipoMateriale, 30),
+            NullableShortText("@UM", materiale.UM, 10),
             Decimal("@Quantita", materiale.Quantita, 18, 4),
             Decimal("@CostoUnitario", materiale.CostoUnitario, 18, 4),
             new SqlParameter("@DaAcquistare", SqlDbType.Bit) { Value = materiale.DaAcquistare },
@@ -616,7 +616,7 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
             NullableInt("@IdRigaCompPrev", lavorazione.IdRigaCompPrev),
             NullableInt("@IdNodoDistinta", lavorazione.IdNodoDistinta),
             NullableInt("@IdLavorazione", lavorazione.IdLavorazione),
-            Text("@DescrizioneLavorazione", lavorazione.DescrizioneLavorazione, 300),
+            Text("@DescrizioneLavorazione", lavorazione.DescrizioneLavorazione, 150),
             NullableInt("@Sequenza", lavorazione.Sequenza),
             Decimal("@TempoSetupMin", lavorazione.TempoSetupMin, 18, 2),
             Decimal("@TempoPezzoMin", lavorazione.TempoPezzoMin, 18, 4),
@@ -672,6 +672,7 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
         string value,
         int length)
     {
+        ParametriTestoSql.VerificaLunghezza(value, length, name);
         return new SqlParameter(name, SqlDbType.NVarChar, length)
         {
             Value = value.Trim()
@@ -681,8 +682,11 @@ public async Task ApplicaSnapshotAsync(int idPreventivo, int idRigaPreventivo, i
     private static SqlParameter NullableShortText(
         string name,
         string? value,
-        int length)
+        int length,
+        bool verificaLunghezza = true)
     {
+        if (verificaLunghezza)
+            ParametriTestoSql.VerificaLunghezza(value, length, name);
         return new SqlParameter(name, SqlDbType.NVarChar, length)
         {
             Value = string.IsNullOrWhiteSpace(value)

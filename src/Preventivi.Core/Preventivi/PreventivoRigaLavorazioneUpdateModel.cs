@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Preventivi.Core.Preventivi;
 
 public sealed class PreventivoRigaLavorazioneUpdateModel
 {
     public int IdRigaLavPrev { get; set; }
+    [StringLength(150, ErrorMessage = "La descrizione della lavorazione puo contenere al massimo {1} caratteri.")]
     public string DescrizioneLavorazione { get; set; } = string.Empty;
     public int Sequenza { get; set; }
     public decimal TempoSetupMin { get; set; }

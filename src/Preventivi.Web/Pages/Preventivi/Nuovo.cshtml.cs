@@ -87,6 +87,7 @@ public class NuovoModel : PageModel
         await CaricaLookupAsync(cancellationToken);
         ValidaDati();
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, Dati, "Dati");
         if (!ModelState.IsValid)
         {
             return Page();

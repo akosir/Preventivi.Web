@@ -14,9 +14,7 @@
     <input type="hidden"
            asp-for="IdCliente" />
 
-    @await Html.PartialAsync(
-        "Shared/Clienti/_ClienteForm",
-        Model.Cliente)
+    <partial name="~/Pages/Shared/Clienti/_ClienteForm.cshtml" for="Cliente" />
 
     <hr class="my-4" />
 

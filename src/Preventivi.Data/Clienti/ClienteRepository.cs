@@ -1,3 +1,4 @@
+﻿using System.ComponentModel.DataAnnotations;
 ﻿using Microsoft.Data.SqlClient;
 using Preventivi.Core.Clienti;
 using Preventivi.Data.Comune;
@@ -114,6 +115,7 @@ public sealed class ClienteRepository : IClienteRepository
     ClienteCreateModel cliente,
     CancellationToken cancellationToken = default)
     {
+        Validator.ValidateObject(cliente, new ValidationContext(cliente), validateAllProperties: true);
         await using var connection =
             _connectionFactory.CreateConnection();
 
@@ -128,31 +130,31 @@ public sealed class ClienteRepository : IClienteRepository
             CommandType.StoredProcedure;
 
         command.Parameters.Add(
-            new SqlParameter("@CodiceCliente", SqlDbType.NVarChar, 50)
+            new SqlParameter("@CodiceCliente", SqlDbType.NVarChar, 30)
             {
                 Value = cliente.CodiceCliente
             });
 
         command.Parameters.Add(
-            new SqlParameter("@RagioneSociale", SqlDbType.NVarChar, 200)
+            new SqlParameter("@RagioneSociale", SqlDbType.NVarChar, 150)
             {
                 Value = cliente.RagioneSociale
             });
 
         command.Parameters.Add(
-            new SqlParameter("@PartitaIVA", SqlDbType.NVarChar, 30)
+            new SqlParameter("@PartitaIVA", SqlDbType.NVarChar, 20)
             {
                 Value = (object?)cliente.PartitaIVA ?? DBNull.Value
             });
 
         command.Parameters.Add(
-            new SqlParameter("@CodiceFiscale", SqlDbType.NVarChar, 30)
+            new SqlParameter("@CodiceFiscale", SqlDbType.NVarChar, 20)
             {
                 Value = (object?)cliente.CodiceFiscale ?? DBNull.Value
             });
 
         command.Parameters.Add(
-            new SqlParameter("@Indirizzo", SqlDbType.NVarChar, 200)
+            new SqlParameter("@Indirizzo", SqlDbType.NVarChar, 150)
             {
                 Value = (object?)cliente.Indirizzo ?? DBNull.Value
             });
@@ -182,7 +184,7 @@ public sealed class ClienteRepository : IClienteRepository
             });
 
         command.Parameters.Add(
-            new SqlParameter("@Email", SqlDbType.NVarChar, 200)
+            new SqlParameter("@Email", SqlDbType.NVarChar, 150)
             {
                 Value = (object?)cliente.Email ?? DBNull.Value
             });
@@ -293,6 +295,7 @@ public sealed class ClienteRepository : IClienteRepository
     ClienteUpdateModel cliente,
     CancellationToken cancellationToken = default)
     {
+        Validator.ValidateObject(cliente, new ValidationContext(cliente), validateAllProperties: true);
         await using var connection =
             _connectionFactory.CreateConnection();
 
@@ -313,31 +316,31 @@ public sealed class ClienteRepository : IClienteRepository
             });
 
         command.Parameters.Add(
-            new SqlParameter("@CodiceCliente", SqlDbType.NVarChar, 50)
+            new SqlParameter("@CodiceCliente", SqlDbType.NVarChar, 30)
             {
                 Value = cliente.CodiceCliente
             });
 
         command.Parameters.Add(
-            new SqlParameter("@RagioneSociale", SqlDbType.NVarChar, 200)
+            new SqlParameter("@RagioneSociale", SqlDbType.NVarChar, 150)
             {
                 Value = cliente.RagioneSociale
             });
 
         command.Parameters.Add(
-            new SqlParameter("@PartitaIVA", SqlDbType.NVarChar, 30)
+            new SqlParameter("@PartitaIVA", SqlDbType.NVarChar, 20)
             {
                 Value = (object?)cliente.PartitaIVA ?? DBNull.Value
             });
 
         command.Parameters.Add(
-            new SqlParameter("@CodiceFiscale", SqlDbType.NVarChar, 30)
+            new SqlParameter("@CodiceFiscale", SqlDbType.NVarChar, 20)
             {
                 Value = (object?)cliente.CodiceFiscale ?? DBNull.Value
             });
 
         command.Parameters.Add(
-            new SqlParameter("@Indirizzo", SqlDbType.NVarChar, 200)
+            new SqlParameter("@Indirizzo", SqlDbType.NVarChar, 150)
             {
                 Value = (object?)cliente.Indirizzo ?? DBNull.Value
             });
@@ -367,7 +370,7 @@ public sealed class ClienteRepository : IClienteRepository
             });
 
         command.Parameters.Add(
-            new SqlParameter("@Email", SqlDbType.NVarChar, 200)
+            new SqlParameter("@Email", SqlDbType.NVarChar, 150)
             {
                 Value = (object?)cliente.Email ?? DBNull.Value
             });

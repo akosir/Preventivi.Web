@@ -22,7 +22,7 @@
         <input type="hidden" asp-for="IdPreventivo" />
         <input type="hidden" asp-for="IdVariantePreventivo" />
 
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
         <div class="row g-3">
 
@@ -68,7 +68,8 @@
 
             <div class="col-12 pfw-field-required">
                 <label class="form-label" asp-for="Riga.DescrizioneVoce">Descrizione</label>
-                <textarea class="form-control" asp-for="Riga.DescrizioneVoce" rows="3"></textarea>
+                <textarea class="form-control" maxlength="250" asp-for="Riga.DescrizioneVoce" rows="3">
+                            <span class="form-text">Massimo 250 caratteri.</span></textarea>
                 <span class="text-danger" asp-validation-for="Riga.DescrizioneVoce"></span>
             </div>
 

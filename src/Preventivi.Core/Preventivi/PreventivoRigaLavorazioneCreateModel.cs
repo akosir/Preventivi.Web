@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Preventivi.Core.Preventivi;
 
 public sealed class PreventivoRigaLavorazioneCreateModel
@@ -10,6 +12,7 @@ public sealed class PreventivoRigaLavorazioneCreateModel
 
     public int? IdLavorazione { get; set; }
 
+    [StringLength(150, ErrorMessage = "La descrizione della lavorazione puo contenere al massimo {1} caratteri.")]
     public string DescrizioneLavorazione { get; set; } = string.Empty;
 
     public int? Sequenza { get; set; }

@@ -310,6 +310,7 @@ public class ComponentiModel : PageModel
 
         NuovoComponente.IdRigaPreventivo = idRigaPreventivo;
 
+        global::Preventivi.Web.UI.ValidazioneLunghezzeTesto.ValidaLunghezzeTesto(ModelState, NuovoComponente, "NuovoComponente");
         if (!ModelState.IsValid)
         {
             return Page();
