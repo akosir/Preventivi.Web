@@ -1,0 +1,8 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Amministrazione.Utenti.StatoModel
+@{ var u=Model.Utente!; ViewData["Title"]=u.Attivo ? "Disattiva utente" : "Riattiva utente"; }
+<div class="workspace-header"><a asp-page="./Dettaglio" asp-route-id="@u.IdUtente">@u.Username</a><h1 class="workspace-title mt-2">@ViewData["Title"]</h1></div>
+<section class="pfw-panel"><form method="post"><div class="pfw-panel-body"><input asp-for="Versione" type="hidden" /><div asp-validation-summary="All" class="text-danger" role="alert"></div>
+    <p>Confermi di @(u.Attivo ? "disattivare" : "riattivare") <strong>@u.Username</strong>?</p><p>Lo storico viene conservato. Un utente disattivato perde l’accesso, comprese le sessioni già aperte.</p>
+    <div class="form-check"><input asp-for="Conferma" class="form-check-input" /><label asp-for="Conferma" class="form-check-label">Confermo il cambio di stato</label></div>
+</div><div class="pfw-panel-footer d-flex gap-2 justify-content-end"><a asp-page="./Dettaglio" asp-route-id="@u.IdUtente" class="pfw-btn pfw-btn-secondary">Annulla</a><button class="pfw-btn pfw-btn-primary" type="submit">Conferma</button></div></form></section>

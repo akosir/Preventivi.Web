@@ -2345,6 +2345,99 @@ univoca. I collaudi riferiti dall'utente e i 214 test automatici locali
 sono evidenze distinte. La verifica automatica non sostituisce le prove
 runtime ancora pendenti.
 
+### 5.30 TEC-019 — Gestione utenti, decisioni 367–371
+
+**Classificazione:** [D]. **Stato:** decisioni confermate e implementazione
+autorizzata separatamente il 25 novembre 2026, con «CONFERMO IMPLEMENTAZIONE».
+Le proposte 362–366 sulle ricezioni ordini restano non approvate e sospese.
+
+- **367 — Accesso amministrativo.** Amministrazione → Utenti accessibile
+  soltanto ad ADMIN, con controllo server anche sulle richieste dirette.
+- **368 — Gestione utenti.** Elenco ricercabile e filtrabile per stato,
+  creazione, dettaglio e modifica di nome completo, stato e ruoli già
+  presenti. Username obbligatorio, univoco e immutabile dopo la creazione.
+- **369 — Password.** Password iniziale e reimpostazione a cura di ADMIN,
+  con hashing già utilizzato dall'applicazione. Le password esistenti non
+  sono consultabili e non devono comparire nei log.
+- **370 — Conservazione e protezioni.** Disattivazione e riattivazione,
+  senza eliminazione fisica, conservando lo storico. Vietare la
+  disattivazione del proprio account e la rimozione dell'ultimo ADMIN
+  attivo. Stato, ruoli e password aggiornati devono essere recepiti dalle
+  sessioni già aperte alla richiesta successiva.
+- **371 — Integrità e audit.** Salvataggi transazionali, concorrenza e
+  audit delle operazioni amministrative. Assegnazione dei ruoli esistenti;
+  la modifica dei permessi dei ruoli è rinviata a un pacchetto separato.
+
+**Implementazione predisposta [C]**
+
+Le pagine `/Amministrazione/Utenti` usano PFW, la policy Admin sulla
+cartella e la verifica esplicita dell'attore nei PageModel. Sono previsti
+elenco, creazione/modifica, dettaglio, conferma di stato e reset password.
+Menu e dashboard espongono il collegamento esclusivamente ad ADMIN.
+Lo storico mostra le ultime 50 operazioni. I dettagli prima/dopo sono
+conservati nell'audit SQL senza password, hash o versione di sessione.
+
+Il servizio applicativo valida dati, almeno un ruolo, versione e password
+di 12–256 caratteri, riutilizzando la soglia minima di 12 già presente
+nell'inizializzazione ADMIN. Hashing tramite `IPasswordHasher<UtenteAccesso>`.
+I campi password sono svuotati quando il form viene ripresentato dopo
+un errore. Un ruolo non attivo può essere conservato solo se già assegnato
+e non conferisce accesso. Nessun ruolo o utente predefinito viene creato.
+
+`TEC-019_01_Gestione_Utenti.sql` richiede `2026112503` e registra
+`2026112504`, codice `TEC-019-UTENTI`. Estende UtentiApplicazione con
+rowversion, versione di sessione, data e autore della modifica. Aggiunge
+UtentiGestioneAudit append-only e le procedure per controllare ADMIN,
+leggere utenti/ruoli/audit, salvare e reimpostare password. Aggiorna la
+lettura di accesso senza cambiare le password esistenti. Ogni scrittura
+verifica anche sul database l'amministratore attivo e la sua sessione,
+serializza le modifiche agli utenti e ripete i controlli di concorrenza,
+ruoli, account corrente e ultimo amministratore utilizzabile.
+
+La verifica del cookie rilegge l'utente a ogni richiesta autenticata,
+rifiuta identità disattivate, sessioni obsolete e utenti privi di password
+e aggiorna i claim da ruoli e permessi effettivi prima dell'autorizzazione.
+Le modifiche a stato/ruoli e il reset password ruotano la versione della
+sessione. Dopo l'aggiornamento i cookie precedenti richiedono un nuovo login,
+con le credenziali già impostate. Le indisponibilità della verifica negano
+l'accesso. L'applicazione non esegue automaticamente la migrazione SQL.
+
+Alla preparazione iniziale l'applicazione dello script e i collaudi runtime
+restavano da eseguire; gli esiti successivi sono riportati sotto.
+Questa implementazione non amplia il modulo Ordini fornitori.
+
+**Verifiche locali [C], 25 novembre 2026.** Compilazione dell'intera
+soluzione senza errori o warning e 244 test automatici superati, di cui
+30 nuovi casi per accesso diretto, attore, sessioni revocate o obsolete,
+aggiornamento dei claim, indisponibilità del servizio, hashing, password
+non valide, conferme e versioni. Controllo sintattico ScriptDom di 11
+blocchi SQL e impronta SHA-256 verificata. I test locali non attestano
+l'installazione SQL, il funzionamento dei vincoli sul server o il collaudo
+runtime della protezione dell'ultimo amministratore.
+
+**Collaudo riferito dall'utente [C], 25 novembre 2026.** L'utente ha
+confermato l'esecuzione dello script TEC-019 e 17 collaudi con esito
+positivo, comprendenti accesso ADMIN, collegamenti menu/dashboard,
+creazione con ruolo non amministrativo, consultazione senza password o
+hash e registrazione dell'audit. Confermati il menu nascosto all'operatore
+e l'accesso negato tramite URL diretto alla gestione utenti.
+
+Confermati disattivazione con revoca della sessione, riattivazione, reset
+password di altro utente e del proprio ADMIN, rifiuto della vecchia
+password, blocco dell'auto-disattivazione e della rimozione dell'ultimo
+ADMIN attivo. Verificati modifica concorrente in due schede, username
+univoco e immutabile, password corte o non coincidenti, campi password
+svuotati dopo errore, aggiunta e rimozione del ruolo ADMIN con nuovo login
+e conseguente variazione dell'accesso, ruolo obbligatorio, conferma di
+stato, annullamento, ricerca e filtri.
+
+Questi riscontri runtime provengono dalle prove dell'utente. L'agente non
+ha ricontrollato il registro SQL installato. La prova simultanea con due
+amministratori che tentano di rimuovere l'ultimo accesso amministrativo
+non è attestata dai collaudi riferiti; resta distinta dal blocco verificato
+con un solo ADMIN e dai controlli automatici locali. La gestione dei
+permessi dei ruoli rimane fuori da questo pacchetto.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

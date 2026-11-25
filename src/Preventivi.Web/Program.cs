@@ -171,6 +171,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<IPasswordHasher<UtenteAccesso>, PasswordHasher<UtenteAccesso>>();
 builder.Services.AddScoped<AutenticazioneApplicazioneService>();
 builder.Services.AddScoped<PasswordAdminInitializer>();
+builder.Services.AddScoped<IGestioneUtentiRepository, GestioneUtentiRepository>();
+builder.Services.AddScoped<GestioneUtentiApplicationService>();
+builder.Services.AddScoped<SessioneApplicazioneEvents>();
 
 builder.Services.AddScoped<
     global::Preventivi.Core.Allegati.Application.IAllegatoApplicationService,

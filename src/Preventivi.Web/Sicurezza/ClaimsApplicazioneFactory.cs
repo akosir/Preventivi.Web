@@ -18,6 +18,8 @@ public static class ClaimsApplicazioneFactory
         {
             claims.Add(new Claim(ClaimTypes.GivenName, utente.NomeCompleto));
         }
+        if (utente.VersioneSessione != Guid.Empty)
+            claims.Add(new Claim(SessioneApplicazioneEvents.ClaimVersioneSessione, utente.VersioneSessione.ToString("D")));
 
         claims.AddRange(utente.Ruoli.Select(ruolo =>
             new Claim(ClaimTypes.Role, ruolo)));

@@ -1,0 +1,15 @@
+@page
+@model global::Preventivi.Web.Pages.Amministrazione.Utenti.IndexModel
+@{ ViewData["Title"]="Utenti"; }
+<div class="workspace-header"><div class="workspace-top"><div><h1 class="workspace-title">Utenti</h1><p class="workspace-subtitle">Amministrazione degli accessi</p></div><a asp-page="./Modifica" class="pfw-btn pfw-btn-primary">Nuovo utente</a></div></div>
+<section class="pfw-panel mb-3"><form method="get" class="pfw-panel-body"><div asp-validation-summary="All" class="text-danger" role="alert"></div><div class="row g-3 align-items-end">
+    <div class="col-12 col-md-6"><label asp-for="Ricerca" class="form-label">Username o nome completo</label><input asp-for="Ricerca" class="form-control" maxlength="150" /></div>
+    <div class="col-12 col-md-3"><label asp-for="Attivo" class="form-label">Stato utente</label><select asp-for="Attivo" class="form-select"><option value="">Tutti</option><option value="true">Attivi</option><option value="false">Disattivati</option></select></div>
+    <div class="col-12 col-md-3 d-flex gap-2"><button class="pfw-btn pfw-btn-primary" type="submit">Cerca</button><a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Azzera</a></div>
+</div></form></section>
+<section class="pfw-panel"><div class="table-responsive"><table class="table pfw-table"><thead><tr><th>Username</th><th>Nome completo</th><th>Ruoli</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>
+@foreach(var u in Model.Utenti)
+{ <tr><td>@u.Username</td><td>@u.NomeCompleto</td><td>@u.Ruoli</td><td><span class="pfw-badge @(u.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(u.Attivo ? "Attivo" : "Disattivato")</span></td><td><div class="preventivi-actions"><a asp-page="./Dettaglio" asp-route-id="@u.IdUtente" class="pfw-btn pfw-btn-secondary">Apri</a><a asp-page="./Modifica" asp-route-id="@u.IdUtente" class="pfw-btn pfw-btn-secondary">Modifica</a></div></td></tr> }
+@if(Model.Utenti.Count==0) { <tr><td colspan="5">Nessun utente corrisponde ai filtri.</td></tr> }
+</tbody></table></div></section>
+<div class="mt-3"><a asp-page="/Index" class="pfw-btn pfw-btn-secondary">Torna alla dashboard</a></div>

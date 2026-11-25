@@ -6,6 +6,10 @@
 }
 
 <div class="dashboard-page">
+    @if (User.IsInRole(global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.RuoloAdmin))
+    {
+        <div class="d-flex justify-content-end mb-3"><a asp-page="/Amministrazione/Utenti/Index" class="pfw-btn pfw-btn-secondary">Amministrazione utenti</a></div>
+    }
 
     <div class="dashboard-heading">
         <div>

@@ -37,6 +37,7 @@ public static class AutorizzazioneApplicazione
         options.AccessDeniedPath = "/Account/AccessoNegato";
         options.ExpireTimeSpan = TimeSpan.FromHours(12);
         options.SlidingExpiration = true;
+        options.EventsType = typeof(SessioneApplicazioneEvents);
     }
 
     public static void ConfiguraPolicy(
@@ -80,6 +81,7 @@ public static class AutorizzazioneApplicazione
         options.Conventions.AllowAnonymousToPage("/Account/AccessoNegato");
         options.Conventions.AllowAnonymousToPage("/Error");
         options.Conventions.AuthorizeFolder("/Preventivi", PolicyPreventivi);
+        options.Conventions.AuthorizeFolder("/Amministrazione", PolicyAdmin);
         options.Conventions.AuthorizeFolder("/OrdiniFornitori", PolicyOrdiniFornitori);
         options.Conventions.AuthorizeFolder("/Clienti", PolicyClienti);
         options.Conventions.AuthorizeFolder(

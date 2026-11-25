@@ -1,0 +1,20 @@
+@page "{id:int}"
+@model global::Preventivi.Web.Pages.Amministrazione.Utenti.DettaglioModel
+@{ var u=Model.Utente!; ViewData["Title"]="Dettaglio utente"; }
+<div class="workspace-header"><a asp-page="./Index">Utenti</a><div class="workspace-top mt-2"><h1 class="workspace-title">@u.Username</h1><div class="preventivi-actions">
+    <a asp-page="./Modifica" asp-route-id="" class="pfw-btn pfw-btn-secondary">Nuovo utente</a><a asp-page="./Modifica" asp-route-id="@u.IdUtente" class="pfw-btn pfw-btn-primary">Modifica</a><a asp-page="./Stato" asp-route-id="@u.IdUtente" class="pfw-btn pfw-btn-secondary">@(u.Attivo ? "Disattiva" : "Riattiva")</a><a asp-page="./Password" asp-route-id="@u.IdUtente" class="pfw-btn pfw-btn-secondary">Reimposta password</a>
+</div></div></div>
+@if(TempData["MessaggioSuccesso"] is string messaggio) { <p class="alert alert-success" role="status">@messaggio</p> }
+<section class="pfw-panel"><div class="pfw-panel-header"><h2 class="pfw-panel-title">Dati utente</h2></div><div class="pfw-panel-body"><dl class="row mb-0">
+    <dt class="col-md-3">Nome completo</dt><dd class="col-md-9">@(u.NomeCompleto ?? "Non indicato")</dd>
+    <dt class="col-md-3">Stato</dt><dd class="col-md-9">@(u.Attivo ? "Attivo" : "Disattivato")</dd>
+    <dt class="col-md-3">Ruoli assegnati</dt><dd class="col-md-9">@u.Ruoli</dd>
+    <dt class="col-md-3">Password</dt><dd class="col-md-9">@(u.PasswordImpostata ? "Impostata" : "Da impostare")</dd>
+    <dt class="col-md-3">Creato il</dt><dd class="col-md-9">@u.DataCreazione.ToString("dd/MM/yyyy HH:mm")</dd>
+    <dt class="col-md-3">Ultima modifica</dt><dd class="col-md-9">@(u.DataModifica?.ToString("dd/MM/yyyy HH:mm") ?? "—")</dd>
+</dl></div></section>
+<section class="pfw-panel mt-3"><div class="pfw-panel-header"><h2 class="pfw-panel-title">Storico operazioni</h2><span class="pfw-panel-subtitle">Ultime 50 operazioni</span></div><div class="table-responsive"><table class="table pfw-table"><thead><tr><th>Data</th><th>Operazione</th><th>Amministratore</th></tr></thead><tbody>
+@foreach(var a in Model.Audit) { <tr><td>@a.DataOperazione.ToString("dd/MM/yyyy HH:mm")</td><td>@a.Operazione</td><td>@a.Operatore</td></tr> }
+@if(Model.Audit.Count==0) { <tr><td colspan="3">Nessuna operazione registrata.</td></tr> }
+</tbody></table></div></section>
+<div class="mt-3"><a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Torna agli utenti</a></div>

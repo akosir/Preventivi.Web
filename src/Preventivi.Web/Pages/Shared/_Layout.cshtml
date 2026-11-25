@@ -173,6 +173,13 @@
                         </a>
                 }
 
+                @if (User.IsInRole(global::Preventivi.Web.Sicurezza.AutorizzazioneApplicazione.RuoloAdmin))
+                {
+                    <div class="app-menu-section">Amministrazione</div>
+                    <a class="app-menu-item @(PaginaInArea("/Amministrazione/Utenti") ? "active" : string.Empty)" asp-page="/Amministrazione/Utenti/Index">
+                        <span class="app-menu-item-symbol" aria-hidden="true">U</span><span>Utenti</span>
+                    </a>
+                }
             </nav>
 
         </aside>

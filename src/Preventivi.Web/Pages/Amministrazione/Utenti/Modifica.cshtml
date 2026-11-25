@@ -1,0 +1,29 @@
+@page "{id:int?}"
+@model global::Preventivi.Web.Pages.Amministrazione.Utenti.ModificaModel
+@{ ViewData["Title"]=Model.Utente is null ? "Nuovo utente" : "Modifica utente"; }
+<div class="workspace-header"><a asp-page="./Index">Utenti</a><h1 class="workspace-title mt-2">@ViewData["Title"]</h1></div>
+<section class="pfw-panel"><div class="pfw-panel-header"><h2 class="pfw-panel-title">Identità e accesso</h2></div>
+<form method="post"><div class="pfw-panel-body"><input asp-for="Dati.Versione" type="hidden" /><div asp-validation-summary="All" class="text-danger" role="alert"></div>
+    <div class="row g-3">
+        <div class="col-12 col-md-4 pfw-field-required"><label asp-for="Dati.Username" class="form-label">Username *</label><input asp-for="Dati.Username" class="form-control" maxlength="50" readonly="@(Model.Utente is not null)" autocomplete="off" required /><span asp-validation-for="Dati.Username" class="text-danger"></span></div>
+        <div class="col-12 col-md-8"><label asp-for="Dati.NomeCompleto" class="form-label">Nome completo</label><input asp-for="Dati.NomeCompleto" class="form-control" maxlength="150" /><span asp-validation-for="Dati.NomeCompleto" class="text-danger"></span></div>
+        <div class="col-12"><div class="form-check"><input asp-for="Dati.Attivo" class="form-check-input" /><label asp-for="Dati.Attivo" class="form-check-label">Utente attivo</label></div></div>
+        <div class="col-12"><fieldset><legend class="h6">Ruoli assegnati *</legend>
+        @foreach(var r in Model.Ruoli)
+        {
+            var selezionato=Model.Dati.Ruoli.Contains(r.IdRuolo);
+            <div class="form-check"><input type="checkbox" name="Dati.Ruoli" id="ruolo-@r.IdRuolo" value="@r.IdRuolo" checked="@selezionato" disabled="@(!r.Attivo && !Model.RuoliPrecedenti.Contains(r.IdRuolo))" class="form-check-input" /><label for="ruolo-@r.IdRuolo" class="form-check-label">@r.Descrizione (@r.CodiceRuolo)@(r.Attivo ? "" : " · non attivo")</label></div>
+        }
+        </fieldset><span asp-validation-for="Dati.Ruoli" class="text-danger"></span></div>
+        @if(Model.Utente is null)
+        {
+            <div class="col-12 col-md-6 pfw-field-required"><label asp-for="Password" class="form-label">Password iniziale *</label><input asp-for="Password" type="password" class="form-control" autocomplete="new-password" minlength="12" maxlength="256" required /></div>
+            <div class="col-12 col-md-6 pfw-field-required"><label asp-for="ConfermaPassword" class="form-label">Conferma password *</label><input asp-for="ConfermaPassword" type="password" class="form-control" autocomplete="new-password" minlength="12" maxlength="256" required /></div>
+        }
+    </div>
+    <p class="form-text mt-3">La password deve contenere da 12 a 256 caratteri. Lo username resta invariato dopo la creazione. Modifiche a stato o ruoli richiedono un nuovo accesso dell’utente interessato.</p>
+</div><div class="pfw-panel-footer d-flex flex-wrap gap-2 justify-content-end">
+    <a asp-page="./Index" class="pfw-btn pfw-btn-secondary">Torna agli utenti</a>
+    @if(Model.Utente is not null) { <a asp-page="./Dettaglio" asp-route-id="@Model.Utente.IdUtente" class="pfw-btn pfw-btn-secondary">Annulla</a> }
+    <button type="submit" class="pfw-btn pfw-btn-primary">Salva</button>
+</div></form></section>

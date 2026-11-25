@@ -56,6 +56,7 @@ public sealed class UtenteAccessoRepository : IUtenteAccessoRepository
             ? null
             : reader.GetString(passwordHashOrdinal);
         var attivo = reader.GetBoolean(reader.GetOrdinal("Attivo"));
+        var versioneSessione = reader.GetGuid(reader.GetOrdinal("VersioneSessione"));
         var ruoli = new List<string>();
         var permessi = new List<string>();
 
@@ -82,6 +83,7 @@ public sealed class UtenteAccessoRepository : IUtenteAccessoRepository
             NomeCompleto = nomeCompleto,
             PasswordHash = passwordHash,
             Attivo = attivo,
+            VersioneSessione = versioneSessione,
             Ruoli = ruoli,
             Permessi = permessi
         };

@@ -5,6 +5,48 @@ versionati del progetto.
 
 ## Regole
 
+### TEC-019 — Gestione utenti ADMIN, decisioni 367–371
+
+Dopo `2026112503`, eseguire nel database di test
+`06_Aggiornamenti/TEC-019_01_Gestione_Utenti.sql`. Registra `2026112504`,
+codice `TEC-019-UTENTI`, richiesto dall'applicazione aggiornata.
+Lo script non è stato applicato dall'agente.
+
+Estende UtentiApplicazione con VersioneRiga, VersioneSessione,
+DataModifica e UtenteModifica. Crea UtentiGestioneAudit con trigger che
+impedisce modifica/cancellazione dello storico. Aggiorna
+Sicurezza_UtenteAccesso_Get e aggiunge Utenti_Gestione_VerificaAdmin,
+Elenco, Dettaglio, Ruoli, Audit, Salva e Password. Le nuove procedure
+Utenti_Gestione_* verificano l'attore ADMIN sul database.
+
+La migrazione conserva username, password e ruoli esistenti; non inserisce
+account di prova, credenziali predefinite o nuovi ruoli. Dopo l'aggiornamento
+e l'avvio del codice aggiornato occorre accedere nuovamente, anche come
+ADMIN, usando la password esistente. I nuovi cookie includono la versione
+di sessione. L'applicazione controlla utenti, ruoli e permessi a ogni
+richiesta autenticata e non applica migrazioni automaticamente.
+
+Collaudi runtime da eseguire dopo lo script
+
+1. Accesso ADMIN e collegamenti menu/dashboard. Accesso negato alle pagine
+   e ai POST amministrativi con operatore, anche tramite URL diretto.
+2. Creazione di un utente con password iniziale, ruolo attivo esplicito e
+   username univoco; provare username duplicato e password non valide.
+3. Modifica nome e ruoli, immutabilità dello username, concorrenza tra due
+   modifiche e audit leggibile, senza password o hash nelle consultazioni.
+4. Disattivazione di altro utente, perdita della sua sessione alla richiesta
+   successiva, riattivazione e nuovo accesso; blocco dell'auto-disattivazione.
+5. Con un solo ADMIN attivo, tentare di rimuovergli il ruolo ADMIN e
+   verificare il blocco. Con due ADMIN, verificare modifiche concorrenti
+   che non possano lasciare il sistema senza amministratori utilizzabili.
+6. Reset password, invalidazione delle sessioni, rifiuto della vecchia
+   password e accesso con la nuova. Verificare anche reset della propria
+   password e successivo nuovo login.
+7. Cambio ruoli mentre l'utente è collegato e revoca dell'accesso alla
+   richiesta successiva; controllo del nuovo profilo dopo il login.
+8. Conferme mancanti, annullamenti, versioni superate, audit conservato e
+   rollback completo quando un salvataggio viene rifiutato.
+
 ### Variante scelta nella modifica
 
 Dopo `2026112502`, eseguire nel database di test

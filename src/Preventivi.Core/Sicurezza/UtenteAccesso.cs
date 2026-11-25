@@ -7,6 +7,7 @@ public sealed class UtenteAccesso
     public string? NomeCompleto { get; init; }
     public string? PasswordHash { get; init; }
     public bool Attivo { get; init; }
+    public Guid VersioneSessione { get; init; }
     public IReadOnlyList<string> Ruoli { get; init; } = [];
     public IReadOnlyList<string> Permessi { get; init; } = [];
 }
