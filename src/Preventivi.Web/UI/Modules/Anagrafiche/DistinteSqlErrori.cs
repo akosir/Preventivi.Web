@@ -49,13 +49,14 @@ public static class DistinteSqlErrori
         53625 => "La sequenza indicata e gia utilizzata sul nodo.",
         53626 => "La riga lavorazione non esiste.",
         53701 => "Compilare correttamente i dati dell'importazione.",
-        53702 => "La revisione non esiste oppure non e una bozza modificabile.",
-        53703 => "La revisione e stata modificata da un altro utente. Ricaricare la pagina.",
-        53704 => "L'importazione e consentita soltanto su una revisione vuota.",
-        53705 => "Questo file e gia stato importato nella revisione.",
+        53702 => "La distinta corrente non e disponibile oppure l'articolo non e attivo.",
+        53703 => "La distinta corrente e cambiata dopo l'anteprima. Generare una nuova anteprima.",
+        53704 => "L'importazione e consentita soltanto sulla distinta corrente priva di nodi.",
+        53705 => "Questo file o questa operazione sono gia stati importati nella distinta corrente.",
         53706 => "La gerarchia dei nodi contenuta nel file non e valida.",
         53707 => "Il file contiene tipi nodo, materiali o lavorazioni non validi o non attivi.",
         53708 => "Il file contiene valori numerici, duplicati o riferimenti non validi.",
+        53709 => "Non sono stati inseriti tutti gli elementi previsti. Nessun dato e stato importato.",
         _ => "L'operazione sulla distinta non e valida. Controllare i dati e riprovare."
     };
 }

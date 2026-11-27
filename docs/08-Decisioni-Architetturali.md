@@ -2622,6 +2622,198 @@ Il registro VersioniSchema non e stato ricontrollato dall'agente. Il collaudo
 runtime dell'importazione Articoli resta da eseguire; la conferma dello script
 non viene considerata conferma del collaudo.
 
+**Collaudo Articoli riferito dall'utente [C], 26 novembre 2026.** Confermati
+download/apertura del modello, anteprima di due articoli con e senza cliente,
+conferma e riapertura, codici gia presenti e duplicati nel file, cliente
+inesistente o non attivo, articolo disattivato gia presente, descrizione oltre
+limite, inserimento concorrente del codice dopo l'anteprima e registro degli
+esiti con completamento e rifiuto. Il collaudo dell'ambito Articoli e quindi
+positivo secondo le prove dell'utente; non deriva da una verifica SQL autonoma
+dell'agente. Questo esito aggiorna lo stato di collaudo pendente riportato sopra.
+
+### 5.34 Importazione Excel Distinta corrente — Decisioni 387–391
+
+**Classificazione:** [D]. **Stato:** decisioni e implementazione confermate
+separatamente dall'utente nella sessione Work del 26 novembre 2026.
+
+- **387 — Distinta corrente.** Importare sulla distinta corrente dell'articolo;
+  rimuovere da pagina, modello Excel e messaggi dell'importazione i riferimenti
+  obsoleti alla revisione in bozza. Gli identificativi tecnici esistenti e la
+  route vengono conservati per compatibilita, senza reintrodurre un workflow
+  di revisioni nell'interfaccia.
+- **388 — Destinazione vuota.** Consentire l'importazione soltanto senza nodi
+  preesistenti; nessuna sostituzione o fusione automatica della struttura.
+- **389 — Collegamenti per codice.** Materiali e lavorazioni devono esistere
+  ed essere attivi; chiavi nodo univoche nel file e riferimenti padre coerenti,
+  senza richiedere ID del database all'operatore.
+- **390 — Anteprima completa.** Mostrare albero, materiali, lavorazioni e valori
+  da importare, con errori per foglio/riga/campo. Nessuna scrittura di anteprima.
+- **391 — Conferma controllata.** Ripetere i controlli nella transazione,
+  rilevare cambiamenti dopo l'anteprima, impedire doppie importazioni e
+  conservare il registro degli esiti. Nessun aggiornamento dei preventivi.
+
+**Implementazione [C].** La pagina usa le diciture Distinta corrente e un nome
+modello senza suffisso di revisione. Visualizza l'albero PFW con livelli
+calcolati, tutti i nodi senza il precedente taglio a 100 righe, codici, chiavi,
+padri e note; materiali/lavorazioni comprendono tutte le righe, valori e note.
+La validazione rifiuta formule, intestazioni duplicate e numeri non
+rappresentabili nei tipi DECIMAL di destinazione senza arrotondarli.
+
+L'anteprima e protetta con Data Protection per 20 minuti e lega file, SHA-256,
+nome, utente, articolo, distinta, versione riga e identificativo operazione.
+La conferma ricontrolla il contesto, la versione e le anagrafiche attive e non
+riabilita il pulsante dopo un errore. Le pagine richiedono il permesso
+Anagrafiche, verificano l'articolo attivo e conservano antiforgery. I dati
+tecnici della conferma non sono ricavati da campi nascosti modificabili.
+
+`PFW_03_Importazione_Distinta_Corrente.sql` richiede `2026112506` e registra
+`2026112601`, codice `PFW-IMPORT-DISTINTE-CORRENTI`, ora richiesto dal codice.
+Aggiorna Anagrafiche_Distinte_Importazioni_Applica con blocco per distinta,
+controlli ripetuti, anagrafiche bloccate fino al commit, verifica dei conteggi,
+rollback esplicito e registrazione degli esiti. Mantiene invariati il registro
+storico DistinteBaseImportazioni e i suoi vincoli contro doppie importazioni.
+Aggiunge DistinteBaseImportazioniEsiti per i nuovi completamenti e rifiuti,
+con zero elementi importati in caso di rifiuto, e trigger di immutabilita.
+Il registro aggiuntivo non ha FK al padre, per conservare l'esito anche se
+una destinazione di test vuota viene successivamente rimossa. Gli errori
+rilevati prima della chiamata SQL non generano scritture nel registro.
+Nessuna distinta esistente viene modificata dalla migrazione; gli allegati
+restano esclusi e non viene eseguito alcun ricalcolo dei preventivi.
+
+**Verifiche locali [C].** Superati 314 test Web e 89 Data, totale 403, inclusi
+albero oltre 100 nodi, ordine padre-figlio, note, precisioni, file non validi,
+autorizzazione, conferma senza anteprima, file/token modificati, cambio utente,
+destinazione e scadenza, versione cambiata, nuovi nodi concorrenti e anagrafica
+non piu disponibile. I repository sono simulati; queste prove non attestano
+la transazione sul database installato. ScriptDom valida script esterno,
+procedura e trigger (3 batch). SHA-256 del payload verificato. Compilazioni
+eseguite in output temporanei senza chiudere l'app o Visual Studio.
+Migrazione non applicata dall'agente; collaudo runtime da eseguire dopo lo
+script e il riavvio. Nessun commit o push eseguiti per questo pacchetto.
+
+**Collaudo runtime da eseguire.** Usare un articolo attivo con distinta vuota,
+scaricare il modello e verificare le diciture correnti; importare una struttura
+padre-figlio con materiale e lavorazione, verificare l'anteprima completa e
+confermare. Riaprire la distinta e confrontare gerarchia, valori e note.
+Provare duplicati/cicli/riferimenti errati, anagrafiche non attive, precisione
+numerica oltre limite, distinta non vuota, cambiamento dopo l'anteprima e
+conferma ripetuta. Controllare il registro storico e quello dei nuovi esiti;
+confermare che i preventivi gia presenti non siano stati aggiornati.
+
+### 5.35 Importazione distinta semplificata — Decisioni 392–396
+
+**Classificazione:** [D]. Decisioni e implementazione confermate separatamente
+dall'utente nella sessione Work del 26 novembre 2026.
+
+- **392 — Foglio unico.** Un solo foglio operativo Distinta, con istruzioni ed
+  elenchi di supporto; conservare anche il modello avanzato.
+- **393 — Componenti leggibili.** Riferimenti brevi e selezione del padre per
+  riferimento e descrizione; ordine e livelli calcolati automaticamente.
+- **394 — Selezioni guidate.** Menu per tipo componente, materiale e lavorazione,
+  con descrizioni e codici leggibili, senza richiedere ID del database.
+- **395 — Valori proposti.** Costi e tempi non compilati assumono i valori
+  correnti dell'anagrafica mostrati nell'anteprima; zero esplicito conservato.
+- **396 — Righe aggiuntive.** Ripetere il riferimento per ulteriori materiali o
+  lavorazioni, riunendo i dati coerenti del componente e rifiutando ambiguita.
+
+**Implementazione [C].** Due download distinti nella pagina. Il formato semplice
+usa una tabella Excel con menu e selezione padre calcolata; colonne facoltative
+di costi, tempi e note raggruppate e richiudibili. La prima riga del componente
+richiede riferimento, descrizione, tipo e quantita base; nelle successive tali
+dati possono restare vuoti. Quantita materiale richiesta quando selezionato.
+Scarto e costo fisso vuoti valgono zero, non avendo un default nel lookup.
+I componenti vengono importati attivi; ordine e sequenze sono generati.
+Materiale duplicato sul componente, lavorazione identica ripetuta, metadati
+incoerenti e valori privi della relativa selezione sono segnalati come errori.
+Formule operative, gerarchie errate e precisioni SQL non valide restano vietate.
+La formula interna di supporto alla selezione padre non e un dato da importare.
+
+La conferma confronta anche l'impronta dei valori normalizzati dell'anteprima:
+se cambiano i default effettivamente utilizzati, richiede una nuova anteprima.
+Non blocca per un costo di anagrafica cambiato quando nel file e fissato zero.
+Normalizzazione verso gli stessi DTO e la stessa transazione del modello
+avanzato; nessuna nuova migrazione, versione richiesta sempre 2026112601.
+
+**Database e collaudo.** L'utente ha dichiarato applicato lo script PFW_03 e
+confermato il primo controllo della pagina/modello del pacchetto 387–391.
+Il collaudo completo dell'importazione e stato interrotto per questa
+semplificazione e deve proseguire sul nuovo formato. Nessuna modifica al
+database eseguita dall'agente. I test automatici usano repository simulati;
+non attestano l'esecuzione sul database o il comportamento interattivo di Excel.
+Resta da verificare apertura, espansione tabella e menu in Excel, anteprima,
+conferma e corrispondenza della distinta salvata. Nessun commit o push.
+
+**Verifiche locali [C].** Superati 325 test Web, inclusi 11 nuovi casi su
+modello, menu, riferimenti padre, raggruppamento, default, zero esplicito,
+ambiguita e controllo dei valori fra anteprima e conferma. Validazione del
+modello generato con OpenXML SDK 3.1.1: zero errori, dopo aver corretto
+l'ordine degli elementi dello stile delle intestazioni nel generatore comune.
+Compilazione e test in output temporanei, senza chiudere l'applicazione.
+
+**Correzione successiva al collaudo Excel [C].** L'utente ha segnalato un
+avviso di riparazione all'apertura del modello semplificato. Il registro
+locale `error304760_01.xml` indica la rimozione di `/xl/tables/table1.xml`.
+Sostituita nella formula della colonna calcolata la sintassi abbreviata
+`[@...]` con il riferimento strutturato esplicito `[[#This Row],[...]]`,
+aggiungendo la relativa asserzione di regressione. Superati nuovamente
+325 test Web e validazione OpenXML senza errori. La verifica automatizzata
+nell'Excel installato non e stata completata per errore dello strumento
+Computer Use; apertura senza riparazione e funzionamento dei menu restano
+da confermare con un nuovo download dopo il riavvio dell'applicazione.
+Nessuna modifica SQL e nessun commit o push.
+
+**Menu padre, secondo riscontro [C].** Dopo apertura e menu anagrafici
+confermati dall'utente, segnalato `#RIF!` nella prima voce dell'elenco padre.
+Verificato nel modello scaricato: R2 usava riferimenti A2/B2, mentre la
+formula delle nuove righe usava riferimenti strutturati. Il generatore ora
+usa la stessa formula strutturata qualificata con il nome della tabella
+sia in R2 sia nella definizione della colonna calcolata. Aggiunte asserzioni
+che impediscono la divergenza e il ritorno ai riferimenti A2/B2.
+Il riscontro nell'Excel dell'utente va ripetuto su un modello nuovo: i file
+gia scaricati non vengono modificati dal codice.
+
+**Diciture approvate dall'utente [D].** Nel modello semplificato le prime due
+intestazioni diventano **Codice** e **Descrizione**, al posto di Riferimento e
+Componente. Aggiornati generatore, formula padre, lettura, errori e istruzioni
+[C]. Usare un nuovo download del modello dopo il riavvio dell'applicazione.
+
+**Conferma importazione, riscontro del 27 novembre 2026 [C].** L'utente ha
+confermato anteprima e menu. La conferma SQL viene invece rifiutata con falso
+conflitto: letture sul database configurato PreventiviProduzione hanno
+verificato tre esiti Rifiutata con messaggio "Distinta corrente modificata
+durante l importazione", zero nodi importati e zero nodi sulla destinazione
+11 dell'articolo prova001. Due letture consecutive via repository C# hanno
+restituito la stessa versione di 8 byte. Il trigger installato
+TR_DistintaBaseNodi_VersioneDistinta aggiorna VersioneContenuto della testata
+durante gli INSERT, cambiando anche la rowversion nella stessa transazione.
+Il confronto finale con la versione iniziale provoca percio il rollback.
+
+Predisposto PFW_04_Importazione_Distinta_Trigger.sql, versione 2026112701,
+con controllo iniziale e UPDLOCK/HOLDLOCK invariati. Solo l'UPDATE finale
+dell'audit usa l'identita della testata gia bloccata, senza confrontare la
+rowversion anteriore alle scritture dei trigger. Verifica @@ROWCOUNT,
+transazione, log esiti e rifiuto dei duplicati conservati. Nessuna modifica
+alle decisioni funzionali, nessuna esecuzione di SQL modificativo da parte
+dell'agente; applicazione script e collaudo positivo ancora da confermare.
+
+Verifiche della correzione: 326 test Web superati; ScriptDom senza errori
+sul batch esterno e sulla procedura interna, impronta SHA-256 corretta e
+guardia iniziale/blocchi verificati. Queste prove non attestano ancora una
+conferma d'importazione completata sul database. Nessun commit o push.
+
+**Chiusura collaudo dichiarata dall'utente — 27 novembre 2026 [C].** Dopo
+la correzione SQL l'utente ha confermato "ora tutto ok" per la conferma
+dell'importazione e "esito ok" per la riapertura della distinta. Il controllo
+richiesto comprendeva C02 figlio di C01, materiale e lavorazione su C02,
+quantita, tempi e costi corrispondenti all'anteprima. Apertura Excel, menu,
+diciture Codice/Descrizione e anteprima erano gia stati confermati.
+Il percorso positivo del modello semplificato e quindi collaudato secondo
+il riscontro dell'utente; non si tratta di una verifica runtime eseguita
+dall'agente. Tale riscontro aggiorna i punti in attesa sopra riportati.
+I casi negativi e di concorrenza restano coperti dalle verifiche automatiche
+descritte, senza estendere il riscontro utente a prove non dichiarate.
+Commit e push del pacchetto richiesti esplicitamente dall'utente.
+
 ## 6. Implementazioni e proposte non promosse a decisioni
 
 ### 6.1 Implementazioni documentate [C]

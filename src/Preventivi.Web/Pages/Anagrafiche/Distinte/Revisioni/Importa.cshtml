@@ -1,33 +1,44 @@
 @page "{id:int}"
 @model global::Preventivi.Web.Pages.Anagrafiche.Distinte.Revisioni.ImportaModel
-@{ var revisione = Model.Revisione!; ViewData["Title"] = "Importa distinta da Excel"; }
+@{ var distinta = Model.Distinta!; ViewData["Title"] = "Importa distinta da Excel"; }
 
 <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
     <div>
-        <div class="pfw-secondary-text mb-1"><a asp-page="../Dettaglio" asp-route-idArticolo="@revisione.IdArticolo" asp-route-idRevisione="@revisione.IdRevisioneDistinta">@revisione.CodiceArticolo - Rev. @revisione.NumeroRevisione</a></div>
+        <div class="pfw-secondary-text mb-1"><a asp-page="../Dettaglio" asp-route-idArticolo="@distinta.IdArticolo" asp-route-idRevisione="@distinta.IdRevisioneDistinta">@distinta.CodiceArticolo - Distinta corrente</a></div>
         <h1 class="h3 mb-1">Importa distinta da Excel</h1>
         <p class="pfw-secondary-text mb-0">L'importazione è applicata soltanto dopo anteprima e conferma.</p>
     </div>
-    <a asp-page-handler="Modello" asp-route-id="@revisione.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Scarica modello Excel</a>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-page-handler="Modello" asp-route-id="@distinta.IdRevisioneDistinta" class="pfw-btn pfw-btn-primary">Modello semplificato</a>
+        <a asp-page-handler="ModelloAvanzato" asp-route-id="@distinta.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Modello avanzato</a>
+    </div>
 </div>
 
+@if (!ViewData.ModelState.IsValid)
+{
+    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+}
+
 <section class="pfw-panel mb-3">
+    <div class="pfw-panel-body">
+        <p class="mb-1"><strong>Modello semplificato:</strong> compila solo il foglio Distinta. Scegli padre, tipo componente, materiale e lavorazione dai menu a tendina.</p>
+        <p class="pfw-secondary-text mb-0">Per aggiungere elementi allo stesso componente ripeti il codice. Costi e tempi facoltativi si trovano nelle colonne richiudibili: se vuoti, saranno proposti dall'anagrafica nell'anteprima. Uno zero digitato resta zero. Il modello avanzato mantiene i tre fogli separati.</p>
+    </div>
     <div class="pfw-panel-header"><div><h2 class="pfw-panel-title">File da controllare</h2><div class="pfw-panel-subtitle">Formato ammesso: .xlsx, massimo 2 MB</div></div></div>
     <form method="post" enctype="multipart/form-data" asp-page-handler="Anteprima">
         <div class="pfw-panel-body">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-            @if (!Model.BozzaVuota)
+            @if (!Model.DistintaVuota)
             {
                 <div class="alert alert-warning mb-0">La distinta contiene già dei nodi. L'importazione è disponibile per le distinte vuote.</div>
             }
             else
             {
-                <label asp-for="Dati.File" class="form-label">File Excel *</label>
-                <input asp-for="Dati.File" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="form-control pfw-required" />
-                <span asp-validation-for="Dati.File" class="text-danger"></span>
+                <div class="pfw-field-required"><label asp-for="Dati.File" class="form-label">File Excel</label>
+                <input asp-for="Dati.File" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="form-control" required />
+                <span asp-validation-for="Dati.File" class="text-danger"></span></div>
             }
         </div>
-        @if (Model.BozzaVuota)
+        @if (Model.DistintaVuota)
         {
             <div class="pfw-panel-footer d-flex justify-content-end gap-2"><button type="submit" class="pfw-btn pfw-btn-primary">Genera anteprima</button></div>
         }
@@ -51,48 +62,65 @@
             }
             else
             {
-                <div class="alert alert-success">File valido. Nessun dato è stato ancora scritto nel database.</div>
+                @if (Model.PuoConfermare)
+                {
+                    <div class="alert alert-success">File valido. Nessun dato è stato ancora scritto nel database. La conferma è valida per 20 minuti e non aggiorna i preventivi.</div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">La conferma non e disponibile. Generare una nuova anteprima dopo aver corretto i problemi indicati.</div>
+                }
+                @if (Model.Analisi.ModelloSemplificato)
+                { <p class="pfw-secondary-text">Modello semplificato: i valori qui mostrati comprendono costi e tempi proposti dall'anagrafica per i campi lasciati vuoti nel file.</p> }
                 <div class="row g-3">
                     <div class="col-12 col-md-4"><div class="pfw-summary-card"><div class="pfw-summary-label">Nodi</div><div class="pfw-summary-value">@Model.Analisi.Nodi.Count</div></div></div>
                     <div class="col-12 col-md-4"><div class="pfw-summary-card"><div class="pfw-summary-label">Materiali</div><div class="pfw-summary-value">@Model.Analisi.Materiali.Count</div></div></div>
                     <div class="col-12 col-md-4"><div class="pfw-summary-card"><div class="pfw-summary-label">Lavorazioni</div><div class="pfw-summary-value">@Model.Analisi.Lavorazioni.Count</div></div></div>
                 </div>
 
-                <h3 class="h5 mt-4">Anteprima nodi</h3>
-                <div class="table-responsive">
-                    <table class="table pfw-table align-middle mb-0">
-                        <thead><tr><th>Riga</th><th>Chiave</th><th>Padre</th><th>Tipo</th><th>Descrizione</th><th>Quantità</th><th>Ordine</th><th>Stato</th></tr></thead>
-                        <tbody>
-                        @foreach (var nodo in Model.Analisi.Nodi.Take(100))
-                        {
-                            <tr><td>@nodo.RigaExcel</td><td>@nodo.ChiaveNodo</td><td>@(nodo.ChiavePadre ?? "-")</td><td>@nodo.TipoNodo</td><td>@nodo.DescrizioneNodo</td><td>@nodo.QuantitaBase.ToString("N4")</td><td>@nodo.OrdineVisualizzazione</td><td>@(nodo.Attivo ? "Attivo" : "Non attivo")</td></tr>
-                        }
-                        </tbody>
-                    </table>
+                <h3 class="h5 mt-4">Anteprima albero distinta</h3>
+                <p class="pfw-secondary-text">Tutti i nodi sono ordinati secondo i rapporti padre-figlio. I livelli sono calcolati dalla struttura del file.</p>
+                <div class="pfw-tree-grid">
+                    <div class="pfw-tree-grid-header" aria-hidden="true"><div>Struttura distinta</div><div>Tipo nodo</div><div>Quantita base</div><div>Ordine</div><div>Stato</div><div>Riga Excel</div></div>
+                    <div class="pfw-tree-grid-body" role="tree" aria-label="Anteprima struttura della distinta corrente">
+                    @foreach (var voce in Model.Analisi.NodiAlbero)
+                    {
+                        var nodo = voce.Nodo;
+                        <div class="pfw-tree-grid-row @(!nodo.Attivo ? "is-inactive" : string.Empty)" role="treeitem" aria-level="@(voce.Livello + 1)">
+                            <div class="pfw-tree-grid-structure">
+                                <span class="pfw-tree-guides" aria-hidden="true">@for (var livello = 0; livello < voce.Livello; livello++)
+                                { <span class="pfw-tree-guide @(livello == voce.Livello - 1 ? "is-branch" : string.Empty)"></span> }</span>
+                                <span class="pfw-tree-node-marker @(voce.Livello == 0 ? "is-root" : string.Empty)" aria-hidden="true"></span>
+                                <span class="pfw-tree-node-content">
+                                    <span class="pfw-tree-node-title">@if (!string.IsNullOrWhiteSpace(nodo.CodiceNodo)) { <strong>@nodo.CodiceNodo</strong><span> — </span> }@nodo.DescrizioneNodo</span>
+                                    <span class="pfw-tree-level">Livello @voce.Livello · Chiave @nodo.ChiaveNodo · Padre @(nodo.ChiavePadre ?? "-")</span>
+                                    @if (!string.IsNullOrWhiteSpace(nodo.Note)) { <span class="pfw-secondary-text">Note: @nodo.Note</span> }
+                                </span>
+                            </div>
+                            <div class="pfw-tree-grid-cell"><span class="pfw-tree-grid-label">Tipo nodo</span>@nodo.TipoNodo</div>
+                            <div class="pfw-tree-grid-cell"><span class="pfw-tree-grid-label">Quantita base</span>@nodo.QuantitaBase.ToString("N4")</div>
+                            <div class="pfw-tree-grid-cell"><span class="pfw-tree-grid-label">Ordine</span>@nodo.OrdineVisualizzazione</div>
+                            <div class="pfw-tree-grid-cell"><span class="pfw-badge @(nodo.Attivo ? "pfw-badge-success" : "pfw-badge-secondary")">@(nodo.Attivo ? "Attivo" : "Non attivo")</span></div>
+                            <div class="pfw-tree-grid-cell"><span class="pfw-tree-grid-label">Riga Excel</span>@nodo.RigaExcel</div>
+                        </div>
+                    }
+                    </div>
                 </div>
-                @if (Model.Analisi.Nodi.Count > 100)
-                {
-                    <div class="pfw-secondary-text mt-2">Sono mostrate le prime 100 righe nodo.</div>
-                }
 
                 @if (Model.Analisi.Materiali.Count > 0)
                 {
                     <h3 class="h5 mt-4">Anteprima materiali</h3>
                     <div class="table-responsive">
                         <table class="table pfw-table align-middle mb-0">
-                            <thead><tr><th>Riga</th><th>Chiave nodo</th><th>Materiale</th><th>Quantità</th><th>Scarto %</th><th>Costo unitario</th></tr></thead>
+                            <thead><tr><th>Riga</th><th>Chiave nodo</th><th>Materiale</th><th>Quantità</th><th>Scarto %</th><th>Costo unitario</th><th>Note</th></tr></thead>
                             <tbody>
-                            @foreach (var materiale in Model.Analisi.Materiali.Take(100))
+                            @foreach (var materiale in Model.Analisi.Materiali)
                             {
-                                <tr><td>@materiale.RigaExcel</td><td>@materiale.ChiaveNodo</td><td>@materiale.CodiceMateriale</td><td>@materiale.Quantita.ToString("N4")</td><td>@materiale.CoeffScartoPerc.ToString("N2")</td><td>@materiale.CostoUnitario.ToString("C4")</td></tr>
+                                <tr><td>@materiale.RigaExcel</td><td>@materiale.ChiaveNodo</td><td>@materiale.CodiceMateriale</td><td>@materiale.Quantita.ToString("N4")</td><td>@materiale.CoeffScartoPerc.ToString("N2")</td><td>@materiale.CostoUnitario.ToString("C4")</td><td>@(materiale.Note ?? "-")</td></tr>
                             }
                             </tbody>
                         </table>
                     </div>
-                    @if (Model.Analisi.Materiali.Count > 100)
-                    {
-                        <div class="pfw-secondary-text mt-2">Sono mostrate le prime 100 righe materiale.</div>
-                    }
                 }
 
                 @if (Model.Analisi.Lavorazioni.Count > 0)
@@ -100,30 +128,24 @@
                     <h3 class="h5 mt-4">Anteprima lavorazioni</h3>
                     <div class="table-responsive">
                         <table class="table pfw-table align-middle mb-0">
-                            <thead><tr><th>Riga</th><th>Chiave nodo</th><th>Lavorazione</th><th>Sequenza</th><th>Setup min</th><th>Tempo pezzo min</th><th>Costo orario</th><th>Costo fisso</th></tr></thead>
+                            <thead><tr><th>Riga</th><th>Chiave nodo</th><th>Lavorazione</th><th>Sequenza</th><th>Setup min</th><th>Tempo pezzo min</th><th>Costo orario</th><th>Costo fisso</th><th>Note</th></tr></thead>
                             <tbody>
-                            @foreach (var lavorazione in Model.Analisi.Lavorazioni.Take(100))
+                            @foreach (var lavorazione in Model.Analisi.Lavorazioni)
                             {
-                                <tr><td>@lavorazione.RigaExcel</td><td>@lavorazione.ChiaveNodo</td><td>@lavorazione.CodiceLavorazione</td><td>@lavorazione.Sequenza</td><td>@lavorazione.TempoSetupMin.ToString("N2")</td><td>@lavorazione.TempoPezzoMin.ToString("N4")</td><td>@lavorazione.CostoOrario.ToString("C4")</td><td>@lavorazione.CostoFisso.ToString("C4")</td></tr>
+                                <tr><td>@lavorazione.RigaExcel</td><td>@lavorazione.ChiaveNodo</td><td>@lavorazione.CodiceLavorazione</td><td>@lavorazione.Sequenza</td><td>@lavorazione.TempoSetupMin.ToString("N2")</td><td>@lavorazione.TempoPezzoMin.ToString("N4")</td><td>@lavorazione.CostoOrario.ToString("C4")</td><td>@lavorazione.CostoFisso.ToString("C4")</td><td>@(lavorazione.Note ?? "-")</td></tr>
                             }
                             </tbody>
                         </table>
                     </div>
-                    @if (Model.Analisi.Lavorazioni.Count > 100)
-                    {
-                        <div class="pfw-secondary-text mt-2">Sono mostrate le prime 100 righe lavorazione.</div>
-                    }
                 }
             }
         </div>
-        @if (Model.Analisi.Valida)
+        @if (Model.PuoConfermare)
         {
             <div class="pfw-panel-footer d-flex justify-content-end gap-2">
                 <form method="post" asp-page-handler="Applica">
                     <input asp-for="Dati.ContenutoBase64" type="hidden" />
-                    <input asp-for="Dati.NomeFile" type="hidden" />
-                    <input asp-for="Dati.ImprontaSha256" type="hidden" />
-                    <input asp-for="Dati.VersioneRigaBase64" type="hidden" />
+                    <input asp-for="Dati.TokenAnteprima" type="hidden" />
                     <button type="submit" class="pfw-btn pfw-btn-primary" onclick="return confirm('Confermare l’importazione della distinta? L’operazione sarà applicata in un’unica transazione.');">Conferma importazione</button>
                 </form>
             </div>
@@ -131,6 +153,6 @@
     </section>
 }
 
-<div><a asp-page="../Dettaglio" asp-route-idArticolo="@revisione.IdArticolo" asp-route-idRevisione="@revisione.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Torna alla distinta</a></div>
+<div><a asp-page="../Dettaglio" asp-route-idArticolo="@distinta.IdArticolo" asp-route-idRevisione="@distinta.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Torna alla distinta</a></div>
 
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

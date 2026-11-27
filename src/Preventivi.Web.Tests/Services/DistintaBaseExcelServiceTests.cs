@@ -79,6 +79,114 @@ public sealed class DistintaBaseExcelServiceTests
         Assert.False(analisi.Valida);
     }
 
+    [Fact]
+    public void Modello_ParlaDiDistintaCorrenteSenzaRevisioni()
+    {
+        using var archivio = new ZipArchive(new MemoryStream(new DistintaBaseExcelService().CreaModello(Tipi(), Materiali(), Lavorazioni())));
+        var testo = CaricaXml(archivio, "xl/worksheets/sheet1.xml").ToString();
+        Assert.Contains("distinta corrente", testo);
+        Assert.DoesNotContain("bozza", testo, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("revisione", testo, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void AnteprimaAlbero_RicostruiscePadriELivelliIndipendentementeDalleRighe()
+    {
+        var excel = new DistintaBaseExcelService();
+        var file = AggiungiRighe(excel.CreaModello(Tipi(), Materiali(), Lavorazioni()), "xl/worksheets/sheet2.xml",
+        [
+            ["FIGLIO", "RADICE", "Componente", "F", "Figlio", "2", "20", "Sì", "Nota figlio"],
+            ["RADICE", "", "Prodotto finito", "R", "Radice", "1", "10", "Sì", "Nota radice"],
+            ["NIPOTE", "FIGLIO", "Componente", "N", "Nipote", "3", "30", "Sì", ""]
+        ]);
+        var analisi = excel.Analizza(file, Tipi(), Materiali(), Lavorazioni());
+        Assert.True(analisi.Valida);
+        Assert.Equal(new[] { "RADICE", "FIGLIO", "NIPOTE" }, analisi.NodiAlbero.Select(x => x.Nodo.ChiaveNodo));
+        Assert.Equal(new[] { 0, 1, 2 }, analisi.NodiAlbero.Select(x => x.Livello));
+        Assert.Equal("Nota figlio", analisi.NodiAlbero[1].Nodo.Note);
+        Assert.Equal(2, analisi.NodiAlbero[1].Nodo.RigaExcel);
+    }
+
+    [Fact]
+    public void AnteprimaAlbero_NonTroncaDopoCentoNodi()
+    {
+        var excel = new DistintaBaseExcelService();
+        var righe = new List<IReadOnlyList<string>> { new[] { "R", "", "Prodotto finito", "R", "Radice", "1", "0", "Sì", "" } };
+        righe.AddRange(Enumerable.Range(1, 120).Select(i => (IReadOnlyList<string>)new[] { "F" + i, "R", "Componente", "C" + i, "Figlio " + i, "1", i.ToString(), "Sì", "" }));
+        var file = AggiungiRighe(excel.CreaModello(Tipi(), Materiali(), Lavorazioni()), "xl/worksheets/sheet2.xml", righe);
+        var analisi = excel.Analizza(file, Tipi(), Materiali(), Lavorazioni());
+        Assert.True(analisi.Valida); Assert.Equal(121, analisi.NodiAlbero.Count);
+        Assert.Equal("F120", analisi.NodiAlbero[^1].Nodo.ChiaveNodo);
+    }
+
+    [Theory]
+    [InlineData("1.23456", "nodo")]
+    [InlineData("100000000000000", "nodo")]
+    [InlineData("0.001", "setup")]
+    [InlineData("1.23456", "materiale")]
+    public void PrecisioneNonRappresentabile_BloccaSenzaArrotondare(string valore, string campo)
+    {
+        var excel = new DistintaBaseExcelService();
+        var file = AggiungiRighe(excel.CreaModello(Tipi(), Materiali(), Lavorazioni()), "xl/worksheets/sheet2.xml",
+            [["R", "", "Prodotto finito", "R", "Radice", campo == "nodo" ? valore : "1", "10", "Sì", ""]]);
+        if (campo == "setup") file = AggiungiRighe(file, "xl/worksheets/sheet4.xml", [["R", "LAV-01", "10", valore, "0", "30", "0", ""]]);
+        if (campo == "materiale") file = AggiungiRighe(file, "xl/worksheets/sheet3.xml", [["R", "MAT-01", "1", "0", valore, ""]]);
+        var analisi = excel.Analizza(file, Tipi(), Materiali(), Lavorazioni());
+        Assert.False(analisi.Valida);
+        Assert.Contains(analisi.Errori, x => x.Messaggio.Contains("Non viene arrotondato"));
+        if (campo == "setup") Assert.Equal(0.001m, Assert.Single(analisi.Lavorazioni).TempoSetupMin);
+    }
+
+    [Theory]
+    [InlineData("ciclo")] [InlineData("duplicato")] [InlineData("radiceNonAttiva")]
+    public void GerarchiaNonValida_NonGeneraAlbero(string caso)
+    {
+        var excel = new DistintaBaseExcelService();
+        var file = AggiungiRighe(excel.CreaModello(Tipi(), Materiali(), Lavorazioni()), "xl/worksheets/sheet2.xml",
+        [
+            ["R", caso == "ciclo" ? "F" : "", "Prodotto finito", "R", "Radice", "1", "10", caso == "radiceNonAttiva" ? "No" : "Sì", ""],
+            [caso == "duplicato" ? "R" : "F", "R", "Componente", "F", "Figlio", "1", "20", "Sì", ""]
+        ]);
+        var analisi = excel.Analizza(file, Tipi(), Materiali(), Lavorazioni());
+        Assert.False(analisi.Valida); Assert.Empty(analisi.NodiAlbero);
+    }
+
+    [Fact]
+    public void IntestazioneDuplicata_ErroreControllato()
+    {
+        var excel = new DistintaBaseExcelService();
+        var file = ModificaFoglio(excel.CreaModello(Tipi(), Materiali(), Lavorazioni()), doc =>
+        {
+            var celle = doc.Descendants(Spreadsheet + "row").First().Elements(Spreadsheet + "c").ToArray();
+            celle[1].Descendants(Spreadsheet + "t").Single().Value = "Chiave nodo";
+        });
+        var analisi = excel.Analizza(file, Tipi(), Materiali(), Lavorazioni());
+        Assert.False(analisi.Valida); Assert.Contains(analisi.Errori, x => x.Campo == "Intestazione");
+    }
+
+    [Fact]
+    public void Formula_NonImportaIlValoreMemorizzato()
+    {
+        var excel = new DistintaBaseExcelService();
+        var file = AggiungiRighe(excel.CreaModello(Tipi(), Materiali(), Lavorazioni()), "xl/worksheets/sheet2.xml",
+            [["R", "", "Prodotto finito", "R", "Radice", "1", "10", "Sì", ""]]);
+        file = ModificaFoglio(file, doc => doc.Descendants(Spreadsheet + "row").ElementAt(1).Elements(Spreadsheet + "c").First().Add(new XElement(Spreadsheet + "f", "1+1")));
+        var analisi = excel.Analizza(file, Tipi(), Materiali(), Lavorazioni());
+        Assert.False(analisi.Valida); Assert.Contains(analisi.Errori, x => x.Messaggio.Contains("formula"));
+    }
+
+    private static byte[] ModificaFoglio(byte[] file, Action<XDocument> modifica)
+    {
+        using var output = new MemoryStream(); output.Write(file);
+        using (var zip = new ZipArchive(output, ZipArchiveMode.Update, true))
+        {
+            const string percorso = "xl/worksheets/sheet2.xml";
+            var documento = CaricaXml(zip, percorso); modifica(documento);
+            zip.GetEntry(percorso)!.Delete(); using var stream = zip.CreateEntry(percorso).Open(); documento.Save(stream);
+        }
+        return output.ToArray();
+    }
+
     private static IReadOnlyList<TipoNodoDistintaLookupItem> Tipi() =>
     [
         new() { IdTipoNodo = 1, Descrizione = "Prodotto finito", Attivo = true },

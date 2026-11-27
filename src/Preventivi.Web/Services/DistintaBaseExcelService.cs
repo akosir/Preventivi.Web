@@ -20,9 +20,35 @@ public sealed class DistintaImportazioneAnalisi
     public IReadOnlyList<DistintaImportazioneLavorazione> Lavorazioni { get; init; } = [];
     public IReadOnlyList<DistintaImportazioneErrore> Errori { get; init; } = [];
     public bool Valida => Errori.Count == 0 && Nodi.Count > 0;
+    public bool ModelloSemplificato { get; init; }
+
+    public IReadOnlyList<DistintaImportazioneNodoAnteprima> NodiAlbero
+    {
+        get
+        {
+            if (!Valida) return [];
+            var figli = Nodi.ToLookup(x => x.ChiavePadre ?? string.Empty, StringComparer.OrdinalIgnoreCase);
+            var risultato = new List<DistintaImportazioneNodoAnteprima>();
+            var pila = new Stack<DistintaImportazioneNodoAnteprima>();
+            void Aggiungi(string padre, int livello)
+            {
+                foreach (var nodo in figli[padre].OrderByDescending(x => x.OrdineVisualizzazione).ThenByDescending(x => x.RigaExcel))
+                    pila.Push(new(nodo, livello));
+            }
+            Aggiungi(string.Empty, 0);
+            while (pila.TryPop(out var voce))
+            {
+                risultato.Add(voce);
+                Aggiungi(voce.Nodo.ChiaveNodo, voce.Livello + 1);
+            }
+            return risultato;
+        }
+    }
 }
 
-public sealed class DistintaBaseExcelService
+public sealed record DistintaImportazioneNodoAnteprima(DistintaImportazioneNodo Nodo, int Livello);
+
+public sealed partial class DistintaBaseExcelService
 {
     public const int DimensioneMassimaFile = 2 * 1024 * 1024;
 
@@ -75,6 +101,12 @@ public sealed class DistintaBaseExcelService
             ])
         };
 
+        return CreaCartella(fogli);
+    }
+
+    private static byte[] CreaCartella(IReadOnlyList<(string Nome, IReadOnlyList<IReadOnlyList<string>> Righe)> fogli,
+        Action<ZipArchive>? personalizza = null)
+    {
         using var output = new MemoryStream();
         using (var archivio = new ZipArchive(output, ZipArchiveMode.Create, leaveOpen: true))
         {
@@ -90,6 +122,12 @@ public sealed class DistintaBaseExcelService
                     $"xl/worksheets/sheet{indice + 1}.xml",
                     CreaWorksheet(fogli[indice].Righe));
             }
+        }
+        if (personalizza is not null)
+        {
+            output.Position = 0;
+            using var modifica = new ZipArchive(output, ZipArchiveMode.Update, leaveOpen: true);
+            personalizza(modifica);
         }
         return output.ToArray();
     }
@@ -123,6 +161,14 @@ public sealed class DistintaBaseExcelService
             errori.Add(new("File", 0, "File", "La struttura XML del documento Excel non è valida."));
             return new DistintaImportazioneAnalisi { Errori = errori };
         }
+        catch (ArgumentException)
+        {
+            errori.Add(new("File", 0, "Intestazione", "Il file contiene intestazioni o riferimenti duplicati. Correggere il modello Excel."));
+            return new DistintaImportazioneAnalisi { Errori = errori };
+        }
+
+        if (fogli.ContainsKey("Distinta"))
+            return AnalizzaSemplificato(fogli["Distinta"], tipiNodo, materiali, lavorazioni, errori);
 
         var nodi = LeggiNodi(fogli, errori);
         var righeMateriali = LeggiMateriali(fogli, errori);
@@ -145,7 +191,7 @@ public sealed class DistintaBaseExcelService
     [
         ["IMPORTAZIONE MASSIVA DISTINTA BASE"],
         ["Compilare esclusivamente i fogli Nodi, Materiali e Lavorazioni."],
-        ["La revisione di destinazione deve essere in bozza e priva di nodi."],
+        ["La distinta corrente dell'articolo deve essere attiva e priva di nodi. Non sono previste sostituzioni o fusioni."],
         ["Chiave nodo è un identificativo testuale univoco nel file; Chiave padre richiama la chiave del nodo padre."],
         ["Deve esistere un solo nodo radice, con Chiave padre vuota e stato Attivo = Sì."],
         ["Tipo nodo deve coincidere con una voce del foglio Tipi nodo."],
@@ -162,6 +208,8 @@ public sealed class DistintaBaseExcelService
     {
         using var stream = new MemoryStream(contenuto, writable: false);
         using var archivio = new ZipArchive(stream, ZipArchiveMode.Read);
+        if (archivio.Entries.Sum(x => x.Length) > 32 * 1024 * 1024)
+            throw new InvalidDataException("Contenuto decompresso troppo grande.");
         var workbook = CaricaXml(archivio, "xl/workbook.xml");
         var relazioni = CaricaXml(archivio, "xl/_rels/workbook.xml.rels")
             .Root!
@@ -184,6 +232,12 @@ public sealed class DistintaBaseExcelService
             risultato[nome] = LeggiRighe(CaricaXml(archivio, percorso), condivise, nome, errori);
         }
 
+        if (risultato.ContainsKey("Distinta"))
+        {
+            if (new[] { "Nodi", "Materiali", "Lavorazioni" }.Any(risultato.ContainsKey))
+                errori.Add(new("Distinta", 0, "Modello", "Il file contiene sia il modello semplificato sia quello avanzato. Usare un solo modello."));
+            return risultato;
+        }
         foreach (var obbligatorio in new[] { "Nodi", "Materiali", "Lavorazioni" })
         {
             if (!risultato.ContainsKey(obbligatorio))
@@ -216,11 +270,19 @@ public sealed class DistintaBaseExcelService
             "NODI" => ColonneNodi,
             "MATERIALI" => ColonneMateriali,
             "LAVORAZIONI" => ColonneLavorazioni,
+            "DISTINTA" => ColonneSemplificate.Take(5).ToArray(),
             _ => Array.Empty<string>()
         };
         var nomiColonne = intestazioni.Values.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (nomiColonne.Count != intestazioni.Count)
+            errori.Add(new(foglio, 1, "Intestazione", "Una colonna e presente piu volte nel foglio."));
+        if (rows[0].Elements(Spreadsheet + "c").Any(x => x.Element(Spreadsheet + "f") is not null))
+            errori.Add(new(foglio, 1, "Intestazione", "Le intestazioni non possono contenere formule."));
         foreach (var colonna in colonneRichieste.Where(c => !nomiColonne.Contains(c)))
             errori.Add(new(foglio, 1, colonna, $"La colonna obbligatoria '{colonna}' non è presente."));
+        if (foglio.Equals("Distinta", StringComparison.OrdinalIgnoreCase))
+            foreach (var colonna in nomiColonne.Where(c => !ColonneSemplificate.Contains(c, StringComparer.OrdinalIgnoreCase)))
+                errori.Add(new(foglio, 1, colonna, "Colonna non prevista dal modello semplificato."));
         var risultato = new List<Dictionary<string, string>>();
         foreach (var row in rows.Skip(1))
         {
@@ -229,11 +291,17 @@ public sealed class DistintaBaseExcelService
             {
                 ["__RigaExcel"] = numero.ToString(CultureInfo.InvariantCulture)
             };
+            var indiciLetti = new HashSet<int>();
             foreach (var cella in row.Elements(Spreadsheet + "c"))
             {
                 var indice = IndiceColonna((string?)cella.Attribute("r"));
+                if (!indiciLetti.Add(indice))
+                    errori.Add(new(foglio, numero, "Cella", "Riferimento di cella duplicato nella riga."));
                 if (intestazioni.TryGetValue(indice, out var colonna))
                 {
+                    if (foglio.Equals("Distinta", StringComparison.OrdinalIgnoreCase) && colonna == "Selezione padre") continue;
+                    if (cella.Element(Spreadsheet + "f") is not null)
+                        errori.Add(new(foglio, numero, colonna, "Sostituire la formula con un valore prima dell'importazione."));
                     valori[colonna] = ValoreCella(cella, condivise).Trim();
                 }
             }
@@ -334,6 +402,7 @@ public sealed class DistintaBaseExcelService
             Lunghezza("Nodi", nodo.RigaExcel, "Chiave padre", nodo.ChiavePadre, 50, errori);
             Lunghezza("Nodi", nodo.RigaExcel, "Codice nodo", nodo.CodiceNodo, 50, errori);
             Lunghezza("Nodi", nodo.RigaExcel, "Note", nodo.Note, 500, errori);
+            NumeroSql(nodo.QuantitaBase, 18, 4, "Nodi", nodo.RigaExcel, "Quantita base", errori);
             if (!string.IsNullOrWhiteSpace(nodo.ChiaveNodo) && !chiavi.TryAdd(nodo.ChiaveNodo, nodo))
                 errori.Add(new("Nodi", nodo.RigaExcel, "Chiave nodo", "La chiave nodo è duplicata nel file."));
             if (!tipiAmmessi.Contains(nodo.TipoNodo))
@@ -387,6 +456,9 @@ public sealed class DistintaBaseExcelService
             Richiesto("Materiali", materiale.RigaExcel, "Chiave nodo", materiale.ChiaveNodo, 50, errori);
             Richiesto("Materiali", materiale.RigaExcel, "Codice materiale", materiale.CodiceMateriale, 50, errori);
             Lunghezza("Materiali", materiale.RigaExcel, "Note", materiale.Note, 500, errori);
+            NumeroSql(materiale.Quantita, 18, 4, "Materiali", materiale.RigaExcel, "Quantita", errori);
+            NumeroSql(materiale.CoeffScartoPerc, 9, 2, "Materiali", materiale.RigaExcel, "Scarto %", errori);
+            NumeroSql(materiale.CostoUnitario, 18, 4, "Materiali", materiale.RigaExcel, "Costo unitario", errori);
             if (!chiavi.ContainsKey(materiale.ChiaveNodo))
                 errori.Add(new("Materiali", materiale.RigaExcel, "Chiave nodo", "La chiave nodo non esiste nel foglio Nodi."));
             if (!codiciMateriale.Contains(materiale.CodiceMateriale))
@@ -404,6 +476,10 @@ public sealed class DistintaBaseExcelService
             Richiesto("Lavorazioni", lavorazione.RigaExcel, "Chiave nodo", lavorazione.ChiaveNodo, 50, errori);
             Richiesto("Lavorazioni", lavorazione.RigaExcel, "Codice lavorazione", lavorazione.CodiceLavorazione, 50, errori);
             Lunghezza("Lavorazioni", lavorazione.RigaExcel, "Note", lavorazione.Note, 500, errori);
+            NumeroSql(lavorazione.TempoSetupMin, 18, 2, "Lavorazioni", lavorazione.RigaExcel, "Tempo setup min", errori);
+            NumeroSql(lavorazione.TempoPezzoMin, 18, 4, "Lavorazioni", lavorazione.RigaExcel, "Tempo pezzo min", errori);
+            NumeroSql(lavorazione.CostoOrario, 18, 4, "Lavorazioni", lavorazione.RigaExcel, "Costo orario", errori);
+            NumeroSql(lavorazione.CostoFisso, 18, 4, "Lavorazioni", lavorazione.RigaExcel, "Costo fisso", errori);
             if (!chiavi.ContainsKey(lavorazione.ChiaveNodo))
                 errori.Add(new("Lavorazioni", lavorazione.RigaExcel, "Chiave nodo", "La chiave nodo non esiste nel foglio Nodi."));
             if (!codiciLavorazione.Contains(lavorazione.CodiceLavorazione))
@@ -466,15 +542,16 @@ public sealed class DistintaBaseExcelService
         var entry = archivio.GetEntry(percorso.Replace('\\', '/'))
             ?? throw new InvalidDataException($"Parte Excel mancante: {percorso}");
         using var stream = entry.Open();
-        return XDocument.Load(stream, LoadOptions.None);
+        using var reader = System.Xml.XmlReader.Create(stream, new System.Xml.XmlReaderSettings
+        { DtdProcessing = System.Xml.DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 32 * 1024 * 1024 });
+        return XDocument.Load(reader, LoadOptions.None);
     }
 
     private static IReadOnlyList<string> LeggiStringheCondivise(ZipArchive archivio)
     {
         var entry = archivio.GetEntry("xl/sharedStrings.xml");
         if (entry is null) return [];
-        using var stream = entry.Open();
-        return XDocument.Load(stream)
+        return CaricaXml(archivio, "xl/sharedStrings.xml")
             .Descendants(Spreadsheet + "si")
             .Select(x => string.Concat(x.Descendants(Spreadsheet + "t").Select(t => t.Value)))
             .ToArray();
@@ -485,7 +562,12 @@ public sealed class DistintaBaseExcelService
         var tipo = (string?)cella.Attribute("t");
         if (tipo == "inlineStr") return string.Concat(cella.Descendants(Spreadsheet + "t").Select(x => x.Value));
         var valore = cella.Element(Spreadsheet + "v")?.Value ?? string.Empty;
-        if (tipo == "s" && int.TryParse(valore, out var indice) && indice >= 0 && indice < condivise.Count) return condivise[indice];
+        if (tipo == "s")
+        {
+            if (!int.TryParse(valore, out var indice) || indice < 0 || indice >= condivise.Count)
+                throw new InvalidDataException("Indice delle stringhe condivise non valido.");
+            return condivise[indice];
+        }
         if (tipo == "b") return valore == "1" ? "Sì" : "No";
         return valore;
     }
@@ -540,7 +622,7 @@ public sealed class DistintaBaseExcelService
         new(new XElement(Spreadsheet + "styleSheet",
             new XElement(Spreadsheet + "fonts", new XAttribute("count", 2),
                 new XElement(Spreadsheet + "font", new XElement(Spreadsheet + "sz", new XAttribute("val", 11)), new XElement(Spreadsheet + "name", new XAttribute("val", "Calibri"))),
-                new XElement(Spreadsheet + "font", new XElement(Spreadsheet + "b"), new XElement(Spreadsheet + "color", new XAttribute("rgb", "FFFFFFFF")), new XElement(Spreadsheet + "sz", new XAttribute("val", 11)), new XElement(Spreadsheet + "name", new XAttribute("val", "Calibri")))),
+                new XElement(Spreadsheet + "font", new XElement(Spreadsheet + "b"), new XElement(Spreadsheet + "sz", new XAttribute("val", 11)), new XElement(Spreadsheet + "color", new XAttribute("rgb", "FFFFFFFF")), new XElement(Spreadsheet + "name", new XAttribute("val", "Calibri")))),
             new XElement(Spreadsheet + "fills", new XAttribute("count", 3),
                 new XElement(Spreadsheet + "fill", new XElement(Spreadsheet + "patternFill", new XAttribute("patternType", "none"))),
                 new XElement(Spreadsheet + "fill", new XElement(Spreadsheet + "patternFill", new XAttribute("patternType", "gray125"))),
@@ -589,4 +671,13 @@ public sealed class DistintaBaseExcelService
     }
 
     private static string Numero(decimal valore) => valore.ToString("0.####", CulturaItaliana);
+
+    private static void NumeroSql(decimal valore, int precisione, int scala, string foglio, int riga,
+        string campo, ICollection<DistintaImportazioneErrore> errori)
+    {
+        decimal limite = 1;
+        for (var i = 0; i < precisione - scala; i++) limite *= 10;
+        if (valore >= limite || valore <= -limite || decimal.Round(valore, scala) != valore)
+            errori.Add(new(foglio, riga, campo, $"Valore non rappresentabile: massimo {precisione - scala} cifre intere e {scala} decimali. Non viene arrotondato automaticamente."));
+    }
 }

@@ -5,6 +5,57 @@ versionati del progetto.
 
 ## Regole
 
+### Correzione importazione Distinta e trigger — 27 novembre 2026
+
+Applicare `06_Aggiornamenti/PFW_04_Importazione_Distinta_Trigger.sql` dopo
+`2026112601`. Registra `2026112701`, codice `PFW-IMPORT-DISTINTE-TRIGGER`,
+richiesto dall'applicazione aggiornata. Script predisposto, non applicato
+dall'agente. Non rieseguire o modificare PFW_03 gia installato.
+
+L'importazione mantiene il controllo della versione ricevuta e il blocco
+UPDLOCK/HOLDLOCK della testata prima delle scritture. I trigger dei nodi e
+degli elementi associati aggiornano la versione della testata nella stessa
+transazione. L'aggiornamento finale dell'audit identifica quindi la testata
+gia bloccata senza confrontarla con la versione precedente agli INSERT.
+Restano verifica del conteggio aggiornato, rollback, registro esiti e blocchi
+contro duplicati/importazioni concorrenti. Non cambia dati esistenti, trigger,
+anagrafiche o preventivi. Riavviare l'app dopo lo script, generare una nuova
+anteprima e collaudare conferma e valori salvati.
+
+### Importazione Distinta corrente — Decisioni 387–391
+
+Prima di utilizzare il codice aggiornato, applicare nel database di test
+`06_Aggiornamenti/PFW_03_Importazione_Distinta_Corrente.sql`, dopo la versione
+`2026112506`. Registra `2026112601`, codice `PFW-IMPORT-DISTINTE-CORRENTI`,
+richiesto dal codice aggiornato. Non e stato applicato dall'agente.
+
+Aggiorna Anagrafiche_Distinte_Importazioni_Applica. La destinazione deve
+essere la distinta corrente vuota di un articolo attivo. La transazione
+verifica versione, gerarchia, tipi nodo, materiali e lavorazioni attivi,
+blocca le anagrafiche coinvolte fino al commit e verifica i conteggi inseriti.
+Un errore annulla l'intera importazione. Non vengono sostituite strutture,
+importati allegati o aggiornati preventivi.
+
+DistinteBaseImportazioni e lo storico preesistente restano invariati.
+Il nuovo registro DistinteBaseImportazioniEsiti conserva gli esiti dei nuovi
+tentativi SQL, compresi i rifiuti dopo il rollback. Il trigger impedisce
+modifica/cancellazione degli esiti. Non sono aggiunte FK dal registro al padre,
+per non perdere lo storico quando una destinazione vuota viene rimossa.
+Gli errori di caricamento o anteprima non scrivono nel database.
+
+Verifiche locali: 403 test, ScriptDom su 3 batch e SHA-256 del payload.
+Queste verifiche non attestano il database installato. Dopo lo script e
+il riavvio, collaudare modello, anteprima completa, conferma, rifiuti e
+concorrenza. Le riesecuzioni della migrazione con stessi metadati e impronta
+non applicano modifiche. Lo script non seleziona il database.
+
+```sql
+SELECT IdImportazione, IdRevisioneDistinta, NomeFile, Utente, DataOperazione,
+       Stato, NumeroNodi, NumeroMateriali, NumeroLavorazioni, Messaggio
+FROM dbo.DistinteBaseImportazioniEsiti
+ORDER BY IdEsito DESC;
+```
+
 ### Importazione nuovi Articoli da Excel — Decisioni 382–386
 
 Prima di utilizzare il codice aggiornato, eseguire nel database previsto

@@ -1,200 +1,202 @@
+using System.Security.Cryptography;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.SqlClient;
 using Preventivi.Core.Anagrafiche;
 using Preventivi.Web.Services;
+using Preventivi.Web.Sicurezza;
 using Preventivi.Web.UI.Modules.Anagrafiche;
 
 namespace Preventivi.Web.Pages.Anagrafiche.Distinte.Revisioni;
 
-public sealed class ImportaModel : PageModel
+[Authorize(Policy = AutorizzazioneApplicazione.PolicyAnagrafiche)]
+[RequestSizeLimit(4 * 1024 * 1024)]
+[RequestFormLimits(ValueLengthLimit = 3 * 1024 * 1024, MultipartBodyLengthLimit = 4 * 1024 * 1024)]
+public sealed class ImportaModel(
+    IDistintaBaseRepository repository,
+    IDistintaBaseApplicationService applicationService,
+    DistintaBaseExcelService excel,
+    ILogger<ImportaModel> logger,
+    IArticoloRepository articoli,
+    IDataProtectionProvider protezione) : PageModel
 {
-    private readonly IDistintaBaseRepository _repository;
-    private readonly IDistintaBaseApplicationService _applicationService;
-    private readonly DistintaBaseExcelService _excel;
-    private readonly ILogger<ImportaModel> _logger;
+    private readonly ITimeLimitedDataProtector _protezione = protezione
+        .CreateProtector("Preventivi.Distinte.Importazione.Anteprima.v1").ToTimeLimitedDataProtector();
 
-    public ImportaModel(
-        IDistintaBaseRepository repository,
-        IDistintaBaseApplicationService applicationService,
-        DistintaBaseExcelService excel,
-        ILogger<ImportaModel> logger)
-    {
-        _repository = repository;
-        _applicationService = applicationService;
-        _excel = excel;
-        _logger = logger;
-    }
-
-    [BindProperty]
-    public DistintaImportazioneFormModel Dati { get; set; } = new();
-
-    public DistintaRevisioneDettaglio? Revisione { get; private set; }
+    [BindProperty] public DistintaImportazioneFormModel Dati { get; set; } = new();
+    public DistintaRevisioneDettaglio? Distinta { get; private set; }
     public DistintaImportazioneAnalisi? Analisi { get; private set; }
-    public bool BozzaVuota { get; private set; }
+    public bool DistintaVuota { get; private set; }
+    public bool PuoConfermare { get; private set; }
+    public string? NomeFile { get; private set; }
 
-    public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
-    {
-        var risultato = await CaricaAsync(id, cancellationToken);
-        return risultato ?? Page();
-    }
+    public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken) =>
+        await CaricaAsync(id, cancellationToken) ?? Page();
 
-    public async Task<IActionResult> OnGetModelloAsync(int id, CancellationToken cancellationToken)
+    public Task<IActionResult> OnGetModelloAsync(int id, CancellationToken cancellationToken) =>
+        ScaricaModelloAsync(id, false, cancellationToken);
+
+    public Task<IActionResult> OnGetModelloAvanzatoAsync(int id, CancellationToken cancellationToken) =>
+        ScaricaModelloAsync(id, true, cancellationToken);
+
+    private async Task<IActionResult> ScaricaModelloAsync(int id, bool avanzato, CancellationToken cancellationToken)
     {
         var risultato = await CaricaAsync(id, cancellationToken);
         if (risultato is not null) return risultato;
-
         var lookups = await CaricaLookupsAsync(cancellationToken);
-        var contenuto = _excel.CreaModello(lookups.Tipi, lookups.Materiali, lookups.Lavorazioni);
-        var codice = SanificaNomeFile(Revisione!.CodiceArticolo);
-        return File(
-            contenuto,
+        return File(avanzato ? excel.CreaModello(lookups.Tipi, lookups.Materiali, lookups.Lavorazioni)
+                : excel.CreaModelloSemplificato(lookups.Tipi, lookups.Materiali, lookups.Lavorazioni),
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            $"ImportazioneDistinta_{codice}_Rev{Revisione.NumeroRevisione}.xlsx");
+            $"ImportazioneDistinta_{SanificaNomeFile(Distinta!.CodiceArticolo)}{(avanzato ? "_Avanzato" : "")}.xlsx");
     }
 
     public async Task<IActionResult> OnPostAnteprimaAsync(int id, CancellationToken cancellationToken)
     {
+        AnnullaConferma();
+        Analisi = null;
         var risultato = await CaricaAsync(id, cancellationToken);
         if (risultato is not null) return risultato;
-        if (!BozzaVuota)
-        {
-            ModelState.AddModelError(string.Empty, "L'importazione è consentita soltanto su una revisione in bozza priva di nodi.");
-            return Page();
-        }
+        if (!DistintaVuota)
+            return Errore("L'importazione e consentita soltanto sulla distinta corrente priva di nodi.");
+        if (string.IsNullOrWhiteSpace(User.Identity?.Name)) return Forbid();
 
         var file = Dati.File;
-        if (file is null || file.Length == 0)
+        if (file is null || file.Length == 0 || file.Length > DistintaBaseExcelService.DimensioneMassimaFile ||
+            !string.Equals(Path.GetExtension(file.FileName), ".xlsx", StringComparison.OrdinalIgnoreCase))
         {
-            ModelState.AddModelError(nameof(Dati.File), "Selezionare il file Excel da importare.");
+            ModelState.AddModelError("Dati.File", "Selezionare un file .xlsx non vuoto, fino a 2 MB.");
             return Page();
         }
-        if (!string.Equals(Path.GetExtension(file.FileName), ".xlsx", StringComparison.OrdinalIgnoreCase))
+        using var stream = new MemoryStream();
+        using (var input = file.OpenReadStream())
         {
-            ModelState.AddModelError(nameof(Dati.File), "Selezionare un file con estensione .xlsx.");
-            return Page();
+            var buffer = new byte[81920];
+            int letti;
+            while ((letti = await input.ReadAsync(buffer, cancellationToken)) > 0)
+            {
+                if (stream.Length + letti > DistintaBaseExcelService.DimensioneMassimaFile)
+                    return Errore("Il file supera 2 MB.");
+                await stream.WriteAsync(buffer.AsMemory(0, letti), cancellationToken);
+            }
         }
-        if (file.Length > DistintaBaseExcelService.DimensioneMassimaFile)
-        {
-            ModelState.AddModelError(nameof(Dati.File), "Il file supera la dimensione massima di 2 MB.");
-            return Page();
-        }
-
-        byte[] contenuto;
-        await using (var stream = new MemoryStream())
-        {
-            await file.CopyToAsync(stream, cancellationToken);
-            contenuto = stream.ToArray();
-        }
+        var contenuto = stream.ToArray();
+        NomeFile = Path.GetFileName(file.FileName.Replace('\\', '/'));
+        if (NomeFile.Length > 260) return Errore("Il nome del file supera 260 caratteri.");
 
         var lookups = await CaricaLookupsAsync(cancellationToken);
-        Analisi = _excel.Analizza(contenuto, lookups.Tipi, lookups.Materiali, lookups.Lavorazioni);
-        Dati.NomeFile = Path.GetFileName(file.FileName);
-        Dati.ImprontaSha256 = DistintaBaseExcelService.CalcolaImpronta(contenuto);
-        Dati.VersioneRigaBase64 = Convert.ToBase64String(Revisione!.VersioneRiga);
-        Dati.ContenutoBase64 = Analisi.Valida ? Convert.ToBase64String(contenuto) : string.Empty;
-        ModelState.Remove(nameof(Dati.ContenutoBase64));
-        ModelState.Remove(nameof(Dati.NomeFile));
-        ModelState.Remove(nameof(Dati.ImprontaSha256));
-        ModelState.Remove(nameof(Dati.VersioneRigaBase64));
+        Analisi = excel.Analizza(contenuto, lookups.Tipi, lookups.Materiali, lookups.Lavorazioni);
+        if (Analisi.Valida && ModelState.IsValid)
+        {
+            Dati.ContenutoBase64 = Convert.ToBase64String(contenuto);
+            Dati.TokenAnteprima = _protezione.Protect(JsonSerializer.Serialize(new Anteprima(
+                Guid.NewGuid(), id, Distinta!.IdArticolo, NomeFile,
+                DistintaBaseExcelService.CalcolaImpronta(contenuto),
+                Convert.ToBase64String(Distinta.VersioneRiga), User.Identity.Name,
+                DistintaBaseExcelService.CalcolaImprontaAnalisi(Analisi))), TimeSpan.FromMinutes(20));
+            PuoConfermare = true;
+        }
         return Page();
     }
 
     public async Task<IActionResult> OnPostApplicaAsync(int id, CancellationToken cancellationToken)
     {
+        PuoConfermare = false;
         var risultato = await CaricaAsync(id, cancellationToken);
         if (risultato is not null) return risultato;
-        if (!BozzaVuota)
-        {
-            ModelState.AddModelError(string.Empty, "La revisione non è più vuota. Ricaricare la pagina.");
-            return Page();
-        }
-        if (string.IsNullOrWhiteSpace(Dati.ContenutoBase64) ||
-            string.IsNullOrWhiteSpace(Dati.NomeFile) ||
-            string.IsNullOrWhiteSpace(Dati.ImprontaSha256) ||
-            string.IsNullOrWhiteSpace(Dati.VersioneRigaBase64))
-        {
-            ModelState.AddModelError(string.Empty, "L'anteprima non è disponibile o è scaduta. Ricaricare il file.");
-            return Page();
-        }
+        if (!DistintaVuota) return Errore("La distinta corrente contiene gia dei nodi. Nessun dato e stato importato.");
+        if (string.IsNullOrWhiteSpace(User.Identity?.Name)) return Forbid();
+        if (!ModelState.IsValid || string.IsNullOrWhiteSpace(Dati.TokenAnteprima) ||
+            Dati.TokenAnteprima.Length > 8192 || string.IsNullOrWhiteSpace(Dati.ContenutoBase64) ||
+            Dati.ContenutoBase64.Length > 2796204)
+            return AnteprimaNonValida();
 
-        byte[] contenuto;
-        byte[] versione;
+        Anteprima? anteprima;
+        byte[] contenuto, versione;
         try
         {
+            anteprima = JsonSerializer.Deserialize<Anteprima>(_protezione.Unprotect(Dati.TokenAnteprima));
             contenuto = Convert.FromBase64String(Dati.ContenutoBase64);
-            versione = Convert.FromBase64String(Dati.VersioneRigaBase64);
+            versione = anteprima is null ? [] : Convert.FromBase64String(anteprima.VersioneRiga);
         }
-        catch (FormatException)
+        catch (Exception e) when (e is CryptographicException or JsonException or FormatException)
         {
-            ModelState.AddModelError(string.Empty, "I dati dell'anteprima non sono validi. Ricaricare il file.");
-            return Page();
+            return AnteprimaNonValida();
         }
-        if (versione.Length != 8)
-        {
-            ModelState.AddModelError(string.Empty, "La versione della revisione non è valida. Ricaricare il file.");
-            return Page();
-        }
-
-        var impronta = DistintaBaseExcelService.CalcolaImpronta(contenuto);
-        if (!string.Equals(impronta, Dati.ImprontaSha256, StringComparison.OrdinalIgnoreCase))
-        {
-            ModelState.AddModelError(string.Empty, "Il contenuto del file è cambiato dopo l'anteprima. Ricaricare il file.");
-            return Page();
-        }
+        if (anteprima is null || anteprima.IdImportazione == Guid.Empty ||
+            anteprima.IdDistinta != id || anteprima.IdArticolo != Distinta!.IdArticolo ||
+            anteprima.Utente != User.Identity.Name || anteprima.Impronta != DistintaBaseExcelService.CalcolaImpronta(contenuto))
+            return AnteprimaNonValida();
+        if (versione.Length != 8 || !versione.SequenceEqual(Distinta.VersioneRiga))
+            return Errore("La distinta corrente e cambiata dopo l'anteprima. Generare una nuova anteprima.");
+        NomeFile = anteprima.NomeFile;
 
         var lookups = await CaricaLookupsAsync(cancellationToken);
-        Analisi = _excel.Analizza(contenuto, lookups.Tipi, lookups.Materiali, lookups.Lavorazioni);
+        Analisi = excel.Analizza(contenuto, lookups.Tipi, lookups.Materiali, lookups.Lavorazioni);
         if (!Analisi.Valida)
-        {
-            Dati.ContenutoBase64 = string.Empty;
-            ModelState.AddModelError(string.Empty, "Il file non supera più la validazione. Correggerlo e generare una nuova anteprima.");
-            return Page();
-        }
-
+            return Errore("I dati non superano piu la validazione. Correggere il file e generare una nuova anteprima.");
+        if (string.IsNullOrWhiteSpace(anteprima.ImprontaAnalisi) ||
+            anteprima.ImprontaAnalisi != DistintaBaseExcelService.CalcolaImprontaAnalisi(Analisi))
+            return Errore("I valori proposti dall'anagrafica sono cambiati dopo l'anteprima. Generare una nuova anteprima per verificarli.");
         try
         {
-            await _applicationService.ImportaAsync(
-                new DistintaImportazioneRequest
-                {
-                    IdImportazione = Guid.NewGuid(),
-                    IdRevisioneDistinta = id,
-                    NomeFile = Path.GetFileName(Dati.NomeFile),
-                    ImprontaSha256 = impronta,
-                    Utente = User.Identity?.Name ?? "Sistema",
-                    VersioneRiga = versione,
-                    Nodi = Analisi.Nodi,
-                    Materiali = Analisi.Materiali,
-                    Lavorazioni = Analisi.Lavorazioni
-                },
-                cancellationToken);
+            await applicationService.ImportaAsync(new DistintaImportazioneRequest
+            {
+                IdImportazione = anteprima.IdImportazione, IdRevisioneDistinta = id,
+                NomeFile = NomeFile, ImprontaSha256 = anteprima.Impronta,
+                Utente = User.Identity.Name, VersioneRiga = versione,
+                Nodi = Analisi.Nodi, Materiali = Analisi.Materiali, Lavorazioni = Analisi.Lavorazioni
+            }, cancellationToken);
             TempData["MessaggioSuccesso"] = $"Importazione completata: {Analisi.Nodi.Count} nodi, {Analisi.Materiali.Count} materiali e {Analisi.Lavorazioni.Count} lavorazioni.";
-            return RedirectToPage("../Dettaglio", new { idArticolo = Revisione!.IdArticolo, idRevisione = id });
+            return RedirectToPage("../Dettaglio", new { idArticolo = Distinta.IdArticolo });
         }
-        catch (SqlException exception) when (DistinteSqlErrori.Gestito(exception.Number))
+        catch (SqlException e) when (DistinteSqlErrori.Gestito(e.Number) || e.Number is 2601 or 2627 or 1205)
         {
-            _logger.LogWarning(exception, "Importazione distinta {IdRevisione} rifiutata", id);
-            ModelState.AddModelError(string.Empty, DistinteSqlErrori.Messaggio(exception.Number));
-            return Page();
+            logger.LogWarning(e, "Importazione distinta corrente {Id} rifiutata", id);
+            return Errore(e.Number is 2601 or 2627 or 1205
+                ? "I dati sono cambiati durante l'importazione. Generare una nuova anteprima; nessun dato e stato importato."
+                : DistinteSqlErrori.Messaggio(e.Number));
         }
     }
 
     private async Task<IActionResult?> CaricaAsync(int id, CancellationToken cancellationToken)
     {
         if (id <= 0) return NotFound();
-        Revisione = await _repository.GetRevisioneAsync(id, cancellationToken);
-        if (Revisione is null) return NotFound();
-        if (!Revisione.Modificabile) return Forbid();
-        BozzaVuota = (await _repository.GetNodiAsync(id, cancellationToken)).Count == 0;
+        Distinta = await repository.GetRevisioneAsync(id, cancellationToken);
+        if (Distinta is null) return NotFound();
+        if (!Distinta.Modificabile) return Forbid();
+        var articolo = await articoli.GetDettaglioAsync(Distinta.IdArticolo, cancellationToken);
+        if (articolo?.Attivo != true) return Forbid();
+        DistintaVuota = (await repository.GetNodiAsync(id, cancellationToken)).Count == 0;
         return null;
     }
 
-    private async Task<(IReadOnlyList<TipoNodoDistintaLookupItem> Tipi, IReadOnlyList<DistintaMaterialeLookupItem> Materiali, IReadOnlyList<DistintaLavorazioneLookupItem> Lavorazioni)> CaricaLookupsAsync(CancellationToken cancellationToken) =>
-        (
-            await _repository.GetTipiNodoAsync(cancellationToken: cancellationToken),
-            await _repository.GetMaterialiLookupAsync(cancellationToken: cancellationToken),
-            await _repository.GetLavorazioniLookupAsync(cancellationToken: cancellationToken)
-        );
+    private async Task<(IReadOnlyList<TipoNodoDistintaLookupItem> Tipi,
+        IReadOnlyList<DistintaMaterialeLookupItem> Materiali,
+        IReadOnlyList<DistintaLavorazioneLookupItem> Lavorazioni)> CaricaLookupsAsync(CancellationToken cancellationToken) =>
+        (await repository.GetTipiNodoAsync(cancellationToken: cancellationToken),
+         await repository.GetMaterialiLookupAsync(cancellationToken: cancellationToken),
+         await repository.GetLavorazioniLookupAsync(cancellationToken: cancellationToken));
+
+    private PageResult AnteprimaNonValida() =>
+        Errore("Anteprima assente, modificata o scaduta. Caricare il file e generare una nuova anteprima.");
+
+    private PageResult Errore(string messaggio)
+    {
+        AnnullaConferma();
+        ModelState.AddModelError(string.Empty, messaggio);
+        return Page();
+    }
+
+    private void AnnullaConferma()
+    {
+        PuoConfermare = false;
+        Dati.TokenAnteprima = Dati.ContenutoBase64 = string.Empty;
+        ModelState.Remove("Dati.TokenAnteprima");
+        ModelState.Remove("Dati.ContenutoBase64");
+    }
 
     private static string SanificaNomeFile(string valore)
     {
@@ -202,4 +204,7 @@ public sealed class ImportaModel : PageModel
         var pulito = new string(valore.Where(c => !nonValidi.Contains(c)).ToArray()).Trim();
         return string.IsNullOrWhiteSpace(pulito) ? "Articolo" : pulito;
     }
+
+    public sealed record Anteprima(Guid IdImportazione, int IdDistinta, int IdArticolo,
+        string NomeFile, string Impronta, string VersioneRiga, string Utente, string? ImprontaAnalisi = null);
 }

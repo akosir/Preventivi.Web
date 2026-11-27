@@ -36,9 +36,11 @@ public sealed class DistintaBaseApplicationService : IDistintaBaseApplicationSer
         ArgumentNullException.ThrowIfNull(request);
         if (request.IdImportazione == Guid.Empty || request.IdRevisioneDistinta <= 0 ||
             request.VersioneRiga.Length != 8 || request.Nodi.Count == 0 ||
-            string.IsNullOrWhiteSpace(request.NomeFile) ||
-            request.ImprontaSha256.Length != 64 ||
-            string.IsNullOrWhiteSpace(request.Utente))
+            string.IsNullOrWhiteSpace(request.NomeFile) || request.NomeFile.Length > 260 ||
+            !request.NomeFile.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase) ||
+            string.IsNullOrWhiteSpace(request.ImprontaSha256) || request.ImprontaSha256.Length != 64 ||
+            !request.ImprontaSha256.All(Uri.IsHexDigit) ||
+            string.IsNullOrWhiteSpace(request.Utente) || request.Utente.Length > 256)
         {
             throw new ArgumentException("La richiesta di importazione non e valida.", nameof(request));
         }

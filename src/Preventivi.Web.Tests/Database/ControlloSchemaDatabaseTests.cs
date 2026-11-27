@@ -25,7 +25,9 @@ public sealed class ControlloSchemaDatabaseTests
     [InlineData(2026102600, CompatibilitaSchemaDatabase.Obsoleto)]
     [InlineData(2026112504, CompatibilitaSchemaDatabase.Obsoleto)]
     [InlineData(2026112505, CompatibilitaSchemaDatabase.Obsoleto)]
-    [InlineData(2026112507, CompatibilitaSchemaDatabase.Futuro)]
+    [InlineData(2026112506, CompatibilitaSchemaDatabase.Obsoleto)]
+    [InlineData(2026112601, CompatibilitaSchemaDatabase.Obsoleto)]
+    [InlineData(2026112702, CompatibilitaSchemaDatabase.Futuro)]
     public void Valuta_VersioneNonSupportata_BloccaApplicazione(
         int? versione,
         CompatibilitaSchemaDatabase compatibilitaAttesa)

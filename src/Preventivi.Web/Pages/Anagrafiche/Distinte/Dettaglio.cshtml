@@ -17,7 +17,7 @@
             {
                 <a asp-page="./Revisioni/Duplica" asp-route-idSorgente="@revisione.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Duplica su altro articolo</a>
             }
-            @if (revisione.Modificabile && Model.Nodi.Count == 0)
+            @if (articolo.Attivo && revisione.Modificabile && Model.Nodi.Count == 0)
             {
                 <a asp-page="./Revisioni/Importa" asp-route-id="@revisione.IdRevisioneDistinta" class="pfw-btn pfw-btn-secondary">Importa Excel</a>
             }
